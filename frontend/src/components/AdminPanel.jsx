@@ -9,7 +9,7 @@ function AdminPanel() {
   const [empresas, setEmpresas] = useState([]);
 
   useEffect(() => {
-    fetch('https://tu-api.onrender.com/auth/usuarios', {
+    fetch('https://backend-inventario-t3yr.onrender.com/auth/usuarios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ empresa: user.empresa })
@@ -35,7 +35,7 @@ function AdminPanel() {
 
     if (confirm.isConfirmed) {
       try {
-        await fetch(`https://tu-api.onrender.com/auth/usuarios/${id}`, {
+        await fetch(`https://backend-inventario-t3yr.onrender.com/auth/usuarios/${id}`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ empresa: user.empresa })
@@ -72,7 +72,7 @@ function AdminPanel() {
 
     if (formValues) {
       try {
-        await fetch(`https://tu-api.onrender.com/auth/usuarios/${usuario.id}`, {
+        await fetch(`https://backend-inventario-t3yr.onrender.com/auth/usuarios/${usuario.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...formValues, empresa: user.empresa }),
@@ -102,7 +102,7 @@ function AdminPanel() {
 
     if (nuevaPassword) {
       try {
-        await fetch(`https://tu-api.onrender.com/auth/usuarios/${usuario.id}/password`, {
+        await fetch(`https://backend-inventario-t3yr.onrender.com/auth/usuarios/${usuario.id}/password`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nuevaPassword, empresa: user.empresa }),
