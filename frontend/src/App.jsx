@@ -6,14 +6,19 @@ import Inventario from './pages/Inventario';
 import ControlInventario from './pages/ControlInventario';
 import Reportes from './pages/Reportes';
 import Registro from './components/Registro';
+import AdminPanel from './components/AdminPanel'; // ⬅️ Asegúrate que esté importado
 
 import { InventarioProvider } from './context/InventarioContext';
 import { UserProvider } from './context/UserContext';
 
-// Componente para proteger rutas privadas
 const ProtectedRoute = ({ children }) => {
   const isLoggedIn = !!localStorage.getItem('username');
   return isLoggedIn ? children : <Navigate to="/" />;
+};
+
+const AdminRoute = ({ children }) => {
+  const user = localStorage.getItem('username');
+  return user === 'LyMCompany' ? children : <Navigate to="/" />;
 };
 
 function App() {
@@ -22,7 +27,6 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
 
-      {/* Rutas protegidas */}
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
@@ -43,8 +47,12 @@ function App() {
           <Reportes />
         </ProtectedRoute>
       } />
+      <Route path="/admin" element={
+        <AdminRoute>
+          <AdminPanel />
+        </AdminRoute>
+      } />
 
-      {/* Ruta comodín */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

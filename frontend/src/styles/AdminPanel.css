@@ -1,0 +1,83 @@
+/* AdminPanel.css */
+
+.admin-panel-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fdfdfd;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .admin-panel-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .empresa-select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 25px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .usuario-info {
+    margin-top: 20px;
+  }
+  
+  .usuario-info h3 {
+    margin-bottom: 10px;
+    color: #444;
+  }
+  
+  .usuario-info table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .usuario-info td {
+    padding: 10px;
+    border: 1px solid #eee;
+    font-size: 15px;
+  }
+  
+  .botones-acciones {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .botones-acciones button {
+    flex: 1;
+    padding: 10px;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .botones-acciones button:hover {
+    filter: brightness(0.95);
+  }
+  
+  .botones-acciones button:nth-child(1) {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .botones-acciones button:nth-child(2) {
+    background-color: #ffc107;
+    color: #000;
+  }
+  
+  .botones-acciones button:nth-child(3) {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
