@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Symbol.RFID.SDK">
+      <HintPath>libs\Symbol.RFID.SDK.dll</HintPath>
+    </Reference>
+    <Reference Include="Symbol.RFID.SDK.Logger">
+      <HintPath>libs\Symbol.RFID.SDK.Logger.dll</HintPath>
+    </Reference>
+    <Reference Include="Symbol.RFID.SDK.USB">
+      <HintPath>libs\Symbol.RFID.SDK.USB.dll</HintPath>
+    </Reference>
+    <Reference Include="Symbol.RFID.SDK.IP">
+      <HintPath>libs\Symbol.RFID.SDK.IP.dll</HintPath>
+    </Reference>
+    <Reference Include="Symbol.RFID.SDK.Discovery.Windows">
+      <HintPath>libs\Symbol.RFID.SDK.Discovery.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Symbol.RFID.SDK.Connectivity.Windows">
+      <HintPath>libs\Symbol.RFID.SDK.Connectivity.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Symbol.RFID.SDK.Domain.Reader">
+      <HintPath>libs\Symbol.RFID.SDK.Domain.Reader.dll</HintPath>
+    </Reference>
+    <Reference Include="Symbol.RFID.SDK.Domain.Reader.Infrastructure">
+      <HintPath>libs\Symbol.RFID.SDK.Domain.Reader.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Symbol.RFID.SDK.Domain.Reader.Infrastructure.Management">
+      <HintPath>libs\Symbol.RFID.SDK.Domain.Reader.Infrastructure.Management.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>libs\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json">
+      <HintPath>libs\System.Text.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Encoding.Web" Version="6.0.0" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>
