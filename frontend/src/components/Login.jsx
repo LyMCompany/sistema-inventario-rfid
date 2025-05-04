@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { handleRegistro } from './RegistroUsuario';
 import '../styles/Login.css';
 import { useUser } from '../context/UserContext';
 
 function Login() {
-  const { setUsername } = useUser();
-  const navigate = useNavigate();
   const [empresa, setEmpresa] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const { setUsername } = useUser();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -50,26 +49,16 @@ function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-box">
+      <form className="login-form" onSubmit={handleLogin}>
         <h2>Iniciar Sesión</h2>
-        <form onSubmit={handleLogin}>
-          <input
-            type="text"
-            placeholder="Empresa"
-            value={empresa}
-            onChange={(e) => setEmpresa(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button type="submit">Ingresar</button>
-        </form>
+        <input type="text" placeholder="Empresa" value={empresa} onChange={(e) => setEmpresa(e.target.value)} />
+        <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <button type="submit">Ingresar</button>
+
+        {/* Botón de registro */}
         <button
           type="button"
-          onClick={handleRegistro}
+          onClick={() => navigate('/registro')}
           style={{
             marginTop: '10px',
             background: '#007bff',
@@ -82,7 +71,7 @@ function Login() {
         >
           Registrarse
         </button>
-      </div>
+      </form>
     </div>
   );
 }

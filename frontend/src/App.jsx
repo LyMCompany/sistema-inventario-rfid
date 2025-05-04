@@ -6,8 +6,7 @@ import Inventario from './pages/Inventario';
 import ControlInventario from './pages/ControlInventario';
 import Reportes from './pages/Reportes';
 import Registro from './components/Registro';
-import AdminPanel from './components/AdminPanel'; // ⬅️ Asegúrate que esté importado
-
+import AdminPanel from './components/AdminPanel';
 import { InventarioProvider } from './context/InventarioContext';
 import { UserProvider } from './context/UserContext';
 
@@ -21,41 +20,21 @@ const AdminRoute = ({ children }) => {
   return usuario?.rol === 'admin' ? children : <Navigate to="/" />;
 };
 
-
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/registro" element={<Registro />} />
-
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="/inventario" element={
-        <ProtectedRoute>
-          <Inventario />
-        </ProtectedRoute>
-      } />
-      <Route path="/control-inventario" element={
-        <ProtectedRoute>
-          <ControlInventario />
-        </ProtectedRoute>
-      } />
-      <Route path="/reportes" element={
-        <ProtectedRoute>
-          <Reportes />
-        </ProtectedRoute>
-      } />
-      <Route path="/admin" element={
-        <AdminRoute>
-          <AdminPanel />
-        </AdminRoute>
-      } />
-
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <InventarioProvider>
+      <UserProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/inventario" element={<ProtectedRoute><Inventario /></ProtectedRoute>} />
+          <Route path="/control" element={<ProtectedRoute><ControlInventario /></ProtectedRoute>} />
+          <Route path="/reportes" element={<ProtectedRoute><Reportes /></ProtectedRoute>} />
+          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+        </Routes>
+      </UserProvider>
+    </InventarioProvider>
   );
 }
 
