@@ -1,81 +1,91 @@
+import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { v4 as uuidv4 } from 'uuid';
 
-export const handleRegistro = async () => {
-  const { value: formValues } = await Swal.fire({
-    title: 'Registro de Usuario',
-    html:
-      '<input id="nombre" class="swal2-input" placeholder="Nombre">' +
-      '<input id="apellidos" class="swal2-input" placeholder="Apellidos">' +
-      '<input id="correo" type="email" class="swal2-input" placeholder="Correo">' +
-      '<input id="empresa" class="swal2-input" placeholder="Empresa">' +
-      '<input id="telefono" class="swal2-input" placeholder="Teléfono">',
-    focusConfirm: false,
-    showCancelButton: true,
-    confirmButtonText: 'Enviar datos',
-    preConfirm: () => {
-      const nombre = document.getElementById('nombre').value;
-      const apellidos = document.getElementById('apellidos').value;
-      const correo = document.getElementById('correo').value;
-      const empresa = document.getElementById('empresa').value;
-      const telefono = document.getElementById('telefono').value;
+function RegistroUsuario({ cerrar }) {
+  const [form, setForm] = useState({ nombre: '', apellidos: '', correo: '', empresa: '', telefono: '' });
 
-      if (!nombre || !apellidos || !correo || !empresa || !telefono) {
-        Swal.showValidationMessage('Todos los campos son obligatorios');
-        return false;
-      }
+  const handleChange = e => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-      return { nombre, apellidos, correo, empresa, telefono };
+  const handleRegistro = async () => {
+    const { nombre, apellidos, correo, empresa, telefono } = form;
+
+    if (!nombre || !apellidos || !correo || !empresa || !telefono) {
+      Swal.fire('Faltan datos', 'Todos los campos son obligatorios', 'warning');
+      return;
     }
-  });
-
-  if (formValues) {
-    const llave = uuidv4().slice(0, 4) + '-' + uuidv4().slice(0, 4) + '-' + uuidv4().slice(0, 4);
 
     try {
-      // Después (correcto)
       const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formValues, clave: llave })
+        body: JSON.stringify(form)
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        let intentos = 0;
         let validado = false;
+        let intentos = 0;
 
-        while (intentos < 3 && !validado) {
-          const { value: claveIngresada } = await Swal.fire({
-            title: `Validación para empresa ${formValues.empresa}`,
+        while (!validado && intentos < 3) {
+          const { value: llaveIngresada } = await Swal.fire({
+            title: `Validación para empresa ${data.empresa}`,
             input: 'text',
-            inputLabel: 'Ingresa la llave enviada:',
+            inputLabel: 'Por favor, ingrese la llave enviada al correo',
             inputPlaceholder: 'xxxx-xxxx-xxxx',
-            showCancelButton: true,
-            inputValidator: (value) => {
-              if (!value) return 'Debes ingresar una llave';
-            }
+            showCancelButton: true
           });
 
-          if (claveIngresada === llave) {
-            await Swal.fire('Registro exitoso', 'Usuario registrado correctamente.', 'success');
+          if (!llaveIngresada) return;
+
+          const validar = await fetch('https://backend-inventario-t3yr.onrender.com/auth/validar-llave', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ empresa: data.empresa, llaveIngresada })
+          });
+
+          const res = await validar.json();
+
+          if (validar.ok && res.validado) {
             validado = true;
+            await Swal.fire('Validado', 'Su empresa ha sido registrada correctamente', 'success');
+            cerrar();
           } else {
             intentos++;
-            if (intentos >= 3) {
-              Swal.fire('Error', 'Has superado el número de intentos', 'error');
-            } else {
-              Swal.fire('Error', 'Llave incorrecta', 'warning');
-            }
+            Swal.fire('Llave incorrecta', res.mensaje, 'error');
           }
         }
+
+        if (!validado) {
+          Swal.fire('Error', 'Máximo de intentos superado', 'error');
+          cerrar();
+        }
       } else {
-        Swal.fire('Error', data.mensaje || 'No se pudo registrar', 'error');
+        Swal.fire('Error', data.mensaje, 'error');
       }
-    } catch (error) {
-      console.error('Error durante el registro:', error);
-      Swal.fire('Error', 'Error en la solicitud', 'error');
+    } catch (err) {
+      console.error(err);
+      Swal.fire('Error', 'Error durante el registro', 'error');
     }
-  }
-};
+  };
+
+  return (
+    <div className="registro-overlay">
+      <div className="registro-modal">
+        <h3>Registro de Usuario</h3>
+        <input name="nombre" placeholder="Nombre" onChange={handleChange} />
+        <input name="apellidos" placeholder="Apellidos" onChange={handleChange} />
+        <input name="correo" placeholder="Correo" onChange={handleChange} />
+        <input name="empresa" placeholder="Empresa" onChange={handleChange} />
+        <input name="telefono" placeholder="Teléfono" onChange={handleChange} />
+        <button onClick={handleRegistro}>Enviar datos</button>
+        <button onClick={cerrar}>Cancelar</button>
+      </div>
+    </div>
+  );
+}
+
+export default RegistroUsuario;

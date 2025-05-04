@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../styles/Login.css';
-import { useUser } from '../context/UserContext';
+import RegistroUsuario from './RegistroUsuario';
 
 function Login() {
   const [empresa, setEmpresa] = useState('');
   const [password, setPassword] = useState('');
+  const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const navigate = useNavigate();
-  const { setUsername } = useUser();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
+  const handleLogin = async () => {
     if (!empresa || !password) {
       Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
       return;
@@ -31,8 +29,6 @@ function Login() {
         const usuario = data.usuario;
         localStorage.setItem('usuario', JSON.stringify(usuario));
         localStorage.setItem('username', usuario.empresa);
-        setUsername(usuario.empresa);
-
         if (usuario.rol === 'admin') {
           navigate('/admin');
         } else {
@@ -49,29 +45,13 @@ function Login() {
 
   return (
     <div className="login-container">
-      <form className="login-form" onSubmit={handleLogin}>
-        <h2>Iniciar Sesión</h2>
-        <input type="text" placeholder="Empresa" value={empresa} onChange={(e) => setEmpresa(e.target.value)} />
-        <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <button type="submit">Ingresar</button>
+      <h2>Iniciar Sesión</h2>
+      <input type="text" placeholder="Empresa" value={empresa} onChange={e => setEmpresa(e.target.value)} />
+      <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} />
+      <button onClick={handleLogin}>Ingresar</button>
+      <button className="registro-btn" onClick={() => setMostrarRegistro(true)}>Registrarse</button>
 
-        {/* Botón de registro */}
-        <button
-          type="button"
-          onClick={() => navigate('/registro')}
-          style={{
-            marginTop: '10px',
-            background: '#007bff',
-            color: '#fff',
-            border: 'none',
-            padding: '10px',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
-        >
-          Registrarse
-        </button>
-      </form>
+      {mostrarRegistro && <RegistroUsuario cerrar={() => setMostrarRegistro(false)} />}
     </div>
   );
 }
