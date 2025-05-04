@@ -9,11 +9,7 @@ function AdminPanel() {
   const [empresas, setEmpresas] = useState([]);
 
   useEffect(() => {
-    fetch('https://backend-inventario-t3yr.onrender.com/auth/usuarios', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empresa: user.empresa })
-    })
+    fetch('https://backend-inventario-t3yr.onrender.com/usuarios')
       .then(res => res.json())
       .then(data => {
         setUsuarios(data);
@@ -21,7 +17,8 @@ function AdminPanel() {
         setEmpresas(empresasUnicas);
       })
       .catch(err => console.error(err));
-  }, [user.empresa]);
+  }, []);
+  
 
   const handleEliminar = async (id) => {
     const confirm = await Swal.fire({

@@ -33,7 +33,7 @@ export const handleRegistro = async () => {
     const llave = uuidv4().slice(0, 4) + '-' + uuidv4().slice(0, 4) + '-' + uuidv4().slice(0, 4);
 
     try {
-      const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/registrar', {
+      const response = await fetch('https://backend-inventario-t3yr.onrender.com/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formValues, clave: llave })
