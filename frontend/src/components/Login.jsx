@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { useUser } from '../context/UserContext';
+import { handleRegistro } from './RegistroUsuario';
 import '../styles/Login.css';
+import { useUser } from '../context/UserContext';
 
 function Login() {
   const { setUsername } = useUser();
@@ -30,10 +31,14 @@ function Login() {
       if (response.ok && data.mensaje === 'Login exitoso') {
         const usuario = data.usuario;
         localStorage.setItem('usuario', JSON.stringify(usuario));
-        setUsername(usuario.empresa);
         localStorage.setItem('username', usuario.empresa);
+        setUsername(usuario.empresa);
 
-        navigate('/dashboard');
+        if (usuario.rol === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         Swal.fire('Error', data.mensaje, 'error');
       }
@@ -62,6 +67,21 @@ function Login() {
           />
           <button type="submit">Ingresar</button>
         </form>
+        <button
+          type="button"
+          onClick={handleRegistro}
+          style={{
+            marginTop: '10px',
+            background: '#007bff',
+            color: '#fff',
+            border: 'none',
+            padding: '10px',
+            borderRadius: '8px',
+            cursor: 'pointer'
+          }}
+        >
+          Registrarse
+        </button>
       </div>
     </div>
   );
