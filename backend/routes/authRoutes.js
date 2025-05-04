@@ -92,6 +92,20 @@ router.post('/validar-llave', async (req, res) => {
     res.status(500).json({ mensaje: 'Error validando la llave' });
   }
 });
+router.delete('/eliminar-empresa/:empresa', async (req, res) => {
+  const { empresa } = req.params;
+  try {
+    const resultado = await pool.query('DELETE FROM usuarios WHERE empresa = $1', [empresa]);
+    if (resultado.rowCount > 0) {
+      res.status(200).json({ mensaje: 'Empresa eliminada correctamente' });
+    } else {
+      res.status(404).json({ mensaje: 'Empresa no encontrada' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: 'Error al eliminar la empresa' });
+  }
+});
 
 // 📌 REGISTRAR CONTRASEÑA
 router.post('/registrar-password', async (req, res) => {
