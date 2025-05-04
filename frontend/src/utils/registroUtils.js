@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 export const handleRegistro = async () => {
   const { value: formValues, isConfirmed } = await Swal.fire({
     title: 'Registro de Usuario',
-    
     html:
       '<input id="nombre" class="swal2-input" placeholder="Nombre">' +
       '<input id="apellidos" class="swal2-input" placeholder="Apellidos">' +
@@ -29,34 +28,6 @@ export const handleRegistro = async () => {
       return { nombre, apellidos, correo, empresa, telefono };
     }
   });
-  const { value: contrasena } = await Swal.fire({
-    title: 'Crear contraseña',
-    input: 'password',
-    inputLabel: 'Ingresa una contraseña',
-    inputPlaceholder: 'Contraseña segura',
-    inputAttributes: {
-      minlength: 6,
-      required: true,
-    },
-    showCancelButton: true,
-    confirmButtonText: 'Guardar',
-    preConfirm: (value) => {
-      if (!value || value.length < 6) {
-        return 'La contraseña debe tener al menos 6 caracteres';
-      }
-    }
-  });
-  
-  if (contrasena) {
-    await fetch('https://backend-inventario-t3yr.onrender.com/auth/guardar-contrasena', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empresa: formValues.empresa, contrasena }),
-    });
-  
-    await Swal.fire('Listo', 'Tu contraseña ha sido guardada.', 'success');
-  }
-  
 
   if (!isConfirmed || !formValues) return;
 
@@ -89,7 +60,36 @@ export const handleRegistro = async () => {
 
         if (llaveIngresada === clave) {
           validado = true;
-          await Swal.fire('Registro exitoso', 'Usuario validado y registrado correctamente.', 'success');
+
+          // ✅ Ahora sí pedimos la contraseña
+          const { value: contrasena } = await Swal.fire({
+            title: 'Crear contraseña',
+            input: 'password',
+            inputLabel: 'Ingresa una contraseña',
+            inputPlaceholder: 'Contraseña segura',
+            inputAttributes: {
+              minlength: 6,
+              required: true,
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            preConfirm: (value) => {
+              if (!value || value.length < 6) {
+                return 'La contraseña debe tener al menos 6 caracteres';
+              }
+            }
+          });
+
+          if (contrasena) {
+            await fetch('https://backend-inventario-t3yr.onrender.com/auth/guardar-contrasena', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ empresa: formValues.empresa, contrasena }),
+            });
+
+            await Swal.fire('Registro exitoso', 'Usuario validado y registrado correctamente.', 'success');
+          }
+
         } else {
           intentos++;
           if (intentos >= 3) {
