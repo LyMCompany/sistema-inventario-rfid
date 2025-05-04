@@ -29,11 +29,7 @@ function Login() {
 
       if (response.ok && data.mensaje === 'Login exitoso') {
         const usuario = data.usuario;
-
-        // ✅ Guardar todo el objeto del usuario (incluyendo rol)
         localStorage.setItem('usuario', JSON.stringify(usuario));
-
-        // (opcional) seguir usando empresa como username si se usa en el contexto
         setUsername(usuario.empresa);
         localStorage.setItem('username', usuario.empresa);
 
@@ -49,22 +45,24 @@ function Login() {
 
   return (
     <div className="login-container">
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Empresa"
-          value={empresa}
-          onChange={(e) => setEmpresa(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Ingresar</button>
-      </form>
+      <div className="login-box">
+        <h2>Iniciar Sesión</h2>
+        <form onSubmit={handleLogin}>
+          <input
+            type="text"
+            placeholder="Empresa"
+            value={empresa}
+            onChange={(e) => setEmpresa(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit">Ingresar</button>
+        </form>
+      </div>
     </div>
   );
 }
