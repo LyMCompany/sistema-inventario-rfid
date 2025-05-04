@@ -28,13 +28,14 @@ app.use(express.json());
 // ✅ Aquí las rutas deben tener prefijo '/auth' si así las usas en el frontend
 app.use('/auth', authRoutes);
 
-// ✅ Servir React desde /build
-const buildPath = path.join(__dirname, '../frontend/build');
-
+// ✅ Servir React desde /frontend/build
+const buildPath = path.join(__dirname, 'frontend', 'build');
 app.use(express.static(buildPath));
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(buildPath, 'index.html'));
 });
+
 
 // 🔴 Middleware de errores CORS
 app.use((err, req, res, next) => {

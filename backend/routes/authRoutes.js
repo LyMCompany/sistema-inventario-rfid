@@ -1,111 +1,185 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
-const { leerUsuarios, guardarUsuarios } = require('../utils/usuarios');
+const pool = require('../utils/db');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const router = express.Router();
 
-// Registrar datos iniciales y generar llave
-router.post('/register', [
-  body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-  body('correo').isEmail().withMessage('Correo inválido'),
-  body('empresa').notEmpty().withMessage('La empresa es obligatoria'),
-], (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errores: errors.array() });
+// 🚀 Configuración de transporte de correo
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
+});
+
+// 🔒 Middleware para validar rol admin
+const soloAdmin = async (req, res, next) => {
+  try {
+    const { empresa } = req.body;
+    const result = await pool.query('SELECT rol FROM usuarios WHERE empresa = $1', [empresa]);
+    const usuario = result.rows[0];
+    if (!usuario || usuario.rol !== 'admin') {
+      return res.status(403).json({ mensaje: 'Acceso denegado: solo administradores' });
+    }
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error en verificación de rol' });
+  }
+};
+
+// 📌 REGISTRO DE USUARIO
+router.post('/register', [
+  body('nombre').notEmpty(),
+  body('correo').isEmail(),
+  body('empresa').notEmpty()
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errores: errors.array() });
 
   const { nombre, apellidos, correo, empresa, telefono } = req.body;
-  const usuarios = leerUsuarios();
-
-  if (usuarios.find(u => u.empresa === empresa)) {
-    return res.status(409).json({ mensaje: 'Empresa ya registrada' });
-  }
-
-  const llave = [...Array(3)].map(() => Math.random().toString(36).substring(2, 6)).join('-');
-
-  const nuevoUsuario = {
-    nombre,
-    apellidos,
-    correo,
-    empresa,
-    telefono,
-    llave,
-    validado: false,
-    intentos: 0
-  };
-
-  usuarios.push(nuevoUsuario);
-  guardarUsuarios(usuarios);
-
-  res.json({ llave, empresa });
-});
-
-// Validar llave
-router.post('/validar-llave', (req, res) => {
-  const { empresa, llaveIngresada } = req.body;
-  const usuarios = leerUsuarios();
-  const usuario = usuarios.find(u => u.empresa === empresa);
-
-  if (!usuario) return res.status(404).json({ mensaje: 'Empresa no encontrada' });
-
-  if (usuario.intentos >= 3) {
-    return res.status(403).json({ mensaje: 'Máximo de intentos superado' });
-  }
-
-  if (usuario.llave === llaveIngresada) {
-    usuario.validado = true;
-    usuario.intentos = 0;
-    guardarUsuarios(usuarios);
-    return res.json({ validado: true });
-  } else {
-    usuario.intentos += 1;
-    guardarUsuarios(usuarios);
-    return res.status(401).json({ mensaje: 'Llave incorrecta' });
-  }
-});
-
-// Registrar contraseña
-router.post('/registrar-password', async (req, res) => {
-  const { empresa, password } = req.body;
-  const usuarios = leerUsuarios();
-  const usuario = usuarios.find(u => u.empresa === empresa);
-
-  if (!usuario || !usuario.validado) {
-    return res.status(400).json({ mensaje: 'Usuario no validado' });
-  }
-
-  usuario.password = await bcrypt.hash(password, 10);
-  guardarUsuarios(usuarios);
-
-  res.json({ mensaje: 'Contraseña registrada con éxito' });
-});
-
-// Login
-router.post('/login', async (req, res) => {
-  const { empresa, password } = req.body;
-  const usuarios = leerUsuarios();
-  const usuario = usuarios.find(u => u.empresa === empresa);
-
-  if (!usuario) {
-    return res.status(404).json({ mensaje: 'Usuario no encontrado' });
-  }
-
-  if (!usuario.validado || !usuario.password) {
-    return res.status(403).json({ mensaje: 'Usuario no validado o sin contraseña' });
-  }
 
   try {
-    const match = await bcrypt.compare(password, usuario.password);
-    if (match) {
-      return res.json({ mensaje: 'Login exitoso', usuario: usuario.empresa });
-    } else {
-      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
+    const existe = await pool.query('SELECT * FROM usuarios WHERE empresa = $1', [empresa]);
+    if (existe.rows.length > 0) return res.status(409).json({ mensaje: 'Empresa ya registrada' });
+
+    const clave = [...Array(3)].map(() => Math.random().toString(36).substring(2, 6)).join('-');
+
+    await pool.query(
+      'INSERT INTO usuarios (nombre, apellidos, correo, empresa, telefono, clave) VALUES ($1, $2, $3, $4, $5, $6)',
+      [nombre, apellidos, correo, empresa, telefono, clave]
+    );
+
+    await transporter.sendMail({
+      from: `"SevenShoes" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      subject: `🔐 Nueva clave generada - ${empresa}`,
+      text: `La empresa "${empresa}" se ha registrado.\n\nClave: ${clave}\nCorreo: ${correo}\nTeléfono: ${telefono}`
+    });
+
+    res.json({ clave, empresa });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al registrar usuario' });
+  }
+});
+
+// 📌 VALIDAR LLAVE
+router.post('/validar-llave', async (req, res) => {
+  const { empresa, llaveIngresada } = req.body;
+  try {
+    const result = await pool.query('SELECT * FROM usuarios WHERE empresa = $1', [empresa]);
+    const usuario = result.rows[0];
+    if (!usuario) return res.status(404).json({ mensaje: 'Empresa no encontrada' });
+
+    if (usuario.intentos >= 3) {
+      return res.status(403).json({ mensaje: 'Máximo de intentos superado' });
     }
-  } catch (error) {
-    console.error('Error al comparar contraseñas:', error);
-    return res.status(500).json({ mensaje: 'Error interno en el servidor' });
+
+    if (usuario.clave === llaveIngresada) {
+      await pool.query('UPDATE usuarios SET intentos = 0 WHERE empresa = $1', [empresa]);
+      return res.json({ validado: true });
+    } else {
+      await pool.query('UPDATE usuarios SET intentos = intentos + 1 WHERE empresa = $1', [empresa]);
+      return res.status(401).json({ mensaje: 'Llave incorrecta' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error validando la llave' });
+  }
+});
+
+// 📌 REGISTRAR CONTRASEÑA
+router.post('/registrar-password', async (req, res) => {
+  const { empresa, password } = req.body;
+  try {
+    const hashed = await bcrypt.hash(password, 10);
+    await pool.query('UPDATE usuarios SET contrasena = $1 WHERE empresa = $2', [hashed, empresa]);
+    res.json({ mensaje: 'Contraseña registrada con éxito' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al registrar contraseña' });
+  }
+});
+
+// 📌 LOGIN
+router.post('/login', async (req, res) => {
+  const { empresa, password } = req.body;
+  try {
+    const result = await pool.query('SELECT * FROM usuarios WHERE empresa = $1', [empresa]);
+    const usuario = result.rows[0];
+    if (!usuario) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+
+    if (!usuario.contrasena) return res.status(403).json({ mensaje: 'Contraseña no registrada' });
+
+    const match = await bcrypt.compare(password, usuario.contrasena);
+    if (match) {
+      res.json({ mensaje: 'Login exitoso', usuario: { ...usuario, contrasena: undefined } });
+    } else {
+      res.status(401).json({ mensaje: 'Contraseña incorrecta' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error en login' });
+  }
+});
+
+// 📌 VER USUARIOS (solo admin)
+router.get('/usuarios', soloAdmin, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, nombre, apellidos, correo, empresa, telefono, rol FROM usuarios');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al obtener usuarios' });
+  }
+});
+
+// 📌 EDITAR USUARIO (solo admin)
+router.put('/usuarios/:id', soloAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { nombre, apellidos, correo, empresa, telefono } = req.body;
+
+  try {
+    await pool.query(
+      'UPDATE usuarios SET nombre = $1, apellidos = $2, correo = $3, empresa = $4, telefono = $5 WHERE id = $6',
+      [nombre, apellidos, correo, empresa, telefono, id]
+    );
+    res.json({ mensaje: 'Usuario actualizado' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al actualizar usuario' });
+  }
+});
+
+// 📌 CAMBIAR CONTRASEÑA (solo admin)
+router.put('/usuarios/:id/password', soloAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { nuevaPassword } = req.body;
+
+  try {
+    const hashed = await bcrypt.hash(nuevaPassword, 10);
+    await pool.query('UPDATE usuarios SET contrasena = $1 WHERE id = $2', [hashed, id]);
+    res.json({ mensaje: 'Contraseña actualizada' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al cambiar la contraseña' });
+  }
+});
+
+// 📌 ELIMINAR USUARIO (solo admin)
+router.delete('/usuarios/:id', soloAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM usuarios WHERE id = $1', [id]);
+    res.json({ mensaje: 'Usuario eliminado' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al eliminar usuario' });
   }
 });
 
