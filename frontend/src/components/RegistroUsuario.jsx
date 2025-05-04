@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2';
 import { v4 as uuidv4 } from 'uuid';
 
-export const handleRegistro = async () => {
+const RegistroUsuario = async () => {
   const { value: formValues } = await Swal.fire({
     title: 'Registro de Usuario',
     html:
@@ -13,12 +13,13 @@ export const handleRegistro = async () => {
     focusConfirm: false,
     showCancelButton: true,
     confirmButtonText: 'Enviar datos',
+    cancelButtonText: 'Cancelar',
     preConfirm: () => {
-      const nombre = document.getElementById('nombre').value;
-      const apellidos = document.getElementById('apellidos').value;
-      const correo = document.getElementById('correo').value;
-      const empresa = document.getElementById('empresa').value;
-      const telefono = document.getElementById('telefono').value;
+      const nombre = document.getElementById('nombre').value.trim();
+      const apellidos = document.getElementById('apellidos').value.trim();
+      const correo = document.getElementById('correo').value.trim();
+      const empresa = document.getElementById('empresa').value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
 
       if (!nombre || !apellidos || !correo || !empresa || !telefono) {
         Swal.showValidationMessage('Todos los campos son obligatorios');
@@ -29,68 +30,67 @@ export const handleRegistro = async () => {
     }
   });
 
-  if (formValues) {
-    const clave = uuidv4().slice(0, 4) + '-' + uuidv4().slice(0, 4) + '-' + uuidv4().slice(0, 4);
-    try {
-      const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formValues, clave })
+  if (!formValues) return; // Usuario canceló
+
+  const clave = `${uuidv4().slice(0, 4)}-${uuidv4().slice(0, 4)}-${uuidv4().slice(0, 4)}`;
+
+  try {
+    const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...formValues, clave })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return Swal.fire('Error', data.mensaje || 'No se pudo registrar el usuario', 'error');
+    }
+
+    let intentos = 0;
+    let validado = false;
+
+    while (intentos < 3 && !validado) {
+      const { value: llaveIngresada } = await Swal.fire({
+        title: `Validación para empresa ${formValues.empresa}`,
+        input: 'text',
+        inputLabel: 'Ingresa la llave enviada al correo',
+        inputPlaceholder: 'xxxx-xxxx-xxxx',
+        showCancelButton: true,
+        inputValidator: (value) => {
+          if (!value) return 'Debes ingresar la llave';
+        }
       });
 
-      const data = await response.json();
+      if (!llaveIngresada) break; // Si cancela la validación
 
-      if (response.ok) {
-        let intentos = 0;
-        let validado = false;
-
-        while (intentos < 3 && !validado) {
-          const { value: llaveIngresada } = await Swal.fire({
-            title: `Validación para empresa ${formValues.empresa}`,
-            input: 'text',
-            inputLabel: 'Ingresa la llave enviada al correo',
-            inputPlaceholder: 'xxxx-xxxx-xxxx',
-            showCancelButton: true,
-            inputValidator: (value) => {
-              if (!value) return 'Debes ingresar la llave';
-            }
-          });
-
-          if (llaveIngresada === clave) {
-            validado = true;
-            await Swal.fire('Registro exitoso', 'Usuario validado y registrado correctamente.', 'success');
-          } else {
-            intentos++;
-            if (intentos >= 3) {
-              await fetch(`https://backend-inventario-t3yr.onrender.com/auth/eliminar-empresa/${formValues.empresa}`, {
-                method: 'DELETE'
-              });
-              await Swal.fire('Error', 'Máximo de intentos superado. Registro cancelado.', 'error');
-              return;
-            } else {
-              await Swal.fire('Error', 'Llave incorrecta', 'warning');
-            }
-          }
-        }
-
-        if (!validado) {
+      if (llaveIngresada === clave) {
+        validado = true;
+        await Swal.fire('Registro exitoso', 'Usuario validado y registrado correctamente.', 'success');
+        return;
+      } else {
+        intentos++;
+        if (intentos >= 3) {
           await fetch(`https://backend-inventario-t3yr.onrender.com/auth/eliminar-empresa/${formValues.empresa}`, {
             method: 'DELETE'
           });
+          await Swal.fire('Error', 'Máximo de intentos superado. Registro cancelado.', 'error');
+          return;
+        } else {
+          await Swal.fire('Error', 'Llave incorrecta', 'warning');
         }
-
-      } else {
-        Swal.fire('Error', data.mensaje || 'No se pudo registrar el usuario', 'error');
       }
-    } catch (error) {
-      console.error('Error durante el registro:', error);
-      Swal.fire('Error', 'Error de red o del servidor', 'error');
     }
-  }
-};
 
-const RegistroUsuario = () => {
-  return handleRegistro();
+    if (!validado) {
+      await fetch(`https://backend-inventario-t3yr.onrender.com/auth/eliminar-empresa/${formValues.empresa}`, {
+        method: 'DELETE'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error durante el registro:', error);
+    Swal.fire('Error', 'Error de red o del servidor', 'error');
+  }
 };
 
 export default RegistroUsuario;

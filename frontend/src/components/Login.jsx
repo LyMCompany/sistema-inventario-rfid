@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
-import { registrarUsuario } from '../utils/registroUtils'; // Extraer lógica de registro a un módulo reutilizable
-
-const API_BASE_URL = 'https://backend-inventario-t3yr.onrender.com';
 
 function Login() {
   const [empresa, setEmpresa] = useState('');
@@ -20,7 +17,7 @@ function Login() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ empresa, password })
@@ -34,23 +31,102 @@ function Login() {
         localStorage.setItem('username', usuario.empresa);
         navigate(usuario.rol === 'admin' ? '/admin' : '/dashboard');
       } else {
-        Swal.fire('Error', data.mensaje || 'Credenciales incorrectas', 'error');
+        Swal.fire('Error', data.mensaje, 'error');
       }
+
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
-      Swal.fire('Error', 'No se pudo iniciar sesión. Verifica tu conexión.', 'error');
+      Swal.fire('Error', 'No se pudo iniciar sesión', 'error');
     }
   };
 
   const handleRegistro = async () => {
-    try {
-      const registroExitoso = await registrarUsuario(API_BASE_URL);
-      if (registroExitoso) {
-        Swal.fire('Éxito', 'Usuario registrado correctamente. Ahora puedes iniciar sesión.', 'success');
+    const { value: formValues, isConfirmed } = await Swal.fire({
+      title: 'Registro de Usuario',
+      html:
+        '<input id="nombre" class="swal2-input" placeholder="Nombre">' +
+        '<input id="apellidos" class="swal2-input" placeholder="Apellidos">' +
+        '<input id="correo" class="swal2-input" placeholder="Correo">' +
+        '<input id="empresa" class="swal2-input" placeholder="Empresa">' +
+        '<input id="telefono" class="swal2-input" placeholder="Teléfono">',
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Enviar datos',
+      preConfirm: () => {
+        const nombre = document.getElementById('nombre').value;
+        const apellidos = document.getElementById('apellidos').value;
+        const correo = document.getElementById('correo').value;
+        const empresa = document.getElementById('empresa').value;
+        const telefono = document.getElementById('telefono').value;
+
+        if (!nombre || !apellidos || !correo || !empresa || !telefono) {
+          Swal.showValidationMessage('Todos los campos son obligatorios');
+          return false;
+        }
+
+        return { nombre, apellidos, correo, empresa, telefono };
       }
+    });
+
+    if (!isConfirmed || !formValues) return;
+
+    const clave = `${crypto.randomUUID().slice(0, 4)}-${crypto.randomUUID().slice(0, 4)}-${crypto.randomUUID().slice(0, 4)}`;
+
+    try {
+      const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formValues, clave })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        let intentos = 0;
+        let validado = false;
+
+        while (intentos < 3 && !validado) {
+          const { value: llaveIngresada } = await Swal.fire({
+            title: `Validación para empresa ${formValues.empresa}`,
+            input: 'text',
+            inputLabel: 'Ingresa la llave enviada al correo',
+            inputPlaceholder: 'xxxx-xxxx-xxxx',
+            showCancelButton: true,
+            inputValidator: (value) => {
+              if (!value) return 'Debes ingresar la llave';
+            }
+          });
+
+          if (llaveIngresada === clave) {
+            validado = true;
+            await Swal.fire('Registro exitoso', 'Usuario validado y registrado correctamente.', 'success');
+          } else {
+            intentos++;
+            if (intentos >= 3) {
+              await fetch(`https://backend-inventario-t3yr.onrender.com/auth/eliminar-empresa/${formValues.empresa}`, {
+                method: 'DELETE'
+              });
+              await Swal.fire('Error', 'Máximo de intentos superado. Registro cancelado.', 'error');
+              return;
+            } else {
+              await Swal.fire('Error', 'Llave incorrecta', 'warning');
+            }
+          }
+        }
+
+        if (!validado) {
+          await fetch(`https://backend-inventario-t3yr.onrender.com/auth/eliminar-empresa/${formValues.empresa}`, {
+            method: 'DELETE'
+          });
+        }
+
+      } else {
+        Swal.fire('Error', data.mensaje || 'No se pudo registrar el usuario', 'error');
+      }
+
     } catch (error) {
       console.error('Error durante el registro:', error);
-      Swal.fire('Error', error.message || 'No se pudo completar el registro.', 'error');
+      Swal.fire('Error', 'Error de red o del servidor', 'error');
     }
   };
 
@@ -58,17 +134,13 @@ function Login() {
     <div className="login-container">
       <h2 className="login-title">Iniciar Sesión</h2>
       <form className="login-form" onSubmit={handleLogin}>
-        <label htmlFor="empresa">Empresa</label>
         <input
-          id="empresa"
           type="text"
           placeholder="Empresa"
           value={empresa}
           onChange={(e) => setEmpresa(e.target.value)}
         />
-        <label htmlFor="password">Contraseña</label>
         <input
-          id="password"
           type="password"
           placeholder="Contraseña"
           value={password}
