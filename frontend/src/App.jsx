@@ -17,9 +17,10 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const AdminRoute = ({ children }) => {
-  const user = localStorage.getItem('username');
-  return user === 'LyMCompany' ? children : <Navigate to="/" />;
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  return usuario?.rol === 'admin' ? children : <Navigate to="/" />;
 };
+
 
 function App() {
   return (

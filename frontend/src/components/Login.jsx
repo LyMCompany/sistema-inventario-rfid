@@ -1,67 +1,70 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Login.css';
+import Swal from 'sweetalert2';
 import { useUser } from '../context/UserContext';
-
-// 🔒 Usa la URL actual de ngrok directamente:
-const API_URL = process.env.REACT_APP_API_URL;
-console.log("URL usada para llamadas:", API_URL);
-
+import '../styles/Login.css';
 
 function Login() {
   const { setUsername } = useUser();
-  const [usernameLocal, setUsernameLocal] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const [empresa, setEmpresa] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!usernameLocal || !password) {
-      setMessage('Por favor, completa todos los campos');
+    if (!empresa || !password) {
+      Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
       return;
     }
 
     try {
-      console.log("Enviando a:", `${API_URL}/auth/login`);
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json',},
-        credentials: 'include',
-        body: JSON.stringify({ empresa: usernameLocal, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ empresa, password })
       });
 
       const data = await response.json();
 
       if (response.ok && data.mensaje === 'Login exitoso') {
+        const usuario = data.usuario;
 
-        setUsername(usernameLocal);
-        localStorage.setItem('username', usernameLocal);
+        // ✅ Guardar todo el objeto del usuario (incluyendo rol)
+        localStorage.setItem('usuario', JSON.stringify(usuario));
+
+        // (opcional) seguir usando empresa como username si se usa en el contexto
+        setUsername(usuario.empresa);
+        localStorage.setItem('username', usuario.empresa);
+
         navigate('/dashboard');
       } else {
-        setMessage(data.message || 'Error de inicio de sesión');
+        Swal.fire('Error', data.mensaje, 'error');
       }
     } catch (error) {
-      console.error('Error:', error);
-      setMessage('No se pudo conectar con el servidor. Por favor, intenta más tarde.');
+      console.error('Error al iniciar sesión:', error);
+      Swal.fire('Error', 'No se pudo iniciar sesión', 'error');
     }
   };
 
   return (
     <div className="login-container">
-      <div className="login-form-wrapper">
-        <form onSubmit={handleSubmit} className="login-form">
-          <h2>SevenShoes - Iniciar sesión</h2>
-          <input type="text" className="input-field" placeholder="Nombre de la empresa" value={usernameLocal} onChange={(e) => setUsernameLocal(e.target.value)} required />
-          <input type="password" className="input-field" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <button type="submit" className="submit-button">Iniciar sesión</button>
-          {message && <p className={`message ${message.includes('exitoso') ? 'success' : 'error'}`}>{message}</p>}
-        </form>
-        <p className="register-link">¿No tienes cuenta?
-          <span onClick={() => navigate('/registro')}>Regístrate aquí</span>
-        </p>
-      </div>
+      <h2>Iniciar Sesión</h2>
+      <form onSubmit={handleLogin}>
+        <input
+          type="text"
+          placeholder="Empresa"
+          value={empresa}
+          onChange={(e) => setEmpresa(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit">Ingresar</button>
+      </form>
     </div>
   );
 }
