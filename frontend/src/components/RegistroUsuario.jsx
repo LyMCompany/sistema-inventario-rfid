@@ -88,3 +88,4 @@ export const handleRegistro = async () => {
     }
   }
 };
+export default RegistroUsuario;
