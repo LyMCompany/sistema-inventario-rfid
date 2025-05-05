@@ -125,8 +125,9 @@ router.post('/login', async (req, res) => {
 
 // 📌 VER USUARIOS (solo admin)
 router.post('/usuarios', soloAdmin, async (req, res) => {
+  console.log('BODY RECIBIDO EN /auth/usuarios:', req.body);
   const { empresa } = req.body;
-  console.log('POST /auth/usuarios ejecutado con body:', req.body);
+  
 
   try {
     const result = await pool.query('SELECT * FROM usuarios WHERE empresa = $1', [empresa]);
