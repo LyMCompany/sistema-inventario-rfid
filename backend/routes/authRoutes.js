@@ -127,7 +127,6 @@ router.post('/login', async (req, res) => {
 router.post('/usuarios', soloAdmin, async (req, res) => {
   console.log('BODY RECIBIDO EN /auth/usuarios:', req.body);
   const { empresa } = req.body;
-  
 
   try {
     const result = await pool.query('SELECT * FROM usuarios WHERE empresa = $1', [empresa]);
@@ -137,7 +136,6 @@ router.post('/usuarios', soloAdmin, async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener usuarios' });
   }
 });
-
 
 // 📌 EDITAR USUARIO (solo admin)
 router.put('/usuarios/:id', soloAdmin, async (req, res) => {
