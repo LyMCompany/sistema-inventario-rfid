@@ -28,7 +28,7 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        setUser(data.usuario); // Guarda todo el objeto del usuario
+        setUser(data.usuario);
         navigate(data.rol === 'admin' ? '/admin' : '/dashboard');
       } else {
         Swal.fire('Error', data.mensaje, 'error');
@@ -39,10 +39,14 @@ function Login() {
     }
   };
 
+  const handleRegistro = () => {
+    navigate('/registro'); // O abre modal si es emergente
+  };
+
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2>Inicio de Sesión</h2>
+        <h2 className="login-title">Inicio de Sesión</h2>
         <form onSubmit={handleLogin}>
           <input
             type="text"
@@ -56,7 +60,10 @@ function Login() {
             value={contrasena}
             onChange={(e) => setContrasena(e.target.value)}
           />
-          <button type="submit">Ingresar</button>
+          <div className="login-buttons">
+            <button type="submit" className="login-button">Ingresar</button>
+            <button type="button" className="register-button" onClick={handleRegistro}>Registrarse</button>
+          </div>
         </form>
       </div>
     </div>
