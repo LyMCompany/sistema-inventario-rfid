@@ -137,22 +137,33 @@ router.post('/usuarios', soloAdmin, async (req, res) => {
   }
 });
 
-// 📌 EDITAR USUARIO (solo admin)
-router.put('/usuarios/:id', soloAdmin, async (req, res) => {
-  const { id } = req.params;
-  const { nombre, apellidos, correo, empresa, telefono } = req.body;
+// Ruta para editar un usuario
+router.put('/editar', async (req, res) => {
+  const { correo, nombre, apellidos, telefono, rol, contrasena } = req.body;
 
   try {
-    await pool.query(
-      'UPDATE usuarios SET nombre = $1, apellidos = $2, correo = $3, empresa = $4, telefono = $5 WHERE id = $6',
-      [nombre, apellidos, correo, empresa, telefono, id]
-    );
-    res.json({ mensaje: 'Usuario actualizado' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ mensaje: 'Error al actualizar usuario' });
+    let query = 'UPDATE usuarios SET nombre = $1, apellidos = $2, telefono = $3, rol = $4';
+    const values = [nombre, apellidos, telefono, rol];
+    let paramIndex = 5;
+
+    if (contrasena && contrasena.trim() !== '') {
+      const hashedPassword = await bcrypt.hash(contrasena, 10);
+      query += `, contrasena = $${paramIndex++}`;
+      values.push(hashedPassword);
+    }
+
+    query += ` WHERE correo = $${paramIndex}`;
+    values.push(correo);
+
+    await pool.query(query, values);
+
+    res.status(200).json({ mensaje: 'Usuario actualizado correctamente' });
+  } catch (error) {
+    console.error('Error al editar usuario:', error);
+    res.status(500).json({ mensaje: 'Error en el servidor' });
   }
 });
+
 
 // 📌 CAMBIAR CONTRASEÑA (solo admin)
 router.put('/usuarios/:id/password', soloAdmin, async (req, res) => {
