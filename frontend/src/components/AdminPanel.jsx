@@ -17,10 +17,13 @@ function AdminPanel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ empresa: user.empresa })
     })
-      .then(async res => {
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        const text = await res.text();
-        return text ? JSON.parse(text) : [];
+      .then(async (res) => {
+        if (!res.ok) {
+          const error = await res.text();
+          console.error('Error de respuesta:', error);
+          throw new Error('Error al obtener usuarios');
+        }
+        return res.json();
       })
       .then(data => {
         setUsuarios(data);
@@ -28,9 +31,8 @@ function AdminPanel() {
         setEmpresas(empresasUnicas);
       })
       .catch(err => {
-        console.error('Error cargando usuarios:', err);
-        setUsuarios([]);
-        setEmpresas([]);
+        console.error('Error en fetch:', err);
+        Swal.fire('Error', 'No se pudieron cargar los usuarios', 'error');
       });
   }, [user?.empresa]);
 
@@ -57,7 +59,8 @@ function AdminPanel() {
   return (
     <div className="admin-panel-container">
       <div className="admin-header">
-        {user?.nombre || 'Admin'} | <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
+        <span className="username">{user?.nombre || 'Admin'}</span>
+        <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
       </div>
 
       <h2>Panel de Administración</h2>
