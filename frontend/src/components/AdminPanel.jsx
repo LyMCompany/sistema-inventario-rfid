@@ -10,18 +10,28 @@ function AdminPanel() {
   const [empresas, setEmpresas] = useState([]);
 
   useEffect(() => {
+    if (!user?.empresa) return;
+
     fetch('https://backend-inventario-t3yr.onrender.com/usuarios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empresa: user?.empresa })
+      body: JSON.stringify({ empresa: user.empresa })
     })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+        const text = await res.text();
+        return text ? JSON.parse(text) : [];
+      })
       .then(data => {
         setUsuarios(data);
         const empresasUnicas = [...new Set(data.map(u => u.empresa))];
         setEmpresas(empresasUnicas);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error('Error cargando usuarios:', err);
+        setUsuarios([]);
+        setEmpresas([]);
+      });
   }, [user?.empresa]);
 
   const handleLogout = () => {
