@@ -69,3 +69,111 @@
 .btn-dashboard:hover {
   background-color: #0056b3;
 }
+.dashboard-container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+.dropdown-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.select-dropdown {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 12px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.edit-button,
+.password-button,
+.delete-button {
+  margin: 0 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.edit-button {
+  background-color: #fbbf24;
+  color: black;
+}
+
+.password-button {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.delete-button {
+  background-color: #ef4444;
+  color: white;
+}
+
+.dashboard-message {
+  text-align: center;
+  margin-top: 20px;
+  color: #555;
+}
+.header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: #f3f4f6;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  margin-right: 20px;
+  font-weight: 500;
+}
+
+.logout-button {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #dc2626;
+}
+
