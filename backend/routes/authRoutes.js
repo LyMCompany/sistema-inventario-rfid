@@ -124,7 +124,7 @@ router.post('/login', async (req, res) => {
 });
 
 // 📌 VER USUARIOS (solo admin)
-router.get('/usuarios', soloAdmin, async (req, res) => {
+router.post('/usuarios', soloAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT id, nombre, apellidos, correo, empresa, telefono, rol FROM usuarios');
     res.json(result.rows);
