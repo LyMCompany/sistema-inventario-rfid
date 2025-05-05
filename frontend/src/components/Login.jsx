@@ -4,6 +4,11 @@ import Swal from 'sweetalert2';
 import '../styles/Login.css';
 import { useUser } from '../context/UserContext';
 
+const BACKEND_URL = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BACKEND_URL
+  ? import.meta.env.VITE_BACKEND_URL
+  : 'https://backend-inventario-t3yr.onrender.com';
+
+
 function Login() {
   const [empresa, setEmpresa] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -19,7 +24,7 @@ function Login() {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
+      const response = await fetch(`${BACKEND_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ empresa, contrasena })

@@ -11,7 +11,8 @@ const BACKEND_URL = typeof import.meta !== 'undefined' && import.meta.env && imp
 
 
 function AdminPanel() {
-  const { username, setUsername, user } = useUser();
+  const { user, logout } = useUser(); // ✅ extrae solo lo que existe en tu UserContext
+
   const navigate = useNavigate();
 
   const [usuarios, setUsuarios] = useState([]);
@@ -57,10 +58,13 @@ function AdminPanel() {
     });
   
     if (confirm.isConfirmed) {
-      setUsername('');
+      logout();      // ✅ llama correctamente la función del contexto
       navigate('/');
     }
   };
+  
+  
+  
   
 
   const handleEliminar = async (correo) => {

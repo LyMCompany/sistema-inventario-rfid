@@ -1,5 +1,10 @@
 import Swal from 'sweetalert2';
 
+const API_URL = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BACKEND_URL
+  ? import.meta.env.VITE_BACKEND_URL
+  : 'https://backend-inventario-t3yr.onrender.com';
+
+
 const RegistroUsuario = async () => {
   const { value: formValues } = await Swal.fire({
     title: 'Registro de Usuario',
@@ -30,7 +35,7 @@ const RegistroUsuario = async () => {
 
   if (formValues) {
     try {
-      const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/register', {
+      fetch(`${BACKEND_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formValues)

@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BACKEND_URL
+  ? import.meta.env.VITE_BACKEND_URL
+  : 'https://backend-inventario-t3yr.onrender.com';
+
 
 function Registro() {
   const navigate = useNavigate();
