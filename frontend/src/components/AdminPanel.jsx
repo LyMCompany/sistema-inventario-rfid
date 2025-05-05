@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { useUser } from '../context/UserContext';
+import { FaUserCircle } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 function AdminPanel() {
-  const { user } = useUser();
+  const { user, setUsername } = useUser();
+  const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
   const [empresaSeleccionada, setEmpresaSeleccionada] = useState('');
   const [empresas, setEmpresas] = useState([]);
 
   useEffect(() => {
-    fetch('https://backend-inventario-t3yr.onrender.com/usuarios')
+    fetch('https://backend-inventario-t3yr.onrender.com/auth/usuarios', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ empresa: user.empresa })
+    })
       .then(res => res.json())
       .then(data => {
         setUsuarios(data);
@@ -18,6 +25,12 @@ function AdminPanel() {
       })
       .catch(err => console.error(err));
   }, []);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setUsername('');
+    navigate('/');
+  };
 
   const handleEliminar = async (id) => {
     const confirm = await Swal.fire({
@@ -115,72 +128,92 @@ function AdminPanel() {
     : [];
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-semibold text-center mb-4 border-b pb-2">Panel de Administración</h2>
-
-      <div className="mb-4 flex items-center gap-2">
-        <label className="font-medium">Selecciona una empresa:</label>
-        <select
-          className="border rounded px-3 py-1"
-          value={empresaSeleccionada}
-          onChange={(e) => setEmpresaSeleccionada(e.target.value)}
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center">
+      {/* Encabezado */}
+      <div className="w-full flex items-center justify-between bg-white shadow p-4">
+        <div className="flex items-center space-x-2 font-semibold text-gray-800">
+          <FaUserCircle className="text-2xl" />
+          <span>{user?.nombre || ''}</span>
+        </div>
+        <button
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          onClick={handleLogout}
         >
-          <option value="">-- Seleccionar --</option>
-          {empresas.map((empresa, index) => (
-            <option key={index} value={empresa}>{empresa}</option>
-          ))}
-        </select>
+          Cerrar sesión
+        </button>
       </div>
 
-      {usuariosFiltrados.length > 0 ? (
-        <table className="w-full text-sm border rounded overflow-hidden shadow-sm">
-          <thead className="bg-gray-100 text-left">
-            <tr>
-              <th className="p-2 border">Nombre</th>
-              <th className="p-2 border">Correo</th>
-              <th className="p-2 border">Empresa</th>
-              <th className="p-2 border">Teléfono</th>
-              <th className="p-2 border">Rol</th>
-              <th className="p-2 border">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usuariosFiltrados.map(usuario => (
-              <tr key={usuario.id} className="hover:bg-gray-50">
-                <td className="p-2 border">{usuario.nombre} {usuario.apellidos}</td>
-                <td className="p-2 border">{usuario.correo}</td>
-                <td className="p-2 border">{usuario.empresa}</td>
-                <td className="p-2 border">{usuario.telefono}</td>
-                <td className="p-2 border">{usuario.rol}</td>
-                <td className="p-2 border space-x-1">
-                  <button
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
-                    onClick={() => handleEditar(usuario)}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded"
-                    onClick={() => handleCambiarContrasena(usuario)}
-                  >
-                    Contraseña
-                  </button>
-                  <button
-                    className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
-                    onClick={() => handleEliminar(usuario.id)}
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
+      {/* Banner */}
+      <div className="w-full bg-blue-600 py-4 text-center text-white text-2xl font-semibold shadow">
+        Panel de Administración
+      </div>
+
+      {/* Contenido */}
+      <div className="w-full max-w-6xl p-6 mt-4">
+        <div className="mb-4 text-center">
+          <label className="mr-2 font-medium">Selecciona una empresa:</label>
+          <select
+            className="border rounded px-3 py-1"
+            value={empresaSeleccionada}
+            onChange={(e) => setEmpresaSeleccionada(e.target.value)}
+          >
+            <option value="">-- Seleccionar --</option>
+            {empresas.map((empresa, index) => (
+              <option key={index} value={empresa}>{empresa}</option>
             ))}
-          </tbody>
-        </table>
-      ) : empresaSeleccionada ? (
-        <p className="text-gray-600 mt-4">No hay usuarios registrados en esta empresa.</p>
-      ) : (
-        <p className="text-gray-600 mt-4">Selecciona una empresa para ver los usuarios.</p>
-      )}
+          </select>
+        </div>
+
+        {usuariosFiltrados.length > 0 ? (
+          <table className="w-full border text-sm bg-white shadow">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 border">Nombre</th>
+                <th className="p-2 border">Correo</th>
+                <th className="p-2 border">Empresa</th>
+                <th className="p-2 border">Teléfono</th>
+                <th className="p-2 border">Rol</th>
+                <th className="p-2 border">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {usuariosFiltrados.map(usuario => (
+                <tr key={usuario.id} className="hover:bg-gray-50">
+                  <td className="p-2 border">{usuario.nombre} {usuario.apellidos}</td>
+                  <td className="p-2 border">{usuario.correo}</td>
+                  <td className="p-2 border">{usuario.empresa}</td>
+                  <td className="p-2 border">{usuario.telefono}</td>
+                  <td className="p-2 border">{usuario.rol}</td>
+                  <td className="p-2 border space-x-1">
+                    <button
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
+                      onClick={() => handleEditar(usuario)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded"
+                      onClick={() => handleCambiarContrasena(usuario)}
+                    >
+                      Contraseña
+                    </button>
+                    <button
+                      className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
+                      onClick={() => handleEliminar(usuario.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : empresaSeleccionada ? (
+          <p className="text-gray-600 text-center mt-4">No hay usuarios registrados en esta empresa.</p>
+        ) : (
+          <p className="text-gray-600 text-center mt-4">Selecciona una empresa para ver los usuarios.</p>
+        )}
+      </div>
     </div>
   );
 }
