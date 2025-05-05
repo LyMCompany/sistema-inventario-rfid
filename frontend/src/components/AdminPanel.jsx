@@ -24,13 +24,16 @@ function AdminPanel() {
         body: JSON.stringify({
           empresa: user?.empresa || '',
           correo: user?.correo || ''
-        })
+        }),
       });
-      
-      
-
+  
+      if (!response.ok) {
+        console.error('Respuesta no OK:', response.status);
+        return;
+      }
+  
       const data = await response.json();
-
+  
       if (Array.isArray(data)) {
         setUsuarios(data);
         const empresasUnicas = [...new Set(data.map(u => u.empresa))];
@@ -42,6 +45,7 @@ function AdminPanel() {
       console.error('Error al obtener usuarios:', error);
     }
   };
+  
 
   const handleEliminar = async (id) => {
     const confirm = await Swal.fire({

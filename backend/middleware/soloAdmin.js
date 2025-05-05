@@ -7,6 +7,10 @@ const soloAdmin = async (req, res, next) => {
     if (!empresa || !correo) {
       return res.status(400).json({ mensaje: 'Faltan datos de empresa o correo' });
     }
+    if (!empresa) {
+      return res.status(400).json({ mensaje: 'Empresa no proporcionada' });
+    }
+    
 
     const result = await pool.query(
       'SELECT rol FROM usuarios WHERE empresa = $1 AND correo = $2',
