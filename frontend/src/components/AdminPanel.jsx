@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import '../styles/AdminPanel.css';
 
 function AdminPanel() {
-  const { username, logout } = useUser();
+  const { user, logout } = useUser();
   const navigate = useNavigate();
 
   const [usuarios, setUsuarios] = useState([]);
@@ -21,22 +21,23 @@ function AdminPanel() {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/usuarios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empresa: '' }) // Carga todos los usuarios
+        body: JSON.stringify({ empresa: user.empresa })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      if (!text) throw new Error('Respuesta vacía del servidor');
+
+      const data = JSON.parse(text);
 
       if (Array.isArray(data)) {
         setUsuarios(data);
-
-        // Obtener lista de empresas únicas
         const empresasUnicas = [...new Set(data.map(u => u.empresa))];
         setEmpresas(empresasUnicas);
       } else {
         console.error('Respuesta inesperada:', data);
       }
     } catch (error) {
-      console.error('Error al obtener usuarios:', error);
+      console.error('Error al obtener usuarios:', error.message);
     }
   };
 
@@ -60,7 +61,7 @@ function AdminPanel() {
 
         if (res.ok) {
           Swal.fire('Eliminado', data.mensaje, 'success');
-          fetchUsuarios(); // Recargar
+          fetchUsuarios();
         } else {
           Swal.fire('Error', data.mensaje, 'error');
         }

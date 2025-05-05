@@ -5,22 +5,23 @@ const UserContext = createContext();
 
 // 2. Crear el proveedor con persistencia en localStorage
 export const UserProvider = ({ children }) => {
-  const [username, setUsername] = useState(() => {
-    return localStorage.getItem('usuario') || '';
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('usuario');
+    return saved ? JSON.parse(saved) : null;
   });
 
-  const handleSetUsername = (name) => {
-    setUsername(name);
-    localStorage.setItem('usuario', name); // Guardar al establecer
+  const handleSetUser = (userData) => {
+    setUser(userData);
+    localStorage.setItem('usuario', JSON.stringify(userData));
   };
 
   const handleLogout = () => {
-    setUsername('');
+    setUser(null);
     localStorage.removeItem('usuario');
   };
 
   return (
-    <UserContext.Provider value={{ username, setUsername: handleSetUsername, logout: handleLogout }}>
+    <UserContext.Provider value={{ user, setUser: handleSetUser, logout: handleLogout }}>
       {children}
     </UserContext.Provider>
   );
