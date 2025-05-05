@@ -124,7 +124,7 @@ router.post('/login', async (req, res) => {
 });
 
 // 📌 VER USUARIOS (solo admin)
-router.post('/usuarios', soloAdmin, async (req, res) => {
+router.post('/usuarios', async (req, res) => {
   const { empresa } = req.body;
   try {
     const result = await pool.query(
