@@ -45,17 +45,19 @@ function AdminPanel() {
   const handleLogout = async () => {
     const confirm = await Swal.fire({
       title: '¿Deseas cerrar sesión?',
-      icon: 'question',
+      text: 'Se cerrará tu sesión actual.',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí',
-      cancelButtonText: 'No'
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
     });
-
+  
     if (confirm.isConfirmed) {
       setUsername('');
       navigate('/');
     }
   };
+  
 
   const handleEliminar = async (correo) => {
     const confirm = await Swal.fire({

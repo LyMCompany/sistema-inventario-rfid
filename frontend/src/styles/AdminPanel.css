@@ -1,4 +1,3 @@
-/* CONTENEDOR PRINCIPAL */
 .admin-panel-container {
     max-width: 1500px;
     margin: 40px auto;
@@ -8,10 +7,9 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     font-family: 'Segoe UI', sans-serif;
     overflow: hidden;
-}
-
-/* ENCABEZADO AZUL UNIFORME */
-.admin-header {
+  }
+  
+  .admin-header {
     background-color: #007bff;
     color: #fff;
     padding: 16px 25px;
@@ -21,16 +19,15 @@
     font-size: 20px;
     font-weight: bold;
     border-radius: 12px 12px 0 0;
-}
-
-/* USUARIO + BOTÓN */
-.admin-header .usuario-info {
+  }
+  
+  .usuario-info {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.admin-header .cerrar-sesion {
+  }
+  
+  .cerrar-sesion {
     background-color: white;
     color: #007bff;
     border: 1px solid #fff;
@@ -38,94 +35,36 @@
     padding: 6px 12px;
     cursor: pointer;
     font-weight: bold;
-}
-
-/* TÍTULO DE LA PÁGINA */
-.admin-panel-container h2 {
-    text-align: center;
-    font-size: 24px;
-    color: #000;
-    margin: 20px 0 25px;
-}
-
-/* SELECT CENTRADO Y ESTILIZADO */
-.empresa-select-container {
+  }
+  
+  .empresa-select-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 25px;
-}
-
-.empresa-select {
-    width: 320px;
+    margin: 30px 0;
+  }
+  
+  .empresa-select {
+    width: 300px;
     padding: 12px;
     font-size: 18px;
     border-radius: 10px;
     border: 1px solid #ccc;
     text-align: center;
-}
-
-/* Ocultar opción inicial */
-.empresa-select option:first-child {
-    display: none;
-}
-
-/* TABLA */
-.usuario-info {
-    margin-top: 10px;
-    overflow-x: auto;
-    padding: 0 20px 20px;
-}
-
-.usuario-info table {
-    width: 100%;
+  }
+  
+  .usuario-info table {
+    width: 95%;
+    margin: 0 auto;
     border-collapse: collapse;
     background-color: #fff;
     border: 1px solid #ddd;
-}
-
-.usuario-info th,
-.usuario-info td {
+  }
+  
+  .usuario-info th,
+  .usuario-info td {
     padding: 12px;
     border: 1px solid #eee;
     font-size: 15px;
     text-align: center;
-}
-
-/* BOTONES ACCIÓN */
-.botones-acciones {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 0 20px 20px;
-}
-
-.botones-acciones button {
-    flex: 1;
-    padding: 12px;
-    font-size: 15px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.botones-acciones button:hover {
-    filter: brightness(0.95);
-    transform: scale(1.02);
-}
-
-.botones-acciones button:nth-child(1) {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.botones-acciones button:nth-child(2) {
-    background-color: #ffc107;
-    color: #000;
-}
-
-.botones-acciones button:nth-child(3) {
-    background-color: #dc3545;
-    color: #fff;
-}
+  }
+  
