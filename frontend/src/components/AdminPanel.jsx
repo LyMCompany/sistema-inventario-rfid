@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import '../styles/AdminPanel.css';
 
 function AdminPanel() {
-  const { user, logout } = useUser();
+  const { username, logout } = useUser();
   const navigate = useNavigate();
 
   const [usuarios, setUsuarios] = useState([]);
@@ -22,9 +22,9 @@ function AdminPanel() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          empresa: user?.empresa || '',
-          correo: user?.correo || ''
+          empresa: username
         }),
+        
       });
   
       if (!response.ok) {

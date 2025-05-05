@@ -180,5 +180,32 @@ router.delete('/usuarios/:id', soloAdmin, async (req, res) => {
     res.status(500).json({ mensaje: 'Error al eliminar usuario' });
   }
 });
+// Obtener usuarios por empresa y correo (solo admin)
+router.post('/usuarios', async (req, res) => {
+  const { empresa, correo } = req.body;
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM usuarios WHERE empresa = $1 AND correo = $2',
+      [empresa, correo]
+    );
+
+    const usuario = result.rows[0];
+
+    if (!usuario || usuario.rol !== 'admin') {
+      return res.status(403).json({ mensaje: 'Acceso denegado: solo administradores' });
+    }
+
+    const usuariosEmpresa = await pool.query(
+      'SELECT * FROM usuarios WHERE empresa = $1',
+      [empresa]
+    );
+
+    res.json(usuariosEmpresa.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al obtener usuarios' });
+  }
+});
 
 module.exports = router;
