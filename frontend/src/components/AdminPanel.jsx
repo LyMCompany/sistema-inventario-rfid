@@ -67,54 +67,74 @@ function AdminPanel() {
   const handleEditar = async (usuario) => {
     const { value: formValues } = await Swal.fire({
       title: 'Editar Usuario',
-      html:
-        `<input id="nombre" class="swal2-input" placeholder="Nombre" value="${usuario.nombre || ''}">` +
-        `<input id="apellidos" class="swal2-input" placeholder="Apellidos" value="${usuario.apellidos || ''}">` +
-        `<input id="telefono" class="swal2-input" placeholder="Teléfono" value="${usuario.telefono || ''}">` +
-        `<select id="rol" class="swal2-input">
+      html: `
+        <input id="nombre" class="swal2-input" placeholder="Nombre" value="${usuario.nombre}">
+        <input id="apellidos" class="swal2-input" placeholder="Apellidos" value="${usuario.apellidos}">
+        <input id="correo" class="swal2-input" placeholder="Correo" value="${usuario.correo}" readonly>
+        <input id="empresa" class="swal2-input" placeholder="Empresa" value="${usuario.empresa}" readonly>
+        <input id="telefono" class="swal2-input" placeholder="Teléfono" value="${usuario.telefono}">
+        <select id="rol" class="swal2-select">
           <option value="admin" ${usuario.rol === 'admin' ? 'selected' : ''}>admin</option>
-          <option value="user" ${usuario.rol === 'user' ? 'selected' : ''}>user</option>
-        </select>`,
+          <option value="usuario" ${usuario.rol === 'usuario' ? 'selected' : ''}>usuario</option>
+        </select>
+        <input id="contrasena" class="swal2-input" placeholder="Nueva contraseña (opcional)" type="password">
+      `,
       focusConfirm: false,
       showCancelButton: true,
       confirmButtonText: 'Guardar cambios',
       preConfirm: () => {
-        const nombre = document.getElementById('nombre').value;
-        const apellidos = document.getElementById('apellidos').value;
-        const telefono = document.getElementById('telefono').value;
+        const nombre = document.getElementById('nombre').value.trim();
+        const apellidos = document.getElementById('apellidos').value.trim();
+        const telefono = document.getElementById('telefono').value.trim();
         const rol = document.getElementById('rol').value;
+        const contrasena = document.getElementById('contrasena').value.trim();
   
-        if (!nombre || !apellidos || !telefono) {
-          Swal.showValidationMessage('Todos los campos son obligatorios');
+        if (!nombre || !apellidos || !telefono || !rol) {
+          Swal.showValidationMessage('Todos los campos excepto contraseña son obligatorios');
           return false;
         }
   
-        return { nombre, apellidos, telefono, rol };
+        return { nombre, apellidos, telefono, rol, contrasena };
       }
     });
   
     if (formValues) {
       try {
+        const payload = {
+          correo: usuario.correo,
+          nombre: formValues.nombre,
+          apellidos: formValues.apellidos,
+          telefono: formValues.telefono,
+          rol: formValues.rol,
+        };
+  
+        if (formValues.contrasena) {
+          const encoder = new TextEncoder();
+          const buffer = encoder.encode(formValues.contrasena);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          payload.contrasena = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+  
         const response = await fetch(`${BACKEND_URL}/auth/editar`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            correo: usuario.correo, // identificador
-            ...formValues
-          })
+          body: JSON.stringify(payload)
         });
   
         if (response.ok) {
-          await Swal.fire('Actualizado', 'Usuario editado correctamente.', 'success');
-          fetchUsuarios(); // refrescar la tabla
+          await Swal.fire('Actualizado', 'El usuario ha sido actualizado correctamente.', 'success');
+          fetchUsuarios();
         } else {
           Swal.fire('Error', 'No se pudo actualizar el usuario.', 'error');
         }
       } catch (error) {
-        Swal.fire('Error', 'Error en el servidor o conexión', 'error');
+        console.error('Error al actualizar usuario:', error);
+        Swal.fire('Error', 'Error de red o del servidor.', 'error');
       }
     }
   };
+  
   
   
 
