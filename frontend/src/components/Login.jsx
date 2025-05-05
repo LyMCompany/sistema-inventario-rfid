@@ -19,7 +19,8 @@ function Login() {
       const response = await fetch('https://backend-inventario-t3yr.onrender.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empresa, password: contrasena }) // <--- CORREGIDO
+        body: JSON.stringify({ empresa, contrasena }) // <--- CORRECTO
+ // <--- CORREGIDO
       });
 
       const data = await response.json();
