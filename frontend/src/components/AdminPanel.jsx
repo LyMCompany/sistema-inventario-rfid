@@ -12,11 +12,9 @@ function AdminPanel() {
   const [empresas, setEmpresas] = useState([]);
 
   useEffect(() => {
-    fetch('https://backend-inventario-t3yr.onrender.com/auth/usuarios', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empresa: user.empresa })
-    })
+    if (!user) return;
+
+    fetch('https://backend-inventario-t3yr.onrender.com/auth/usuarios')
       .then(res => res.json())
       .then(data => {
         setUsuarios(data);
@@ -24,7 +22,7 @@ function AdminPanel() {
         setEmpresas(empresasUnicas);
       })
       .catch(err => console.error(err));
-  }, []);
+  }, [user]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -47,7 +45,7 @@ function AdminPanel() {
         await fetch(`https://backend-inventario-t3yr.onrender.com/auth/usuarios/${id}`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ empresa: user.empresa })
+          body: JSON.stringify({ empresa: user?.empresa })
         });
         setUsuarios(prev => prev.filter(u => u.id !== id));
         Swal.fire('Eliminado', 'Usuario eliminado correctamente', 'success');
@@ -84,7 +82,7 @@ function AdminPanel() {
         await fetch(`https://backend-inventario-t3yr.onrender.com/auth/usuarios/${usuario.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...formValues, empresa: user.empresa }),
+          body: JSON.stringify({ ...formValues, empresa: user?.empresa }),
         });
         Swal.fire('Actualizado', 'Usuario actualizado correctamente', 'success');
         setUsuarios(prev => prev.map(u => u.id === usuario.id ? { ...u, ...formValues } : u));
@@ -100,11 +98,6 @@ function AdminPanel() {
       input: 'password',
       inputLabel: 'Nueva contraseña',
       inputPlaceholder: 'Escribe la nueva contraseña',
-      inputAttributes: {
-        maxlength: 50,
-        autocapitalize: 'off',
-        autocorrect: 'off'
-      },
       showCancelButton: true,
       confirmButtonText: 'Cambiar'
     });
@@ -114,7 +107,7 @@ function AdminPanel() {
         await fetch(`https://backend-inventario-t3yr.onrender.com/auth/usuarios/${usuario.id}/password`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nuevaPassword, empresa: user.empresa }),
+          body: JSON.stringify({ nuevaPassword, empresa: user?.empresa }),
         });
         Swal.fire('Contraseña actualizada', 'La nueva contraseña fue guardada', 'success');
       } catch (error) {
@@ -129,7 +122,6 @@ function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center">
-      {/* Encabezado */}
       <div className="w-full flex items-center justify-between bg-white shadow p-4">
         <div className="flex items-center space-x-2 font-semibold text-gray-800">
           <FaUserCircle className="text-2xl" />
@@ -143,12 +135,10 @@ function AdminPanel() {
         </button>
       </div>
 
-      {/* Banner */}
       <div className="w-full bg-blue-600 py-4 text-center text-white text-2xl font-semibold shadow">
         Panel de Administración
       </div>
 
-      {/* Contenido */}
       <div className="w-full max-w-6xl p-6 mt-4">
         <div className="mb-4 text-center">
           <label className="mr-2 font-medium">Selecciona una empresa:</label>
