@@ -3,7 +3,11 @@ import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../styles/AdminPanel.css';
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+const BACKEND_URL = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BACKEND_URL
+  ? import.meta.env.VITE_BACKEND_URL
+  : 'https://backend-inventario-t3yr.onrender.com';
+
 
 
 function AdminPanel() {
