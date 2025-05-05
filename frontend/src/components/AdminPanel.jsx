@@ -17,23 +17,18 @@ function AdminPanel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ empresa: user.empresa })
     })
-      .then(async (res) => {
-        if (!res.ok) {
-          const error = await res.text();
-          console.error('Error de respuesta:', error);
-          throw new Error('Error al obtener usuarios');
+      .then(async res => {
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          setUsuarios(data);
+          const empresasUnicas = [...new Set(data.map(u => u.empresa))];
+          setEmpresas(empresasUnicas);
+        } catch {
+          console.error('Respuesta inválida del servidor:', text);
         }
-        return res.json();
       })
-      .then(data => {
-        setUsuarios(data);
-        const empresasUnicas = [...new Set(data.map(u => u.empresa))];
-        setEmpresas(empresasUnicas);
-      })
-      .catch(err => {
-        console.error('Error en fetch:', err);
-        Swal.fire('Error', 'No se pudieron cargar los usuarios', 'error');
-      });
+      .catch(err => console.error(err));
   }, [user?.empresa]);
 
   const handleLogout = () => {
@@ -59,8 +54,7 @@ function AdminPanel() {
   return (
     <div className="admin-panel-container">
       <div className="admin-header">
-        <span className="username">{user?.nombre || 'Admin'}</span>
-        <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
+        {user?.nombre || 'Admin'} | <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
       </div>
 
       <h2>Panel de Administración</h2>
