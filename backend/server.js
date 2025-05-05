@@ -1,43 +1,31 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-
-// ✅ CORS CONFIG SEGURO PARA NGROK Y LOCALHOST
+// ✅ CORS CONFIG
 const corsOptions = {
   origin: function (origin, callback) {
-    callback(null, true); // Aceptar todas las URLs (ajustar en producción)
+    callback(null, true); // Acepta todas las URLs (ajusta en producción si deseas)
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 };
 
-
-// ✅ Middleware de CORS
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // para preflight
-
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
-// ✅ Aquí las rutas deben tener prefijo '/auth' si así las usas en el frontend
+// ✅ Rutas del backend
 app.use('/auth', authRoutes);
 
-// ✅ Servir React desde /frontend/build
-const buildPath = path.join(__dirname, 'frontend', 'build');
-app.use(express.static(buildPath));
+// 🔴 Ya no se intenta servir frontend en Render
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(buildPath, 'index.html'));
-});
-
-
-// 🔴 Middleware de errores CORS
+// ✅ Middleware de errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({ mensaje: err.message || 'Error interno del servidor' });
