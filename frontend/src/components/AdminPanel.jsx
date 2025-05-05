@@ -21,13 +21,10 @@ function AdminPanel() {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/usuarios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empresa: user.empresa })
+        body: JSON.stringify({ empresa: '' }) // Carga todos los usuarios
       });
 
-      const text = await response.text();
-      if (!text) throw new Error('Respuesta vacía del servidor');
-
-      const data = JSON.parse(text);
+      const data = await response.json();
 
       if (Array.isArray(data)) {
         setUsuarios(data);
@@ -37,7 +34,7 @@ function AdminPanel() {
         console.error('Respuesta inesperada:', data);
       }
     } catch (error) {
-      console.error('Error al obtener usuarios:', error.message);
+      console.error('Error al obtener usuarios:', error);
     }
   };
 
@@ -76,7 +73,20 @@ function AdminPanel() {
   return (
     <div className="admin-panel-container">
       <div className="admin-header">
-        Usuario: {username} | <button onClick={logout} style={{ color: '#fff', marginLeft: 10 }}>Cerrar sesión</button>
+        Usuario: {user?.nombre || 'Admin'} |{' '}
+        <button
+          onClick={logout}
+          style={{
+            color: '#fff',
+            marginLeft: 10,
+            background: 'transparent',
+            border: 'none',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+        >
+          Cerrar sesión
+        </button>
       </div>
 
       <h2>Panel de Administración</h2>
