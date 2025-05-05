@@ -1,11 +1,18 @@
-// middleware/soloAdmin.js
-const pool = require('../utils/db');
+const pool = require('../db');
 
 const soloAdmin = async (req, res, next) => {
   try {
-    const { empresa } = req.body;
+    const { empresa, correo } = req.body;
 
-    const result = await pool.query('SELECT rol FROM usuarios WHERE empresa = $1', [empresa]);
+    if (!empresa || !correo) {
+      return res.status(400).json({ mensaje: 'Faltan datos de empresa o correo' });
+    }
+
+    const result = await pool.query(
+      'SELECT rol FROM usuarios WHERE empresa = $1 AND correo = $2',
+      [empresa, correo]
+    );
+
     const usuario = result.rows[0];
 
     if (!usuario || usuario.rol !== 'admin') {
@@ -14,8 +21,8 @@ const soloAdmin = async (req, res, next) => {
 
     next();
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ mensaje: 'Error en verificación de rol' });
+    console.error('Error en soloAdmin:', err);
+    res.status(500).json({ mensaje: 'Error interno en validación de rol' });
   }
 };
 

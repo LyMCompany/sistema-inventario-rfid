@@ -21,8 +21,12 @@ function AdminPanel() {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/usuarios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empresa: 'LyMCompany' }) // Usa empresa válida temporalmente
+        body: JSON.stringify({
+          empresa: user?.empresa || '',
+          correo: user?.correo || ''
+        })
       });
+      
       
 
       const data = await response.json();
