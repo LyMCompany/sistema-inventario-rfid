@@ -64,6 +64,57 @@ function AdminPanel() {
   };
   
   
+  const handleEditar = async (usuario) => {
+    const { value: formValues } = await Swal.fire({
+      title: 'Editar Usuario',
+      html:
+        `<input id="nombre" class="swal2-input" placeholder="Nombre" value="${usuario.nombre || ''}">` +
+        `<input id="apellidos" class="swal2-input" placeholder="Apellidos" value="${usuario.apellidos || ''}">` +
+        `<input id="telefono" class="swal2-input" placeholder="Teléfono" value="${usuario.telefono || ''}">` +
+        `<select id="rol" class="swal2-input">
+          <option value="admin" ${usuario.rol === 'admin' ? 'selected' : ''}>admin</option>
+          <option value="user" ${usuario.rol === 'user' ? 'selected' : ''}>user</option>
+        </select>`,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Guardar cambios',
+      preConfirm: () => {
+        const nombre = document.getElementById('nombre').value;
+        const apellidos = document.getElementById('apellidos').value;
+        const telefono = document.getElementById('telefono').value;
+        const rol = document.getElementById('rol').value;
+  
+        if (!nombre || !apellidos || !telefono) {
+          Swal.showValidationMessage('Todos los campos son obligatorios');
+          return false;
+        }
+  
+        return { nombre, apellidos, telefono, rol };
+      }
+    });
+  
+    if (formValues) {
+      try {
+        const response = await fetch(`${BACKEND_URL}/auth/editar`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            correo: usuario.correo, // identificador
+            ...formValues
+          })
+        });
+  
+        if (response.ok) {
+          await Swal.fire('Actualizado', 'Usuario editado correctamente.', 'success');
+          fetchUsuarios(); // refrescar la tabla
+        } else {
+          Swal.fire('Error', 'No se pudo actualizar el usuario.', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Error en el servidor o conexión', 'error');
+      }
+    }
+  };
   
   
 
@@ -147,6 +198,11 @@ function AdminPanel() {
                   <td>{usuario.telefono}</td>
                   <td>{usuario.rol}</td>
                   <td>
+                  <td>                  
+                      <button onClick={() => handleEditar(usuario)}>Editar</button>{' '}
+                      <button onClick={() => handleEliminar(usuario.correo)}>Eliminar</button>
+                </td>
+
                     <button onClick={() => handleEliminar(usuario.correo)}>Eliminar</button>
                   </td>
                 </tr>
