@@ -125,14 +125,19 @@ router.post('/login', async (req, res) => {
 
 // 📌 VER USUARIOS (solo admin)
 router.post('/usuarios', soloAdmin, async (req, res) => {
+  const { empresa } = req.body;
   try {
-    const result = await pool.query('SELECT id, nombre, apellidos, correo, empresa, telefono, rol FROM usuarios');
+    const result = await pool.query(
+      'SELECT id, nombre, apellidos, correo, empresa, telefono, rol FROM usuarios WHERE empresa = $1',
+      [empresa]
+    );
     res.json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener usuarios' });
   }
 });
+
 
 // 📌 EDITAR USUARIO (solo admin)
 router.put('/usuarios/:id', soloAdmin, async (req, res) => {
