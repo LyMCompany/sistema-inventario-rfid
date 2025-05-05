@@ -4,7 +4,6 @@ const API_URL = typeof import.meta !== 'undefined' && import.meta.env && import.
   ? import.meta.env.VITE_BACKEND_URL
   : 'https://backend-inventario-t3yr.onrender.com';
 
-
 const RegistroUsuario = async () => {
   const { value: formValues } = await Swal.fire({
     title: 'Registro de Usuario',
@@ -35,7 +34,7 @@ const RegistroUsuario = async () => {
 
   if (formValues) {
     try {
-      fetch(`${BACKEND_URL}/auth/register`, {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formValues)
@@ -66,7 +65,7 @@ const RegistroUsuario = async () => {
           } else {
             intentos++;
             if (intentos >= 3) {
-              await fetch(`https://backend-inventario-t3yr.onrender.com/auth/eliminar-empresa/${formValues.empresa}`, {
+              await fetch(`${API_URL}/auth/eliminar-empresa/${formValues.empresa}`, {
                 method: 'DELETE'
               });
               await Swal.fire('Error', 'Máximo de intentos superado. Registro cancelado.', 'error');
@@ -78,7 +77,7 @@ const RegistroUsuario = async () => {
         }
 
         if (!validado) {
-          await fetch(`https://backend-inventario-t3yr.onrender.com/auth/eliminar-empresa/${formValues.empresa}`, {
+          await fetch(`${API_URL}/auth/eliminar-empresa/${formValues.empresa}`, {
             method: 'DELETE'
           });
         }
