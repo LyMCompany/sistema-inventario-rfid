@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import '../styles/AdminPanel.css';
 
 function AdminPanel() {
-  const { username, logout, user } = useUser();
+  const { username, setUsername, user } = useUser();
   const navigate = useNavigate();
 
   const [usuarios, setUsuarios] = useState([]);
@@ -26,27 +26,24 @@ function AdminPanel() {
           correo: user?.correo || ''
         }),
       });
-  
-      if (!response.ok) {
-        console.error('Respuesta no OK:', response.status);
-        return;
-      }
-  
+
       const text = await response.text();
       const data = text ? JSON.parse(text) : [];
-  
+
       if (Array.isArray(data)) {
         setUsuarios(data);
         const empresasUnicas = [...new Set(data.map(u => u.empresa))];
         setEmpresas(empresasUnicas);
-      } else {
-        console.error('Respuesta inesperada:', data);
       }
     } catch (error) {
       console.error('Error al obtener usuarios:', error);
     }
   };
-  
+
+  const handleLogout = () => {
+    setUsername('');
+    navigate('/');
+  };
 
   const handleEliminar = async (correo) => {
     const confirm = await Swal.fire({
@@ -80,16 +77,22 @@ function AdminPanel() {
 
   return (
     <div className="admin-panel">
-      <div className="header">
-        <div className="user-info">
-          <span>Usuario: {user?.nombre || 'Admin'}</span>
-          <button className="logout-button" onClick={logout}>Cerrar sesión</button>
+      {/* Banner azul */}
+      <div className="encabezado">
+        <div style={{ fontSize: '20px', fontWeight: 'bold' }}>Panel de Administración</div>
+        <div>
+          Usuario: {user?.nombre || 'Admin'}{' '}
+          <button onClick={handleLogout} className="cerrar-sesion">Cerrar sesión</button>
         </div>
-        <h2 className="title">Panel de Administración</h2>
       </div>
 
-      <div className="empresa-selector">
-        <select value={empresaSeleccionada} onChange={(e) => setEmpresaSeleccionada(e.target.value)}>
+      {/* Selector centrado */}
+      <div style={{ textAlign: 'center', marginTop: '30px' }}>
+        <select
+          className="empresa-selector"
+          value={empresaSeleccionada}
+          onChange={(e) => setEmpresaSeleccionada(e.target.value)}
+        >
           <option value="">Seleccionar empresa</option>
           {empresas.map((empresa, index) => (
             <option key={index} value={empresa}>{empresa}</option>
@@ -97,6 +100,7 @@ function AdminPanel() {
         </select>
       </div>
 
+      {/* Tabla */}
       {empresaSeleccionada && (
         <table className="usuarios-table">
           <thead>
