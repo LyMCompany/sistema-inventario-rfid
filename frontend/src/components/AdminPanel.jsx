@@ -3,6 +3,8 @@ import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../styles/AdminPanel.css';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 
 function AdminPanel() {
   const { username, setUsername, user } = useUser();
@@ -18,7 +20,7 @@ function AdminPanel() {
 
   const fetchUsuarios = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/usuarios`, {
+      const response = await fetch(`${BACKEND_URL}/auth/usuarios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -40,9 +42,19 @@ function AdminPanel() {
     }
   };
 
-  const handleLogout = () => {
-    setUsername('');
-    navigate('/');
+  const handleLogout = async () => {
+    const confirm = await Swal.fire({
+      title: '¿Deseas cerrar sesión?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'No'
+    });
+
+    if (confirm.isConfirmed) {
+      setUsername('');
+      navigate('/');
+    }
   };
 
   const handleEliminar = async (correo) => {
@@ -57,7 +69,7 @@ function AdminPanel() {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/eliminar`, {
+        const response = await fetch(`${BACKEND_URL}/auth/eliminar`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ correo }),
@@ -76,20 +88,20 @@ function AdminPanel() {
   };
 
   return (
-    <div className="admin-panel">
-      {/* Banner azul */}
-      <div className="encabezado">
-        <div style={{ fontSize: '20px', fontWeight: 'bold' }}>Panel de Administración</div>
-        <div>
-          Usuario: {user?.nombre || 'Admin'}{' '}
+    <div className="admin-panel-container">
+      {/* Encabezado azul */}
+      <div className="admin-header">
+        <div>Panel de Administración</div>
+        <div className="usuario-info">
+          Usuario: {user?.nombre || 'Admin'}
           <button onClick={handleLogout} className="cerrar-sesion">Cerrar sesión</button>
         </div>
       </div>
 
       {/* Selector centrado */}
-      <div style={{ textAlign: 'center', marginTop: '30px' }}>
+      <div className="empresa-select-container">
         <select
-          className="empresa-selector"
+          className="empresa-select"
           value={empresaSeleccionada}
           onChange={(e) => setEmpresaSeleccionada(e.target.value)}
         >
@@ -100,36 +112,38 @@ function AdminPanel() {
         </select>
       </div>
 
-      {/* Tabla */}
+      {/* Tabla de usuarios */}
       {empresaSeleccionada && (
-        <table className="usuarios-table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Apellidos</th>
-              <th>Correo</th>
-              <th>Empresa</th>
-              <th>Teléfono</th>
-              <th>Rol</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usuarios.filter(u => u.empresa === empresaSeleccionada).map((usuario, index) => (
-              <tr key={index}>
-                <td>{usuario.nombre}</td>
-                <td>{usuario.apellidos}</td>
-                <td>{usuario.correo}</td>
-                <td>{usuario.empresa}</td>
-                <td>{usuario.telefono}</td>
-                <td>{usuario.rol}</td>
-                <td>
-                  <button onClick={() => handleEliminar(usuario.correo)}>Eliminar</button>
-                </td>
+        <div className="usuario-info">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Correo</th>
+                <th>Empresa</th>
+                <th>Teléfono</th>
+                <th>Rol</th>
+                <th>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {usuarios.filter(u => u.empresa === empresaSeleccionada).map((usuario, index) => (
+                <tr key={index}>
+                  <td>{usuario.nombre}</td>
+                  <td>{usuario.apellidos}</td>
+                  <td>{usuario.correo}</td>
+                  <td>{usuario.empresa}</td>
+                  <td>{usuario.telefono}</td>
+                  <td>{usuario.rol}</td>
+                  <td>
+                    <button onClick={() => handleEliminar(usuario.correo)}>Eliminar</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
