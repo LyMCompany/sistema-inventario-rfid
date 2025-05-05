@@ -7,7 +7,7 @@ require('dotenv').config();
 
 const router = express.Router();
 
-// 🚀 Configuración de transporte de correo
+// 📬 Configuración de correo
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// 🔒 Middleware para validar rol admin
+// 🔐 Middleware para validar rol admin
 const soloAdmin = async (req, res, next) => {
   try {
     const { empresa } = req.body;
@@ -32,25 +32,18 @@ const soloAdmin = async (req, res, next) => {
   }
 };
 
-// 📌 REGISTRO DE USUARIO
-router.post('/register', [
-  body('nombre').notEmpty(),
-  body('correo').isEmail(),
-  body('empresa').notEmpty()
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errores: errors.array() });
-
+// 📌 REGISTRO
+router.post('/register', async (req, res) => {
   const { nombre, apellidos, correo, empresa, telefono } = req.body;
 
   try {
     const existe = await pool.query('SELECT * FROM usuarios WHERE empresa = $1', [empresa]);
     if (existe.rows.length > 0) return res.status(409).json({ mensaje: 'Empresa ya registrada' });
 
-    const clave = [...Array(3)].map(() => Math.random().toString(36).substring(2, 6)).join('-');
+    const clave = [1, 2, 3].map(() => Math.random().toString(36).substring(2, 6)).join('-');
 
     await pool.query(
-      'INSERT INTO usuarios (nombre, apellidos, correo, empresa, telefono, clave) VALUES ($1, $2, $3, $4, $5, $6)',
+      'INSERT INTO usuarios (nombre, apellidos, correo, empresa, telefono, clave, intentos) VALUES ($1, $2, $3, $4, $5, $6, 0)',
       [nombre, apellidos, correo, empresa, telefono, clave]
     );
 
@@ -92,26 +85,13 @@ router.post('/validar-llave', async (req, res) => {
     res.status(500).json({ mensaje: 'Error validando la llave' });
   }
 });
-router.delete('/eliminar-empresa/:empresa', async (req, res) => {
-  const { empresa } = req.params;
-  try {
-    const resultado = await pool.query('DELETE FROM usuarios WHERE empresa = $1', [empresa]);
-    if (resultado.rowCount > 0) {
-      res.status(200).json({ mensaje: 'Empresa eliminada correctamente' });
-    } else {
-      res.status(404).json({ mensaje: 'Empresa no encontrada' });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: 'Error al eliminar la empresa' });
-  }
-});
 
 // 📌 REGISTRAR CONTRASEÑA
 router.post('/registrar-password', async (req, res) => {
-  const { empresa, password } = req.body;
+  const { empresa, contrasena } = req.body;
+
   try {
-    const hashed = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(contrasena, 10);
     await pool.query('UPDATE usuarios SET contrasena = $1 WHERE empresa = $2', [hashed, empresa]);
     res.json({ mensaje: 'Contraseña registrada con éxito' });
   } catch (err) {
@@ -122,7 +102,7 @@ router.post('/registrar-password', async (req, res) => {
 
 // 📌 LOGIN
 router.post('/login', async (req, res) => {
-  const { empresa, password } = req.body;
+  const { empresa, contrasena } = req.body;
   try {
     const result = await pool.query('SELECT * FROM usuarios WHERE empresa = $1', [empresa]);
     const usuario = result.rows[0];
@@ -130,9 +110,10 @@ router.post('/login', async (req, res) => {
 
     if (!usuario.contrasena) return res.status(403).json({ mensaje: 'Contraseña no registrada' });
 
-    const match = await bcrypt.compare(password, usuario.contrasena);
+    const match = await bcrypt.compare(contrasena, usuario.contrasena);
     if (match) {
-      res.json({ mensaje: 'Login exitoso', usuario: { ...usuario, contrasena: undefined } });
+      const { contrasena, ...usuarioSinPassword } = usuario;
+      res.json({ mensaje: 'Login exitoso', rol: usuario.rol, usuario: usuarioSinPassword });
     } else {
       res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
