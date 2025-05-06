@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import Registro from './components/Registro';
 import RegistroUsuario from './components/RegistroUsuario';
@@ -21,17 +21,15 @@ const AdminRoute = ({ children }) => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/inventario" element={<ProtectedRoute><Inventario /></ProtectedRoute>} />
-        <Route path="/control-inventario" element={<ProtectedRoute><ControlInventario /></ProtectedRoute>} />
-        <Route path="/reportes" element={<ProtectedRoute><Reportes /></ProtectedRoute>} />
-        <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/registro" element={<Registro />} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/inventario" element={<ProtectedRoute><Inventario /></ProtectedRoute>} />
+      <Route path="/control-inventario" element={<ProtectedRoute><ControlInventario /></ProtectedRoute>} />
+      <Route path="/reportes" element={<ProtectedRoute><Reportes /></ProtectedRoute>} />
+      <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+    </Routes>
   );
 }
 
