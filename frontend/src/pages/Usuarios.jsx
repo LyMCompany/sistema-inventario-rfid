@@ -20,25 +20,25 @@ function Usuarios() {
 
   const eliminarUsuario = async (id) => {
     const confirmacion = await Swal.fire({
-      title: '¿Eliminar usuario?',
+      title: 'Eliminar usuario?',
       text: 'Esta acción no se puede deshacer.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
     });
-
+  
     if (confirmacion.isConfirmed) {
       try {
         const response = await fetch(`${API_URL}/auth/usuarios/${id}`, {
           method: 'DELETE',
         });
-
+  
         const result = await response.json();
-
+  
         if (response.ok) {
           Swal.fire('Eliminado', result.mensaje, 'success');
-          obtenerUsuarios();
+          obtenerUsuarios(); // actualiza la tabla
         } else {
           throw new Error(result.mensaje);
         }
@@ -48,6 +48,7 @@ function Usuarios() {
       }
     }
   };
+  
 
   useEffect(() => {
     obtenerUsuarios();
