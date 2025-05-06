@@ -47,7 +47,8 @@ function Registro() {
       const res = await fetch(`${API_URL}/auth/validar-llave`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empresa: empresaActual, llaveIngresada })
+        body: JSON.stringify({ empresa: empresaActual, clave: llaveIngresada })
+
       });
       const data = await res.json();
       if (res.ok && data.validado) {
