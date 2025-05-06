@@ -1,31 +1,22 @@
-const pool = require('../db'); // asegúrate de que esta ruta es correcta
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-const soloAdmin = async (req, res, next) => {
+const soloAdmin = (req, res, next) => {
   try {
-    const { correo } = req.body;
-
-    // Validar que el correo exista
-    if (!correo) {
-      return res.status(400).json({ mensaje: 'Falta el correo de autenticación' });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ mensaje: 'Token no proporcionado o inválido' });
     }
 
-    // Consulta para obtener el rol del usuario
-    const result = await pool.query(
-      'SELECT rol FROM usuarios WHERE correo = $1',
-      [correo]
-    );
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (result.rows.length === 0) {
-      return res.status(403).json({ mensaje: 'Usuario no encontrado' });
-    }
-
-    const rol = result.rows[0].rol;
-
-    if (rol !== 'admin') {
+    if (decoded.rol !== 'admin') {
       return res.status(403).json({ mensaje: 'Acceso denegado: solo administradores' });
     }
 
-    next(); // Usuario autorizado
+    req.usuario = decoded;
+    next();
   } catch (error) {
     console.error('Error en soloAdmin:', error);
     res.status(500).json({ mensaje: 'Error interno de autenticación' });
