@@ -235,5 +235,22 @@ router.post('/usuarios', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener usuarios' });
   }
 });
+router.delete('/usuarios/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const resultado = await pool.query('DELETE FROM usuarios WHERE id = $1', [id]);
+
+    if (resultado.rowCount === 0) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    res.json({ mensaje: 'Usuario eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar usuario:', error);
+    res.status(500).json({ mensaje: 'Error al eliminar usuario' });
+  }
+});
+
 
 module.exports = router;
