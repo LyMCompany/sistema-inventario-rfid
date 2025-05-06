@@ -138,7 +138,8 @@ function AdminPanel() {
   
   
 
-  const handleEliminar = async (correo) => {
+  const handleEliminar = async (id, correo) => {
+
     const confirm = await Swal.fire({
       title: '¿Estás seguro?',
       text: 'Esta acción eliminará el usuario permanentemente.',
@@ -150,11 +151,10 @@ function AdminPanel() {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`${BACKEND_URL}/auth/eliminar`, {
+        const response = await fetch(`${BACKEND_URL}/auth/usuarios/${id}`, {
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ correo }),
         });
+        
 
         if (response.ok) {
           setUsuarios(usuarios.filter(u => u.correo !== correo));
@@ -220,7 +220,8 @@ function AdminPanel() {
                   <td>
                                    
                       <button onClick={() => handleEditar(usuario)}>Editar</button>{' '}
-                      <button onClick={() => handleEliminar(usuario.correo)}>Eliminar</button>
+                      <button onClick={() => handleEliminar(u.id, u.correo)}>Eliminar</button>
+
                   </td>
                 </tr>
               ))}
