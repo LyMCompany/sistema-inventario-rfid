@@ -9,7 +9,8 @@ function Dashboard() {
 
   // Validación robusta del usuario
   const rawUsuario = localStorage.getItem('usuario');
-  const usuario = typeof rawUsuario === 'string' && rawUsuario.trim() !== '' ? rawUsuario : 'Invitado';
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+
 
   const handleLogout = () => {
     Swal.fire({
@@ -37,7 +38,7 @@ function Dashboard() {
         </div>
         <div className="user-info">
           <FaUserCircle size={24} />
-          <span>{usuario}</span>
+          <span>Empresa: {usuario.empresa || 'Invitado'}</span>
           <button className="logout-button" onClick={handleLogout}>
             Cerrar sesión
           </button>
