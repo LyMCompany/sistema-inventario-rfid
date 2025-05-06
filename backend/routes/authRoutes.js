@@ -19,18 +19,26 @@ const transporter = nodemailer.createTransport({
 // 🔐 Middleware para validar rol admin
 const soloAdmin = async (req, res, next) => {
   try {
-    const { empresa } = req.body;
-    const result = await pool.query('SELECT rol FROM usuarios WHERE empresa = $1', [empresa]);
+    const { correo } = req.body;
+
+    if (!correo) {
+      return res.status(400).json({ mensaje: 'Correo requerido para autenticación' });
+    }
+
+    const result = await pool.query('SELECT rol FROM usuarios WHERE correo = $1', [correo]);
     const usuario = result.rows[0];
+
     if (!usuario || usuario.rol !== 'admin') {
       return res.status(403).json({ mensaje: 'Acceso denegado: solo administradores' });
     }
-    next();
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ mensaje: 'Error en verificación de rol' });
+
+    next(); // ✅ autorizamos continuar
+  } catch (error) {
+    console.error('Error en soloAdmin:', error);
+    res.status(500).json({ mensaje: 'Error interno de autenticación' });
   }
 };
+
 
 // 📌 REGISTRO
 router.post('/register', async (req, res) => {
@@ -123,28 +131,20 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// 📌 VER USUARIOS (solo admin)
+// 📌 VER USUARIOS (solo admin, basado en correo)
 router.post('/usuarios', soloAdmin, async (req, res) => {
-  const { admin, empresa, correo } = req.body;
+  const { correo } = req.body;
   console.log('BODY RECIBIDO EN /auth/usuarios:', req.body);
 
   try {
-    let result;
-
-    if (admin) {
-      // Si es admin, devuelve todos los usuarios
-      result = await pool.query('SELECT * FROM usuarios');
-    } else {
-      // Usuario normal: filtra por empresa o correo
-      result = await pool.query('SELECT * FROM usuarios WHERE empresa = $1 OR correo = $2', [empresa, correo]);
-    }
-
+    const result = await pool.query('SELECT * FROM usuarios');
     res.json(result.rows);
   } catch (err) {
     console.error('Error al obtener usuarios:', err);
     res.status(500).json({ mensaje: 'Error al obtener usuarios' });
   }
 });
+
 
 
 

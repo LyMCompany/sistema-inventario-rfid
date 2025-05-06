@@ -1,18 +1,18 @@
-const pool = require('../db'); // asegúrate de que esta línea apunte bien a tu conexión PostgreSQL
+const pool = require('../db'); // asegúrate de que esta ruta es correcta
 
 const soloAdmin = async (req, res, next) => {
   try {
-    const { empresa, correo } = req.body;
+    const { correo } = req.body;
 
-    // Validar que los datos existan
-    if (!empresa || !correo) {
-      return res.status(400).json({ mensaje: 'Faltan datos de autenticación' });
+    // Validar que el correo exista
+    if (!correo) {
+      return res.status(400).json({ mensaje: 'Falta el correo de autenticación' });
     }
 
-    // Consulta al usuario en la base de datos
+    // Consulta para obtener el rol del usuario
     const result = await pool.query(
-      'SELECT rol FROM usuarios WHERE empresa = $1 AND correo = $2',
-      [empresa, correo]
+      'SELECT rol FROM usuarios WHERE correo = $1',
+      [correo]
     );
 
     if (result.rows.length === 0) {
