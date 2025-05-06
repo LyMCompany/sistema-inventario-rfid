@@ -4,11 +4,12 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { useInventario } from '../context/InventarioContext';
 import { useUser } from '../context/UserContext';
-const { logout } = useUser();
+
 
 import '../styles/Inventario.css';
 
 function Inventario() {
+  const { logout } = useUser();
   const navigate = useNavigate();
   const { setInventarioBase } = useInventario();
   const { username, setUsername } = useUser();

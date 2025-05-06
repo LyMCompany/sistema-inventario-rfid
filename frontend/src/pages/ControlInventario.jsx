@@ -9,6 +9,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import RFIDListener from './RFIDListener';
 
 function ControlInventario() {
+  const { logout } = useUser();
   const { inventarioBase, setInventarioBase } = useInventario();
   const { username, setUsername } = useUser();
   const navigate = useNavigate();
@@ -95,11 +96,12 @@ function ControlInventario() {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        setUsername('');
+        logout(); // ✅ Llama al método del contexto
         navigate('/');
       }
     });
   };
+  
 
   const handleComparar = () => {
     setMostrarImportados(false);
