@@ -135,11 +135,8 @@ router.post('/usuarios', soloAdmin, async (req, res) => {
       // Si es admin, devuelve todos los usuarios
       result = await pool.query('SELECT * FROM usuarios');
     } else {
-      // Usuario normal: solo su empresa o correo
-      result = await pool.query(
-        'SELECT * FROM usuarios WHERE empresa = $1 OR correo = $2',
-        [empresa, correo]
-      );
+      // Usuario normal: filtra por empresa o correo
+      result = await pool.query('SELECT * FROM usuarios WHERE empresa = $1 OR correo = $2', [empresa, correo]);
     }
 
     res.json(result.rows);
@@ -148,6 +145,7 @@ router.post('/usuarios', soloAdmin, async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener usuarios' });
   }
 });
+
 
 
 // Ruta para editar un usuario
@@ -159,11 +157,12 @@ router.put('/editar', async (req, res) => {
     const values = [nombre, apellidos, telefono, rol];
     let paramIndex = 5;
 
-    if (contrasena && contrasena.trim() !== '') {
-      const hashedPassword = await bcrypt.hash(contrasena, 10);
-      query += `, contrasena = $${paramIndex++}`;
+    if (typeof contraseña === 'string' && contraseña.trim() !== '') {
+      const hashedPassword = await bcrypt.hash(contraseña, 10);
       values.push(hashedPassword);
+      query += `, contraseña = $${paramIndex++}`;
     }
+    
 
     query += ` WHERE correo = $${paramIndex}`;
     values.push(correo);
