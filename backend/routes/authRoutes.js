@@ -197,11 +197,12 @@ router.put('/usuarios/:id/password', soloAdmin, async (req, res) => {
   }
 });
 
-// 📌 ELIMINAR USUARIO (solo admin)
-router.delete('/usuarios/:id', soloAdmin, async (req, res) => {
-  const { id } = req.params;
+// ELIMINAR USUARIO POR CORREO (solo admin)
+router.delete('/usuarios/correo/:correo', soloAdmin, async (req, res) => {
+  const { correo } = req.params;
+
   try {
-    await pool.query('DELETE FROM usuarios WHERE id = $1', [id]);
+    await pool.query('DELETE FROM usuarios WHERE correo = $1', [correo]);
     res.json({ mensaje: 'Usuario eliminado' });
   } catch (err) {
     console.error(err);

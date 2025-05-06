@@ -138,8 +138,7 @@ function AdminPanel() {
   
   
 
-  const handleEliminar = async (id, correo) => {
-
+  const handleEliminar = async (correo) => {
     const confirm = await Swal.fire({
       title: '¿Estás seguro?',
       text: 'Esta acción eliminará el usuario permanentemente.',
@@ -148,17 +147,15 @@ function AdminPanel() {
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     });
-
+  
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`${BACKEND_URL}/auth/usuarios/${id}`, {
+        const response = await fetch(`${BACKEND_URL}/auth/usuarios/correo/${correo}`, {
           method: 'DELETE',
         });
-        
-
+  
         if (response.ok) {
-          setUsuarios(usuarios.filter((u) => u.correo !== correo)); // ✅
-
+          setUsuarios(usuarios.filter((u) => u.correo !== correo));
           Swal.fire('Eliminado', 'El usuario ha sido eliminado.', 'success');
         } else {
           Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
@@ -168,7 +165,7 @@ function AdminPanel() {
       }
     }
   };
-
+  
   return (
     <div className="admin-panel-container">
       {/* Encabezado azul */}
@@ -222,7 +219,7 @@ function AdminPanel() {
                                    
                   <td>
                          <button onClick={() => handleEditar(usuario)}>Editar</button>{' '}
-                         <button onClick={() => handleEliminar(usuario.id, usuario.correo)}>Eliminar</button>
+                         <button onClick={() => handleEliminar(usuario.correo)}>Eliminar</button>
                   </td>
                   </td>
                 </tr>
