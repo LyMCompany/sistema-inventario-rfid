@@ -157,10 +157,10 @@ router.put('/editar', async (req, res) => {
     const values = [nombre, apellidos, telefono, rol];
     let paramIndex = 5;
 
-    if (typeof contraseña === 'string' && contraseña.trim() !== '') {
-      const hashedPassword = await bcrypt.hash(contraseña, 10);
+    if (typeof contrasena === 'string' && contrasena.trim() !== '') {
+      const hashedPassword = await bcrypt.hash(contrasena, 10);
       values.push(hashedPassword);
-      query += `, contraseña = $${paramIndex++}`;
+      query += `, contrasena = $${paramIndex++}`;
     }
     
 
