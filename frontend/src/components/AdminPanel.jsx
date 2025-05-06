@@ -29,13 +29,13 @@ function AdminPanel() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          admin: true
-        }),
+          correo: user.correo
+        })
       });
-
+  
       const text = await response.text();
       const data = text ? JSON.parse(text) : [];
-
+  
       if (Array.isArray(data)) {
         setUsuarios(data);
         const empresasUnicas = [...new Set(data.map(u => u.empresa))];
@@ -45,6 +45,7 @@ function AdminPanel() {
       console.error('Error al obtener usuarios:', error);
     }
   };
+  
 
   const handleLogout = async () => {
     const confirm = await Swal.fire({
