@@ -29,8 +29,7 @@ function AdminPanel() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          empresa: user?.empresa || '',
-          correo: user?.correo || ''
+          admin: true
         }),
       });
 

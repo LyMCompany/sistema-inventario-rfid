@@ -125,17 +125,30 @@ router.post('/login', async (req, res) => {
 
 // 📌 VER USUARIOS (solo admin)
 router.post('/usuarios', soloAdmin, async (req, res) => {
+  const { admin, empresa, correo } = req.body;
   console.log('BODY RECIBIDO EN /auth/usuarios:', req.body);
-  const { empresa } = req.body;
 
   try {
-    const result = await pool.query('SELECT * FROM usuarios WHERE empresa = $1', [empresa]);
+    let result;
+
+    if (admin) {
+      // Si es admin, devuelve todos los usuarios
+      result = await pool.query('SELECT * FROM usuarios');
+    } else {
+      // Usuario normal: solo su empresa o correo
+      result = await pool.query(
+        'SELECT * FROM usuarios WHERE empresa = $1 OR correo = $2',
+        [empresa, correo]
+      );
+    }
+
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Error al obtener usuarios:', err);
     res.status(500).json({ mensaje: 'Error al obtener usuarios' });
   }
 });
+
 
 // Ruta para editar un usuario
 router.put('/editar', async (req, res) => {
