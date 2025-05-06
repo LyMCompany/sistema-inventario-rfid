@@ -1,0 +1,158 @@
+/* styles/Reportes.css */
+
+.reporte-container {
+    padding: 20px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  
+  .control-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  
+  .left-actions .btn-regresar {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .left-actions .btn-regresar:hover {
+    background-color: #5a6268;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .user-icon {
+    font-size: 20px;
+  }
+  
+  .username {
+    font-weight: bold;
+    color: white;
+  }
+  
+  .btn-logout {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .btn-logout:hover {
+    background-color: #c82333;
+  }
+  
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .barra-reportes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .barra-reportes select {
+    width: 400px;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .btn-limpiar-reportes {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .btn-limpiar-reportes:hover {
+    background-color: #c82333;
+  }
+  
+  .tabla-contenedor {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .tabla-contenedor h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+  }
+  
+  .tabla-comparacion {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  
+  .tabla-comparacion th,
+  .tabla-comparacion td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .tabla-comparacion th {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .tabla-comparacion tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .acciones-reporte {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .acciones-reporte button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .acciones-reporte .btn-eliminar-reporte {
+    background-color: #dc3545;
+  }
+  
+  .acciones-reporte .btn-eliminar-reporte:hover {
+    background-color: #c82333;
+  }
+  

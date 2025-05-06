@@ -1,0 +1,34 @@
+.usuarios-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+  }
+  
+  .tabla-usuarios {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .tabla-usuarios th,
+  .tabla-usuarios td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .tabla-usuarios th {
+    background-color: #f2f2f2;
+    text-align: left;
+  }
+  
+  .btn-eliminar {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .btn-eliminar:hover {
+    background-color: #c9302c;
+  }
+  
