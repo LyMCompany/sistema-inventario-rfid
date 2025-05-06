@@ -157,6 +157,35 @@ router.post('/validar-llave', async (req, res) => {
     res.status(500).json({ mensaje: 'Error del servidor al validar la llave' });
   }
 });
+router.post(
+  '/registrar-password',
+  validarEntradas([
+    body('empresa').notEmpty().withMessage('La empresa es obligatoria'),
+    body('contrasena').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres')
+  ]),
+  async (req, res) => {
+    const { empresa, contrasena } = req.body;
+
+    try {
+      const hash = await bcrypt.hash(contrasena, 10);
+
+      const result = await pool.query(
+        'UPDATE usuarios SET contrasena = $1 WHERE empresa = $2 RETURNING *',
+        [hash, empresa]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ mensaje: 'Empresa no encontrada' });
+      }
+
+      res.json({ mensaje: 'Contraseña registrada correctamente' });
+    } catch (err) {
+      console.error('Error al registrar contraseña:', err);
+      res.status(500).json({ mensaje: 'Error al registrar contraseña' });
+    }
+  }
+);
+
 
 
 module.exports = router;
