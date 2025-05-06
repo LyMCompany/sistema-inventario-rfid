@@ -8,7 +8,6 @@ const BACKEND_URL = typeof import.meta !== 'undefined' && import.meta.env && imp
   ? import.meta.env.VITE_BACKEND_URL
   : 'https://backend-inventario-t3yr.onrender.com';
 
-
 function Login() {
   const [empresa, setEmpresa] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -33,8 +32,13 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        // ✅ Guardar token en localStorage
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+
         setUser(data.usuario);
-        navigate(data.rol === 'admin' ? '/admin' : '/dashboard');
+        navigate(data.usuario.rol === 'admin' ? '/admin' : '/dashboard');
       } else {
         Swal.fire('Error', data.mensaje, 'error');
       }
@@ -45,7 +49,7 @@ function Login() {
   };
 
   const handleRegistro = () => {
-    navigate('/registro'); // O abre modal si es emergente
+    navigate('/registro');
   };
 
   return (

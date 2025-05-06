@@ -58,10 +58,12 @@ function AdminPanel() {
     });
   
     if (confirm.isConfirmed) {
-      logout();      // ✅ llama correctamente la función del contexto
+      localStorage.removeItem('token'); // ✅ Elimina el token almacenado
+      logout(); // ✅ Llama al contexto para cerrar sesión
       navigate('/');
     }
   };
+  
   
   
   const handleEditar = async (usuario) => {
@@ -138,7 +140,7 @@ function AdminPanel() {
   
   
 
-  const handleEliminar = async (correo) => {
+  const handleEliminar = async (correoUsuario) => {
     const confirm = await Swal.fire({
       title: '¿Estás seguro?',
       text: 'Esta acción eliminará el usuario permanentemente.',
@@ -150,21 +152,31 @@ function AdminPanel() {
   
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`${BACKEND_URL}/auth/usuarios/correo/${correo}`, {
+        const token = localStorage.getItem('token'); // JWT almacenado en login
+  
+        const response = await fetch(`${BACKEND_URL}/auth/usuarios/correo/${encodeURIComponent(correoUsuario)}`, {
           method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // 🔐 Envía el token al backend
+          }
         });
   
         if (response.ok) {
-          setUsuarios(usuarios.filter((u) => u.correo !== correo));
+          setUsuarios(usuarios.filter((u) => u.correo !== correoUsuario));
           Swal.fire('Eliminado', 'El usuario ha sido eliminado.', 'success');
         } else {
-          Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
+          const data = await response.json();
+          Swal.fire('Error', data.mensaje || 'No se pudo eliminar el usuario.', 'error');
         }
       } catch (error) {
         Swal.fire('Error', 'Error al eliminar el usuario.', 'error');
       }
     }
   };
+  
+  
+  
   
   return (
     <div className="admin-panel-container">
@@ -219,6 +231,7 @@ function AdminPanel() {
                   <td>
                          <button onClick={() => handleEditar(usuario)}>Editar</button>{' '}
                          <button onClick={() => handleEliminar(usuario.correo)}>Eliminar</button>
+
                  </td>
                 </tr>
               ))}
