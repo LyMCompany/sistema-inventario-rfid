@@ -305,14 +305,12 @@ function ControlInventario() {
                   <td>{item.Codigo || '-'}</td>
                   <td>{item.SKU || '-'}</td>
                   <td>{item.Marca || '-'}</td>
-                  <td>
-                  <button
-  onClick={() => copiarAlPortapapeles(String(item.RFID || item.codigo || '-'))}
-  style={{ background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
->
-  {String(item.RFID || item.codigo || '-')}
-</button>
-
+                  <td className="celda-rfid">
+                  <button onClick={() => copiarAlPortapapeles(String(item.RFID || item.codigo || '-'))}
+                   style={{ background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer', wordBreak: 'break-word', whiteSpace: 'normal' }}
+                  >
+                   {String(item.RFID || item.codigo || '-')}
+                  </button>
                   </td>
                   <td>{item.Ubicacion || '-'}</td>
                   <td>{item.Estado}</td>
