@@ -215,13 +215,11 @@ function AdminPanel() {
                   <td>{usuario.empresa}</td>
                   <td>{usuario.telefono}</td>
                   <td>{usuario.rol}</td>
-                  <td>
-                                   
+                                                     
                   <td>
                          <button onClick={() => handleEditar(usuario)}>Editar</button>{' '}
                          <button onClick={() => handleEliminar(usuario.correo)}>Eliminar</button>
-                  </td>
-                  </td>
+                 </td>
                 </tr>
               ))}
             </tbody>
