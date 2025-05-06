@@ -74,7 +74,8 @@ function Registro() {
       const res = await fetch(`${API_URL}/auth/registrar-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empresa: empresaActual, password })
+        body: JSON.stringify({ empresa: empresaActual, contrasena: password })
+
       });
       const data = await res.json();
       if (res.ok) {
