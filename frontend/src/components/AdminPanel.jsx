@@ -171,6 +171,8 @@ function AdminPanel() {
         if (response.ok) {
           setUsuarios(usuarios.filter((u) => u.correo !== correoUsuario));
           Swal.fire('Eliminado', 'El usuario ha sido eliminado.', 'success');
+           fetchUsuarios(); // 🔄 Actualiza usuarios y empresas nuevamente
+
         } else {
           const data = await response.json();
           Swal.fire('Error', data.mensaje || 'No se pudo eliminar el usuario.', 'error');

@@ -133,5 +133,30 @@ router.post(
     }
   }
 );
+router.post('/validar-llave', async (req, res) => {
+  const { empresa, clave } = req.body;
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM usuarios WHERE empresa = $1 AND clave = $2',
+      [empresa, clave]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ mensaje: 'Llave incorrecta' });
+    }
+
+    await pool.query(
+      'UPDATE usuarios SET intentos = 0 WHERE empresa = $1',
+      [empresa]
+    );
+
+    res.json({ mensaje: 'Validación exitosa', usuario: result.rows[0] });
+  } catch (error) {
+    console.error('Error al validar la llave:', error);
+    res.status(500).json({ mensaje: 'Error del servidor al validar la llave' });
+  }
+});
+
 
 module.exports = router;
