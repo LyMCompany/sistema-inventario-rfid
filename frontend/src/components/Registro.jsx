@@ -6,7 +6,6 @@ const API_URL = typeof import.meta !== 'undefined' && import.meta.env && import.
   ? import.meta.env.VITE_BACKEND_URL
   : 'https://backend-inventario-t3yr.onrender.com';
 
-
 function Registro() {
   const navigate = useNavigate();
   const [paso, setPaso] = useState(1);
@@ -25,7 +24,6 @@ function Registro() {
     e.preventDefault();
     try {
       const res = await fetch(`${API_URL}/auth/register`, {
-
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -47,7 +45,6 @@ function Registro() {
     e.preventDefault();
     try {
       const res = await fetch(`${API_URL}/auth/validar-llave`, {
-
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ empresa: empresaActual, llaveIngresada })
@@ -61,7 +58,8 @@ function Registro() {
         setIntentos(nuevosIntentos);
         setMensaje(data.mensaje || 'Llave incorrecta');
         if (nuevosIntentos >= 3) {
-          setMensaje('Máximo de intentos superado. Redirigiendo...');
+          setMensaje('Máximo de intentos superado. Eliminando registro...');
+          await fetch(`${API_URL}/auth/eliminar-empresa/${empresaActual}`, { method: 'DELETE' });
           setTimeout(() => navigate('/'), 2000);
         }
       }
@@ -74,7 +72,6 @@ function Registro() {
     e.preventDefault();
     try {
       const res = await fetch(`${API_URL}/auth/registrar-password`, {
-
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ empresa: empresaActual, password })

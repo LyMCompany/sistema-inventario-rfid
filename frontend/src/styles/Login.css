@@ -1,59 +1,65 @@
+
 .login-container {
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f4f5f7;
+  height: 100vh;
+  background-color: #f5f8fa;
   font-family: 'Segoe UI', sans-serif;
 }
 
-.login-box {
-  background-color: white;
+.login-form-wrapper {
+  background-color: #fff;
   padding: 40px 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  width: 360px;
-  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 420px;
 }
 
-.login-title {
+.login-form h2 {
+  margin-bottom: 20px;
   font-size: 24px;
-  margin-bottom: 25px;
+  text-align: center;
   color: #333;
-  font-weight: bold;
 }
 
-.login-box input {
+.input-field {
   width: 100%;
   padding: 12px;
-  margin-bottom: 16px;
-  border-radius: 6px;
+  margin-bottom: 18px;
+  border-radius: 10px;
   border: 1px solid #ccc;
-  background-color: #eef1ff;
-  font-size: 14px;
+  font-size: 15px;
   box-sizing: border-box;
 }
 
-.login-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.login-button,
-.register-button {
-  flex: 1;
-  padding: 10px 0;
-  border: none;
-  border-radius: 6px;
-  background-color: #4c5ef5;
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #007bff;
   color: white;
-  font-size: 14px;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.login-button:hover,
-.register-button:hover {
-  background-color: #3948c9;
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+.message {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.message.success {
+  color: green;
+}
+
+.message.error {
+  color: red;
 }
