@@ -119,4 +119,19 @@ router.delete(
   }
 );
 
+router.post(
+  '/usuarios',
+  validarEntradas([body('correo').isEmail().withMessage('Correo inválido')]),
+  soloAdmin,
+  async (req, res) => {
+    try {
+      const usuarios = await pool.query('SELECT nombre, apellidos, correo, empresa, telefono, rol FROM usuarios');
+      res.json(usuarios.rows);
+    } catch (error) {
+      console.error('Error al obtener usuarios:', error);
+      res.status(500).json({ mensaje: 'Error al obtener usuarios' });
+    }
+  }
+);
+
 module.exports = router;

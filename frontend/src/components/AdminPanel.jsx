@@ -25,9 +25,14 @@ function AdminPanel() {
 
   const fetchUsuarios = async () => {
     try {
+      const token = localStorage.getItem('token');
+  
       const response = await fetch(`${BACKEND_URL}/auth/usuarios`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           correo: user.correo
         })
@@ -43,6 +48,7 @@ function AdminPanel() {
       }
     } catch (error) {
       console.error('Error al obtener usuarios:', error);
+      Swal.fire('Error', 'No se pudieron cargar los usuarios.', 'error');
     }
   };
   
