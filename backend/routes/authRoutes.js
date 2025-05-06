@@ -98,6 +98,10 @@ router.post('/validar-llave', async (req, res) => {
 router.post('/registrar-password', async (req, res) => {
   const { empresa, contrasena } = req.body;
 
+  if (!contrasena || contrasena.trim() === '') {
+    return res.status(400).json({ mensaje: 'La contraseña es requerida' });
+  }
+
   try {
     const hashed = await bcrypt.hash(contrasena, 10);
     await pool.query('UPDATE usuarios SET contrasena = $1 WHERE empresa = $2', [hashed, empresa]);
@@ -107,6 +111,7 @@ router.post('/registrar-password', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al registrar contraseña' });
   }
 });
+
 
 // 📌 LOGIN
 router.post('/login', async (req, res) => {
