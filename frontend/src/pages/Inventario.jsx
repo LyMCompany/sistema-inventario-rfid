@@ -4,6 +4,8 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { useInventario } from '../context/InventarioContext';
 import { useUser } from '../context/UserContext';
+const { logout } = useUser();
+
 import '../styles/Inventario.css';
 
 function Inventario() {
@@ -116,7 +118,7 @@ function Inventario() {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        setUsername('');
+        logout(); // ✅ Llamada correcta
         navigate('/');
       }
     });
