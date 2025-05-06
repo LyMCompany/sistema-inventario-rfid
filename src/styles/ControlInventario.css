@@ -1,0 +1,161 @@
+/* styles/ControlInventario.css */
+
+.control-container {
+  padding: 20px;
+  background: #f5f5f5;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 0;
+  border-bottom: 2px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.left-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-regresar {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 15px;
+  font-weight: bold;
+}
+
+.btn-regresar:hover {
+  background-color: #5a6268;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.user-icon {
+  font-size: 20px;
+}
+
+.username {
+  font-weight: bold;
+  color: white;
+}
+
+.btn-logout {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-logout:hover {
+  background-color: #c82333;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.control-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.control-buttons button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.control-buttons button:hover {
+  background-color: #0056b3;
+}
+
+.tabla-contenedor {
+  margin-top: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-contenedor h3 {
+  margin-bottom: 10px;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.tabla-comparacion,
+.tabla-inventario {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  table-layout: fixed;
+}
+
+.tabla-comparacion th,
+.tabla-comparacion td,
+.tabla-inventario th,
+.tabla-inventario td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+.tabla-comparacion th,
+.tabla-inventario th {
+  background-color: #007bff;
+  color: white;
+}
+
+.tabla-comparacion tr:nth-child(even),
+.tabla-inventario tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+.tabla-comparacion td:nth-child(6) a {
+  display: inline-block;
+  max-width: 250px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+.tabla-comparacion td:nth-child(6) {
+  max-width: 180px;
+  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.tabla-comparacion td:nth-child(6) a {
+  display: block;
+  color: blue;
+  text-decoration: underline;
+}
+

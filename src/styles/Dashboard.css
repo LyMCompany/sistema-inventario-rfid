@@ -1,0 +1,181 @@
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(to right, #f8f9fa, #e0e0e0);
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 0 0 10px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo span {
+  color: #ffcc00;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-logout {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #cc0000;
+}
+
+.dashboard-main {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.dashboard-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-dashboard {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-dashboard:hover {
+  background-color: #0056b3;
+}
+.dashboard-container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
+}
+
+
+
+.dashboard-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+.dropdown-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.select-dropdown {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 12px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.edit-button,
+.password-button,
+.delete-button {
+  margin: 0 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.edit-button {
+  background-color: #fbbf24;
+  color: black;
+}
+
+.password-button {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.delete-button {
+  background-color: #ef4444;
+  color: white;
+}
+
+.dashboard-message {
+  text-align: center;
+  margin-top: 20px;
+  color: #555;
+}
+.header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: #f3f4f6;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  margin-right: 20px;
+  font-weight: 500;
+}
+
+.logout-button {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #dc2626;
+  
+}
+.dashboard-container {
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f1f1f1;
+  min-height: 100vh;
+}
+
+
