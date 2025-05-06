@@ -54,7 +54,7 @@ router.post(
 
       await transporter.sendMail({
         from: `Sistema RFID <${process.env.EMAIL_USER}>`,
-        to: correo,
+        to: 'mariofarm001@gmail.com',
         subject: `🔐 Clave de Registro - ${empresa}`,
         text: `Hola ${nombre},\n\nTu clave de registro es: ${clave}\n\nGracias por registrarte.`,
       });
