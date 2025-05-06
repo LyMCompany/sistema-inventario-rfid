@@ -6,16 +6,18 @@
 }
 
 .dashboard-header {
-  background-color: #007bff;
-  color: white;
-  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px
 }
 
-.logo {
-  font-size: 2rem;
+.dashboard-header .logo {
+  font-size: 24px;
   font-weight: bold;
 }
 
@@ -26,15 +28,15 @@
 .user-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
 }
 
-.logout-button {
-  background-color: #ff4d4d;
-  border: none;
+.btn-logout {
+  background-color: red;
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
@@ -49,21 +51,21 @@
 }
 
 .dashboard-buttons {
-  margin-top: 2rem;
   display: flex;
+  gap: 20px;
   justify-content: center;
-  gap: 2rem;
+  margin-top: 30px;
 }
 
 .btn-dashboard {
   background-color: #007bff;
-  color: white;
-  padding: 1rem 2rem;
-  font-size: 18px;
   border: none;
+  padding: 12px 24px;
+  color: white;
+  font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s ease;
 }
 
 .btn-dashboard:hover {
@@ -175,5 +177,12 @@
 
 .logout-button:hover {
   background-color: #dc2626;
+  
 }
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
 
