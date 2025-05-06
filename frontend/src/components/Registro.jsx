@@ -51,7 +51,7 @@ function Registro() {
 
       });
       const data = await res.json();
-      if (res.ok && data.validado) {
+      if (res.ok && data.usuario) {
         setPaso(3);
         setMensaje('');
       } else {
