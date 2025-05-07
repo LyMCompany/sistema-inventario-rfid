@@ -147,7 +147,8 @@ function Inventario() {
         </div>
         <div className="user-info">
           <span className="user-icon">👤</span>
-          <span className="username">{username || 'Invitado'}</span>
+          <span className="username">{empresa}</span>
+
           <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
         </div>
       </div>
