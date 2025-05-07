@@ -11,13 +11,15 @@ import RFIDListener from './RFIDListener';
 function ControlInventario() {
   const { logout } = useUser();
   const { inventarioBase, setInventarioBase } = useInventario();
-  const { username, setUsername, user } = useUser();
-  const empresa = user?.empresa || 'default';
+  const { user } = useUser();
+  const username = user?.nombre || 'Invitado';
+
+  
 
   const navigate = useNavigate();
 
   const [escaneados, setEscaneados] = useState(() => {
-    const saved = localStorage.getItem(`escaneados_${empresa}`);
+    const saved = localStorage.getItem('escaneados');
     return saved ? JSON.parse(saved) : [];
   });
   const codigosSet = useRef(new Set(escaneados.map(e => String(e.codigo))));
@@ -40,17 +42,16 @@ function ControlInventario() {
       codigosSet.current.add(codigoStr);
       setEscaneados(prev => {
         const nuevos = [...prev, { codigo: codigoStr }];
-        localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevos));
+        localStorage.setItem('escaneados', JSON.stringify(nuevos));
         return nuevos;
       });
       return true;
     }
     return false;
-  }, [empresa]);
-
+  }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem(`inventarioBase_${empresa}`);
+    const saved = localStorage.getItem('inventarioBase');
     if (saved) {
       const parsed = JSON.parse(saved);
       setInventarioBase(parsed);
@@ -108,7 +109,7 @@ function ControlInventario() {
 
   const handleComparar = () => {
     setMostrarImportados(false);
-    const actualBase = localStorage.getItem(`inventarioBase_${empresa}`);
+    const actualBase = localStorage.getItem('inventarioBase');
     const base = actualBase ? JSON.parse(actualBase) : [];
 
     if (base.length === 0) {
@@ -145,17 +146,17 @@ function ControlInventario() {
     };
 
     setEscaneados(nuevosEscaneados);
-    localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevosEscaneados));
+    localStorage.setItem('escaneados', JSON.stringify(nuevosEscaneados));
     setComparacion(resultadoFinal);
-    localStorage.setItem(`comparacion_${empresa}`, JSON.stringify(resultadoFinal));
+    localStorage.setItem('comparacion', JSON.stringify(resultadoFinal));
 
     const fecha = new Date().toLocaleString();
     setFechaComparacion(fecha);
-    localStorage.setItem(`fechaComparacion_${empresa}`, fecha);
+    localStorage.setItem('fechaComparacion', fecha);
 
-    const reportes = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+    const reportes = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
     reportes.push({ usuario: username || 'Desconocido', fecha, ...resultadoFinal });
-    localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(reportes));
+    localStorage.setItem('reportesComparacion', JSON.stringify(reportes));
 
     setIsProcessing(false);
 
@@ -215,7 +216,7 @@ function ControlInventario() {
       if (result.isConfirmed) {
         codigosSet.current.clear();
         setEscaneados([]);
-        localStorage.removeItem(`escaneados_${empresa}`);
+        localStorage.removeItem('escaneados');
         Swal.fire('Limpieza exitosa', 'Se ha borrado la lista de artículos importados.', 'success');
       }
     });
@@ -257,8 +258,7 @@ function ControlInventario() {
             codigosSet.current.add(String(codigo));
             setEscaneados(prev => {
               const nuevos = [...prev, { codigo: String(codigo) }];
-              localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevos));
-
+              localStorage.setItem('escaneados', JSON.stringify(nuevos));
               return nuevos;
             });
             Swal.fire('Éxito', 'Artículo escaneado', 'success');

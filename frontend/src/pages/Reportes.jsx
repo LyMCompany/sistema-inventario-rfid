@@ -6,8 +6,11 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
 function Reportes() {
-  const { username, user } = useUser();
-  const empresa = user?.empresa || 'default';
+  const { user } = useUser();
+  const username = user?.nombre || 'Invitado';
+ 
+
+
   const navigate = useNavigate();
   const [reportes, setReportes] = useState([]);
   const [reporteSeleccionado, setReporteSeleccionado] = useState(null);
@@ -15,9 +18,8 @@ function Reportes() {
   useEffect(() => {
     const ahora = new Date();
     const tresMesesMs = 1000 * 60 * 60 * 24 * 90;
-    const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+    const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
     const propios = todos.filter(r => r.usuario === username && ahora - new Date(r.fecha) <= tresMesesMs);
-
     setReportes(propios);
   }, [username]);
 
@@ -38,16 +40,14 @@ function Reportes() {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    const nombre = `Reporte_${empresa}_${reporte.usuario}_${reporte.fecha.replace(/[/:, ]/g, '_')}.xlsx`;
-
+    const nombre = `Reporte_${reporte.usuario}_${reporte.fecha.replace(/[/:, ]/g, '_')}.xlsx`;
     XLSX.writeFile(wb, nombre);
   };
 
   const eliminarReporte = (fecha) => {
-    const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+    const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
     const nuevos = todos.filter(r => !(r.usuario === username && r.fecha === fecha));
-    localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-    
+    localStorage.setItem('reportesComparacion', JSON.stringify(nuevos));
     setReportes(nuevos.filter(r => r.usuario === username));
     setReporteSeleccionado(null);
   };
@@ -62,10 +62,9 @@ function Reportes() {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+        const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
         const filtrados = todos.filter(r => r.usuario !== username);
-        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
-
+        localStorage.setItem('reportesComparacion', JSON.stringify(filtrados));
         setReportes([]);
         setReporteSeleccionado(null);
         Swal.fire('Eliminados', 'Tus reportes han sido eliminados.', 'success');
