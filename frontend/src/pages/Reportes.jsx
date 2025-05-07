@@ -7,9 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Reportes() {
   const { user } = useUser();
-  const username = user?.nombre || 'Invitado';
- 
-
+  const empresa = user?.empresa || 'Empresa no definida';
 
   const navigate = useNavigate();
   const [reportes, setReportes] = useState([]);

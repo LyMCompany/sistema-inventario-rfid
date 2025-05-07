@@ -13,10 +13,7 @@ function Inventario() {
   const navigate = useNavigate();
   const { setInventarioBase } = useInventario();
   const { user } = useUser();
-  const username = user?.nombre || 'Invitado';
-
-
-
+  const empresa = user?.empresa || 'Empresa no definida';
 
   const [data, setData] = useState(() => {
     const guardado = localStorage.getItem('inventarioBase');
