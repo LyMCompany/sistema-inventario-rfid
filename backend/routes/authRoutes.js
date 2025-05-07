@@ -86,10 +86,14 @@ router.post(
       if (!match) return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
 
       const token = jwt.sign(
-        { correo: usuario.correo, rol: usuario.rol },
+        {
+          empresa: usuario.empresa,
+          rol: usuario.rol,
+        },
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
       );
+      
 
       const { contrasena: _, ...usuarioSinPass } = usuario;
       res.json({ mensaje: 'Login exitoso', usuario: usuarioSinPass, token });

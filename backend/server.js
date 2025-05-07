@@ -6,6 +6,10 @@ const authRoutes = require('./routes/authRoutes');
 const app = express();
 const port = process.env.PORT || 5000;
 
+const reportesRoutes = require('./routes/reportesRoutes');
+app.use('/reportes', reportesRoutes);
+
+
 // ✅ Configuración CORS
 const corsOptions = {
   origin: function (origin, callback) {
