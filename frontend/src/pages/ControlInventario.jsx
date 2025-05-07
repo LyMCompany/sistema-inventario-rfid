@@ -31,6 +31,40 @@ function ControlInventario() {
     return saved || null;
   });
 
+  const reporte = {
+    usuario: username,
+    empresa: empresa,
+    fecha: new Date().toISOString(),
+    encontrados: comparacion?.encontrados?.map(e => e.codigo) || [],
+    faltantes: comparacion?.faltantes?.map(e => e.codigo) || [],
+    no_registrados: comparacion?.noRegistrados?.map(e => e.codigo) || []
+  };
+  
+  enviarReporteAlBackend(reporte);
+  
+
+  const enviarReporteAlBackend = async (reporte) => {
+    try {
+      const response = await fetch("https://tu-backend-render.onrender.com/reportes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(reporte)
+      });
+  
+      if (!response.ok) {
+        throw new Error("Error al guardar el reporte en el backend");
+      }
+  
+      const data = await response.json();
+      console.log("Reporte guardado correctamente:", data);
+    } catch (error) {
+      console.error("Error al enviar reporte:", error);
+    }
+  };
+  
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [mostrarImportados, setMostrarImportados] = useState(false);
 

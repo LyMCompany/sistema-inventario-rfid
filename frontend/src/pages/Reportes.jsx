@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
+
 function Reportes() {
   const { user } = useUser();
   const empresa = user?.empresa || 'Empresa no definida';
@@ -12,6 +13,23 @@ function Reportes() {
   const navigate = useNavigate();
   const [reportes, setReportes] = useState([]);
   const [reporteSeleccionado, setReporteSeleccionado] = useState(null);
+
+  useEffect(() => {
+    const cargarReportes = async () => {
+      try {
+        const response = await fetch(
+          `https://tu-backend-render.onrender.com/reportes?usuario=${user.username}&empresa=${user.empresa}`
+        );
+        const data = await response.json();
+        setReportes(data);
+      } catch (error) {
+        console.error('Error al cargar reportes:', error);
+      }
+    };
+  
+    cargarReportes();
+  }, [user]);
+  
 
   useEffect(() => {
     const ahora = new Date();
@@ -128,6 +146,45 @@ function Reportes() {
             <button onClick={() => exportarReporte(reporteSeleccionado)}>Exportar Reporte</button>
             <button onClick={() => eliminarReporte(reporteSeleccionado.fecha)} className="btn-eliminar-reporte">Eliminar Este Reporte</button>
           </div>
+
+          <select
+  value={reporteSeleccionado}
+  onChange={(e) => setReporteSeleccionado(e.target.value)}
+>
+  <option value="">Seleccionar reporte</option>
+  {reportes.map((r, i) => (
+    <option key={i} value={i}>
+      {new Date(r.fecha).toLocaleString()} - {r.usuario}
+    </option>
+  ))}
+</select>
+
+
+{reporteSeleccionado !== null && (
+  <div className="tabla-reporte">
+    <h3>Encontrados</h3>
+    <ul>
+      {reportes[reporteSeleccionado].encontrados.map((item, i) => (
+        <li key={i}>{item}</li>
+      ))}
+    </ul>
+
+    <h3>Faltantes</h3>
+    <ul>
+      {reportes[reporteSeleccionado].faltantes.map((item, i) => (
+        <li key={i}>{item}</li>
+      ))}
+    </ul>
+
+    <h3>No Registrados</h3>
+    <ul>
+      {reportes[reporteSeleccionado].no_registrados.map((item, i) => (
+        <li key={i}>{item}</li>
+      ))}
+    </ul>
+  </div>
+)}
+
 
           <table className="tabla-comparacion">
             <thead>
