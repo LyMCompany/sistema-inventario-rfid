@@ -153,7 +153,7 @@ function ControlInventario() {
     localStorage.setItem('fechaComparacion', fecha);
 
     const reportes = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
-    reportes.push({ usuario: username || 'Desconocido', fecha, ...resultadoFinal });
+    reportes.push({ usuario: empresa || 'Desconocido', fecha, ...resultadoFinal });
     localStorage.setItem('reportesComparacion', JSON.stringify(reportes));
 
     setIsProcessing(false);
@@ -177,7 +177,7 @@ function ControlInventario() {
       ...item,
       RFID: String(item.RFID || item.codigo || '-'),
       Fecha: fechaComparacion,
-      Usuario: username || 'Desconocido',
+      Usuario: empresa || 'Desconocido',
     });
 
     const dataFinal = [
@@ -190,7 +190,7 @@ function ControlInventario() {
     const ws = XLSX.utils.json_to_sheet(dataFinal);
     XLSX.utils.book_append_sheet(wb, ws, 'Resultados');
 
-    const nombreArchivo = `ComparacionInventario_${username}_${fechaComparacion.replace(/[/:, ]/g, '_')}.xlsx`;
+    const nombreArchivo = `ComparacionInventario_${empresa}_${fechaComparacion.replace(/[/:, ]/g, '_')}.xlsx`;
     try {
       XLSX.writeFile(wb, nombreArchivo);
       Swal.fire('Éxito', 'Archivo exportado', 'success');

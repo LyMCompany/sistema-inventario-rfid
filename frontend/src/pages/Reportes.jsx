@@ -17,9 +17,9 @@ function Reportes() {
     const ahora = new Date();
     const tresMesesMs = 1000 * 60 * 60 * 24 * 90;
     const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
-    const propios = todos.filter(r => r.usuario === username && ahora - new Date(r.fecha) <= tresMesesMs);
+    const propios = todos.filter(r => r.usuario === empresa && ahora - new Date(r.fecha) <= tresMesesMs);
     setReportes(propios);
-  }, [username]);
+  }, [empresa]);
 
   const exportarReporte = (reporte) => {
     const agregarInfo = (item) => ({
@@ -44,9 +44,9 @@ function Reportes() {
 
   const eliminarReporte = (fecha) => {
     const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
-    const nuevos = todos.filter(r => !(r.usuario === username && r.fecha === fecha));
+    const nuevos = todos.filter(r => !(r.usuario === empresa && r.fecha === fecha));
     localStorage.setItem('reportesComparacion', JSON.stringify(nuevos));
-    setReportes(nuevos.filter(r => r.usuario === username));
+    setReportes(nuevos.filter(r => r.usuario === empresa));
     setReporteSeleccionado(null);
   };
 
@@ -61,7 +61,7 @@ function Reportes() {
     }).then((result) => {
       if (result.isConfirmed) {
         const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
-        const filtrados = todos.filter(r => r.usuario !== username);
+        const filtrados = todos.filter(r => r.usuario !== empresa);
         localStorage.setItem('reportesComparacion', JSON.stringify(filtrados));
         setReportes([]);
         setReporteSeleccionado(null);
@@ -96,7 +96,8 @@ function Reportes() {
         </div>
         <div className="user-info">
           <span className="user-icon">👤</span>
-          <span className="username">{username}</span>
+          <span className="username">{empresa}</span>
+
           <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
         </div>
       </div>
