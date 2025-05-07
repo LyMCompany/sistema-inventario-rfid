@@ -32,19 +32,24 @@ function ControlInventario() {
     const saved = localStorage.getItem('fechaComparacion');
     return saved || null;
   });
-
-  const reporte = {
-    usuario: username,
-    empresa: empresa,
-    fecha: new Date().toISOString(),
-    encontrados: comparacion?.encontrados?.map(e => e.codigo) || [],
-    faltantes: comparacion?.faltantes?.map(e => e.codigo) || [],
-    no_registrados: comparacion?.noRegistrados?.map(e => e.codigo) || []
-  };
   
-  enviarReporteAlBackend(reporte);
+  useEffect(() => {
+    if (!comparacion) return;
+  
+    const reporte = {
+      usuario: username,
+      empresa: empresa,
+      fecha: new Date().toISOString(),
+      encontrados: comparacion.encontrados?.map(e => e.codigo) || [],
+      faltantes: comparacion.faltantes?.map(e => e.codigo) || [],
+      no_registrados: comparacion.noRegistrados?.map(e => e.codigo) || []
+    };
+  
+    enviarReporteAlBackend(reporte);
+  }, [comparacion]);
   
 
+  
   const enviarReporteAlBackend = async (reporte) => {
     try {
       const response = await fetch("https://tu-backend-render.onrender.com/reportes", {
@@ -382,6 +387,7 @@ function ControlInventario() {
 >
   {String(item.codigo)}
 </button>
+
 
                   </td>
                   <td>{item.Estado || '-'}</td>
