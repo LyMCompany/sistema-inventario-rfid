@@ -44,7 +44,8 @@ function Inventario() {
     }));
 
     setData(ejemplo);
-    localStorage.setItem('inventarioBase', JSON.stringify(ejemplo));
+    localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(ejemplo));
+
     Swal.fire({ icon: 'success', title: 'Información cargada', showConfirmButton: false, timer: 1500 });
   };
 

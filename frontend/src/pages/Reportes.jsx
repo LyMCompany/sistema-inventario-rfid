@@ -38,7 +38,8 @@ function Reportes() {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    const nombre = `Reporte_${reporte.usuario}_${reporte.fecha.replace(/[/:, ]/g, '_')}.xlsx`;
+    const nombre = `Reporte_${empresa}_${reporte.usuario}_${reporte.fecha.replace(/[/:, ]/g, '_')}.xlsx`;
+
     XLSX.writeFile(wb, nombre);
   };
 
