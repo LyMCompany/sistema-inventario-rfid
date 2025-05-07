@@ -1,3 +1,0 @@
-DELETE FROM usuarios
-WHERE empresa = 'SevenShoes'
-  AND (password IS NULL OR password = '');

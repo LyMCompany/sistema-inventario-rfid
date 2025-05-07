@@ -3,7 +3,8 @@ import { useEffect } from 'react';
 
 function RFIDListener({ onEtiquetaLeida }) {
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
+    const ws = new WebSocket('wss://rfid-websocket-server-production.up.railway.app');
+
 
     ws.onopen = () => {
       console.log('[RFIDListener] Conectado al WebSocket');
