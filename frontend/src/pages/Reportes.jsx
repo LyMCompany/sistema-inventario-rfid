@@ -80,19 +80,19 @@ function Reportes() {
     if (!confirmacion.isConfirmed) return;
   
     try {
-      // Eliminar del backend
+      // 1. Eliminar del backend
       const res = await fetch(`https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado.id}`, {
         method: 'DELETE',
       });
   
       if (!res.ok) throw new Error('No se pudo eliminar del backend');
   
-      // Eliminar del localStorage
+      // 2. Eliminar también del localStorage (con clave por empresa)
       const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-      const filtrados = todos.filter(r => r.fecha !== reporteSeleccionado.fecha);
+      const filtrados = todos.filter(r => r.fecha !== reporteSeleccionado.fecha || r.usuario !== reporteSeleccionado.usuario);
       localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
   
-      // Eliminar del estado React
+      // 3. Actualizar la lista en pantalla
       setReportes(prev => prev.filter(r => r.id !== reporteSeleccionado.id));
       setReporteSeleccionado(null);
   
@@ -102,10 +102,6 @@ function Reportes() {
       Swal.fire('Error', 'No se pudo eliminar el reporte del backend.', 'error');
     }
   };
-  
-  
-  
-  
 
   const eliminarReporte = () => {
     Swal.fire({
@@ -187,9 +183,10 @@ function Reportes() {
         >
           <option value="">Selecciona un reporte</option>
           {reportes.map((r, i) => (
-            <option key={i} value={r.fecha}>
-              {new Date(r.fecha).toLocaleString()} - {r.usuario}
-            </option>
+           <option key={i} value={r.fecha}>
+           {r.fecha} - {r.usuario}
+         </option>
+         
           ))}
         </select>
         <button className="btn-limpiar-reportes" onClick={eliminarReporte}>Limpiar Mis Reportes</button>
