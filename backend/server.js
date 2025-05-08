@@ -9,20 +9,23 @@ const port = process.env.PORT || 5000;
 
 // ✅ Configuración CORS
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || origin.includes('onrender.com')) {
+  origin: (origin, callback) => {
+    const permitido = !origin || origin.includes('onrender.com');
+    if (permitido) {
       callback(null, true);
     } else {
-      callback(new Error('No autorizado por CORS'));
+      callback(new Error('Bloqueado por política de CORS'));
     }
   },
-  
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 };
 
+// Aplica el CORS antes de cualquier ruta
 app.use(cors(corsOptions));
+
+// ⚠️ ¡Importante para OPTIONS!
 app.options('*', cors(corsOptions));
 
 // ✅ Middleware JSON
