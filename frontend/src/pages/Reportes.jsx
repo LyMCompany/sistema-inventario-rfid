@@ -111,23 +111,40 @@ function Reportes() {
   const limpiarTodosMisReportes = () => {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: 'Esto eliminará todos tus reportes guardados.',
+      text: 'Esto eliminará todos tus reportes guardados del navegador y del servidor.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-        const filtrados = todos.filter(r => r.usuario !== user.username || r.empresa !== user.empresa);
-        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
-        setReportes([]);
-        setReporteSeleccionado(null);
-        Swal.fire('Eliminados', 'Tus reportes han sido eliminados.', 'success');
+        try {
+          // 1. Eliminar todos los reportes del backend para este usuario y empresa
+          const response = await fetch(
+            `https://backend-inventario-t3yr.onrender.com/reportes?usuario=${user.correo}&empresa=${user.empresa}`,
+            { method: 'DELETE' }
+          );
+  
+          if (!response.ok) throw new Error('Error al eliminar del backend');
+  
+          // 2. Eliminar todos los reportes del localStorage para este usuario
+          const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+          const filtrados = todos.filter(r => r.usuario !== user.username || r.empresa !== user.empresa);
+          localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
+  
+          // 3. Limpiar la lista actual en pantalla
+          setReportes([]);
+          setReporteSeleccionado(null);
+  
+          Swal.fire('Eliminados', 'Tus reportes han sido eliminados de todos lados.', 'success');
+        } catch (error) {
+          console.error('Error al limpiar reportes:', error);
+          Swal.fire('Error', 'No se pudieron eliminar los reportes del servidor.', 'error');
+        }
       }
     });
   };
-
+  
 
   const handleLogout = () => {
     Swal.fire({
