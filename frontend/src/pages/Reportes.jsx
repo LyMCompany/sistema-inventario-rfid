@@ -175,25 +175,27 @@ function Reportes() {
           {reporteSeleccionado !== null && (
             <div className="tabla-reporte">
               <h3>Encontrados</h3>
-              <ul>
-                {reporteSeleccionado.encontrados.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
+<ul>
+  {(reporteSeleccionado?.encontrados || []).map((item, i) => (
+    <li key={i}>{item}</li>
+  ))}
+</ul>
 
-              <h3>Faltantes</h3>
-              <ul>
-                {reporteSeleccionado.faltantes.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
 
-              <h3>No Registrados</h3>
-              <ul>
-                {reporteSeleccionado.no_registrados.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
+<h3>Faltantes</h3>
+<ul>
+  {(reporteSeleccionado?.faltantes || []).map((item, i) => (
+    <li key={i}>{item}</li>
+  ))}
+</ul>
+
+<h3>No Registrados</h3>
+<ul>
+  {(reporteSeleccionado?.no_registrados || []).map((item, i) => (
+    <li key={i}>{item}</li>
+  ))}
+</ul>
+
             </div>
           )}
 
@@ -210,19 +212,20 @@ function Reportes() {
               </tr>
             </thead>
             <tbody>
-              {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
-                (reporteSeleccionado?.[tipo] || []).map((item, index) => (
-                  <tr key={`${tipo}-${index}`}>
-                    <td>{item.Nombre || '-'}</td>
-                    <td>{item.Codigo || '-'}</td>
-                    <td>{item.SKU || '-'}</td>
-                    <td>{item.Marca || '-'}</td>
-                    <td>{item.RFID || item.codigo || '-'}</td>
-                    <td>{item.Ubicacion || '-'}</td>
-                    <td>{item.Estado}</td>
-                  </tr>
-                ))
-              )}
+            {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
+  (reporteSeleccionado?.[tipo] || []).map((item, index) => (
+    <tr key={`${tipo}-${index}`}>
+      <td>{item.Nombre || '-'}</td>
+      <td>{item.Codigo || '-'}</td>
+      <td>{item.SKU || '-'}</td>
+      <td>{item.Marca || '-'}</td>
+      <td>{item.RFID || item.codigo || '-'}</td>
+      <td>{item.Ubicacion || '-'}</td>
+      <td>{item.Estado}</td>
+    </tr>
+  ))
+)}
+
             </tbody>
           </table>
         </div>
