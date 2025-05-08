@@ -218,11 +218,11 @@ function Reportes() {
                 (reporteSeleccionado?.[tipo] || []).map((item, index) => (
                   <tr key={`${tipo}-${index}`}>
                     <td>{item.Nombre || '-'}</td>
-                    <td>{item.Codigo || '-'}</td>
+                    <td>{item.Codigo || item['Código'] || item['Código Barras'] || '-'}</td>
                     <td>{item.SKU || '-'}</td>
                     <td>{item.Marca || '-'}</td>
                     <td>{item.RFID || item.codigo || '-'}</td>
-                    <td>{item.Ubicacion || '-'}</td>
+                    <td>{item.Ubicacion || item['Ubicación'] || '-'}</td>
                     <td>{item.Estado}</td>
                   </tr>
                 ))
