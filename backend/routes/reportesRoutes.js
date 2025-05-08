@@ -73,6 +73,30 @@ router.delete('/:id', async (req, res) => {
     }
   });
   
+  // Eliminar un reporte específico por usuario, empresa y fecha
+router.delete('/', async (req, res) => {
+    const { usuario, empresa, fecha } = req.body;
+  
+    if (!usuario || !empresa || !fecha) {
+      return res.status(400).json({ error: 'Faltan parámetros: usuario, empresa y fecha son requeridos' });
+    }
+  
+    try {
+      const result = await pool.query(
+        `DELETE FROM reportes WHERE usuario = $1 AND empresa = $2 AND fecha = $3`,
+        [usuario, empresa, fecha]
+      );
+  
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Reporte no encontrado' });
+      }
+  
+      res.status(200).json({ mensaje: 'Reporte eliminado correctamente' });
+    } catch (error) {
+      console.error('Error al eliminar reporte:', error);
+      res.status(500).json({ error: 'Error al eliminar el reporte' });
+    }
+  });
   
 
 module.exports = router;
