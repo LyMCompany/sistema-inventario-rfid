@@ -225,12 +225,13 @@ function Reportes() {
 
           {reporteSeleccionado !== null && (
             <div className="tabla-reporte">
-              <h3>Encontrados</h3>
-<ul>
-  {(reporteSeleccionado?.encontrados || []).map((item, i) => (
-    <li key={i}>{item}</li>
-  ))}
-</ul>
+            <h3>Encontrados</h3>
+             <ul>
+                {(reporteSeleccionado?.encontrados || []).map((item, i) => (
+               <li key={i}>{item?.Nombre || item?.Codigo || 'Código sin nombre'}</li>
+              ))}
+             </ul>
+
 
 
 <h3>Faltantes</h3>
