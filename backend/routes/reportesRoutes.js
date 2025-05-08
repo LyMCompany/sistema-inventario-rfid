@@ -43,5 +43,17 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener reportes' });
   }
 });
+// Eliminar todos los reportes de un usuario y empresa
+router.delete('/', async (req, res) => {
+    const { usuario, empresa } = req.query;
+    try {
+      await pool.query('DELETE FROM reportes WHERE usuario = $1 AND empresa = $2', [usuario, empresa]);
+      res.status(200).json({ mensaje: 'Todos los reportes eliminados correctamente' });
+    } catch (error) {
+      console.error('Error al eliminar reportes:', error);
+      res.status(500).json({ error: 'Error al eliminar reportes' });
+    }
+  });
+  
 
 module.exports = router;
