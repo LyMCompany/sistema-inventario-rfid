@@ -66,7 +66,7 @@ function Reportes() {
   };
 
   const handleEliminarReporteActual = async () => {
-    if (!reporteSeleccionado) return;
+    if (!reporteSeleccionado || !reporteSeleccionado.id) return;
   
     const confirmacion = await Swal.fire({
       title: '¿Estás seguro?',
@@ -74,38 +74,35 @@ function Reportes() {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     });
   
     if (!confirmacion.isConfirmed) return;
   
-    // 1. Eliminar del localStorage
-    const nuevosReportes = reportes.filter(r => r.fecha !== reporteSeleccionado.fecha || r.usuario !== reporteSeleccionado.usuario);
-    localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevosReportes));
-  
-    // 2. Eliminar del backend
     try {
-      await fetch('https://backend-inventario-t3yr.onrender.com/reportes', {
+      // Eliminar del backend
+      const res = await fetch(`https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado.id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          usuario: reporteSeleccionado.usuario,
-          empresa: reporteSeleccionado.empresa,
-          fecha: reporteSeleccionado.fecha,
-        }),
       });
+  
+      if (!res.ok) throw new Error('No se pudo eliminar del backend');
+  
+      // Eliminar del localStorage
+      const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+      const filtrados = todos.filter(r => r.fecha !== reporteSeleccionado.fecha);
+      localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
+  
+      // Eliminar del estado React
+      setReportes(prev => prev.filter(r => r.id !== reporteSeleccionado.id));
+      setReporteSeleccionado(null);
+  
+      Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
     } catch (error) {
-      console.error('Error al eliminar del backend:', error);
+      console.error('Error al eliminar:', error);
+      Swal.fire('Error', 'No se pudo eliminar el reporte del backend.', 'error');
     }
-  
-    // 3. Actualizar el estado en React
-    setReportes(nuevosReportes);
-    setReporteSeleccionado(null);
-  
-    Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
   };
+  
   
   
   
