@@ -7,6 +7,8 @@ const pool = require('../utils/db');
 
 // Guardar reporte
 router.post('/', async (req, res) => {
+    console.log('📦 Body recibido:', req.body);
+
   const { usuario, empresa, fecha, encontrados, faltantes, no_registrados } = req.body;
 
   try {
