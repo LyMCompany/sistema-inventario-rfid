@@ -9,9 +9,14 @@ const port = process.env.PORT || 5000;
 
 // ✅ Configuración CORS
 const corsOptions = {
-  origin: [
-    'https://frontend-inventario-tmzb.onrender.com'
-  ],
+  origin: function (origin, callback) {
+    if (!origin || origin.includes('onrender.com')) {
+      callback(null, true);
+    } else {
+      callback(new Error('No autorizado por CORS'));
+    }
+  },
+  
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
