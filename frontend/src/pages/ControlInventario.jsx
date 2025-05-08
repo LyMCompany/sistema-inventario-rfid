@@ -33,22 +33,6 @@ function ControlInventario() {
     return saved || null;
   });
   
-  useEffect(() => {
-    if (!comparacion) return;
-  
-    const reporte = {
-      usuario: username,
-      empresa: empresa,
-      fecha: fechaComparacion,
-      encontrados: comparacion.encontrados || [],
-      faltantes: comparacion.faltantes || [],
-      no_registrados: comparacion.no_Registrados || []
-    };
-  
-    enviarReporteAlBackend(reporte);
-  }, [comparacion]);
-  
-
   
   const enviarReporteAlBackend = async (reporte) => {
     try {
@@ -199,15 +183,17 @@ const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.get
     reportes.push({ usuario: empresa || 'Desconocido', fecha, ...resultadoFinal });
     localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(reportes));
 
-              // ✅ Enviar al backend aquí, no en useEffect
-                const reporte = {
-                   usuario: username,
-                   empresa: empresa,
-                   fecha,
-                   encontrados: resultadoFinal.encontrados || [],
-                   faltantes: resultadoFinal.faltantes || [],
-                   no_registrados: resultadoFinal.sobrantes || []
-             };
+    const reporte = {
+      usuario: username,
+      empresa: empresa,
+      fecha,
+      encontrados: resultadoFinal.encontrados || [],
+      faltantes: resultadoFinal.faltantes || [],
+      no_registrados: resultadoFinal.no_registrados || []
+    };
+    
+    enviarReporteAlBackend(reporte);
+    
 
 enviarReporteAlBackend(reporte);
 
