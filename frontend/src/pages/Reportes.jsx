@@ -68,7 +68,6 @@ function Reportes() {
   
 
   const eliminarReporte = async (fecha) => {
-    // Verifica si es un reporte del backend (tiene _id por ejemplo)
     if (reporteSeleccionado._id) {
       try {
         const response = await fetch(`https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado._id}`, {
@@ -77,33 +76,24 @@ function Reportes() {
   
         if (!response.ok) throw new Error('Error al eliminar desde backend');
   
-        // Filtra en estado frontend
         setReportes(prev => prev.filter(r => r._id !== reporteSeleccionado._id));
         Swal.fire('Eliminado', 'Reporte eliminado correctamente', 'success');
       } catch (error) {
         console.error('Error al eliminar reporte del backend:', error);
         Swal.fire('Error', 'No se pudo eliminar el reporte del servidor', 'error');
       }
-    } // Elimina desde localStorage si no hay _id
-    else {
+    } else {
+      // Eliminar desde localStorage por coincidencia exacta de usuario + empresa + fecha
       const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-    
-      const nuevos = todos.filter(r => {
-        const mismaEmpresa = r.empresa === user.empresa;
-        const mismoUsuario = r.usuario === user.username;
-        const mismaFecha = r.fecha.includes(fecha); // usa includes para evitar errores por segundos
-        return !(mismaEmpresa && mismoUsuario && mismaFecha);
-      });
-    
+      const nuevos = todos.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha));
       localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-      setReportes(nuevos);
-      setReporteSeleccionado(null);
+      setReportes(prev => prev.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha)));
       Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
     }
-    
   
     setReporteSeleccionado(null);
   };
+  
   const limpiarTodosMisReportes = () => {
     Swal.fire({
       title: '¿Estás seguro?',
