@@ -81,7 +81,7 @@ function Reportes() {
   
     // 1. Eliminar del localStorage
     const nuevosReportes = reportes.filter(r => r.fecha !== reporteSeleccionado.fecha || r.usuario !== reporteSeleccionado.usuario);
-    localStorage.setItem('reportesComparacion', JSON.stringify(nuevosReportes));
+    localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevosReportes));
   
     // 2. Eliminar del backend
     try {
@@ -195,7 +195,7 @@ function Reportes() {
             </option>
           ))}
         </select>
-        <button className="btn-limpiar-reportes" onClick={limpiarTodosMisReportes}>Limpiar Mis Reportes</button>
+        <button className="btn-limpiar-reportes" onClick={eliminarReporte}>Limpiar Mis Reportes</button>
       </div>
 
       {reporteSeleccionado && (
