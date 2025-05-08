@@ -65,46 +65,43 @@ function Reportes() {
     XLSX.writeFile(wb, nombre);
   };
 
-  const eliminarReporte = async (fecha) => {
-    try {
-      // Si el reporte tiene _id, entonces es del backend
-      if (reporteSeleccionado._id) {
-        const response = await fetch(
-          `https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado._id}`,
-          { method: 'DELETE' }
-        );
-
-        if (!response.ok) throw new Error('Error al eliminar desde backend');
-
-        // Elimina también del estado y localStorage
-        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-        const nuevos = todos.filter(r => r.fecha !== reporteSeleccionado.fecha);
-
-        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-
-        setReportes(prev => prev.filter(r =>
-          r._id !== reporteSeleccionado._id && r.fecha !== reporteSeleccionado.fecha
-        ));
-
-        Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
-      } else {
-        // Si no tiene _id, solo está en localStorage
-        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-        const nuevos = todos.filter(r =>
-          r.usuario !== user.username || r.empresa !== user.empresa || r.fecha !== fecha
-        );
-        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-
-        setReportes(prev => prev.filter(r => r.fecha !== fecha));
-        Swal.fire('Eliminado', 'Reporte eliminado correctamente del navegador.', 'success');
-      }
-
+    const eliminarReporte = async () => {
+    if (!reporteSeleccionado) return;
+  
+    const confirmacion = await Swal.fire({
+      title: '¿Eliminar reporte?',
+      text: 'Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+  
+    if (confirmacion.isConfirmed) {
+      const nuevosReportes = reportes.filter(r => r.fecha !== reporteSeleccionado.fecha);
+      localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevosReportes));
+      setReportes(nuevosReportes);
       setReporteSeleccionado(null);
-    } catch (error) {
-      console.error('Error al eliminar reporte:', error);
-      Swal.fire('Error', 'No se pudo eliminar el reporte.', 'error');
+  
+      // 🔴 NUEVO: eliminar también del backend
+      try {
+        await fetch('https://backend-inventario-t3yr.onrender.com/reportes', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            usuario: reporteSeleccionado.usuario,
+            empresa: reporteSeleccionado.empresa,
+            fecha: reporteSeleccionado.fecha
+          })
+        });
+      } catch (error) {
+        console.error('Error al eliminar del backend:', error);
+      }
+  
+      Swal.fire('Eliminado', 'Reporte eliminado correctamente del navegador y servidor.', 'success');
     }
   };
+  
 
   const limpiarTodosMisReportes = () => {
     Swal.fire({
