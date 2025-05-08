@@ -84,14 +84,23 @@ function Reportes() {
         console.error('Error al eliminar reporte del backend:', error);
         Swal.fire('Error', 'No se pudo eliminar el reporte del servidor', 'error');
       }
-    } else {
-      // Eliminar desde localStorage
+    } // Elimina desde localStorage si no hay _id
+    else {
       const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-      const nuevos = todos.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha));
+    
+      const nuevos = todos.filter(r => {
+        const mismaEmpresa = r.empresa === user.empresa;
+        const mismoUsuario = r.usuario === user.username;
+        const mismaFecha = r.fecha.includes(fecha); // usa includes para evitar errores por segundos
+        return !(mismaEmpresa && mismoUsuario && mismaFecha);
+      });
+    
       localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-      setReportes(prev => prev.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha)));
-      Swal.fire('Eliminado', 'Reporte eliminado correctamente', 'success');
+      setReportes(nuevos);
+      setReporteSeleccionado(null);
+      Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
     }
+    
   
     setReporteSeleccionado(null);
   };
@@ -114,7 +123,7 @@ function Reportes() {
       }
     });
   };
-  
+
 
   const handleLogout = () => {
     Swal.fire({
