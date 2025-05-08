@@ -40,9 +40,9 @@ function ControlInventario() {
       usuario: username,
       empresa: empresa,
       fecha: fechaComparacion,
-      encontrados: comparacion.encontrados?.map(e => e.codigo) || [],
-      faltantes: comparacion.faltantes?.map(e => e.codigo) || [],
-      no_registrados: comparacion.noRegistrados?.map(e => e.codigo) || []
+      encontrados: comparacion.encontrados || [],
+      faltantes: comparacion.faltantes || [],
+      no_registrados: comparacion.no_Registrados || []
     };
   
     enviarReporteAlBackend(reporte);
