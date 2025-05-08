@@ -12,7 +12,27 @@ function Reportes() {
   const navigate = useNavigate();
   const [reportes, setReportes] = useState([]);
   const [reporteSeleccionado, setReporteSeleccionado] = useState(null);
-
+  useEffect(() => {
+    const handleStorage = (event) => {
+      if (event.key === "actualizarReportes") {
+        console.log("📥 Actualizando lista de reportes...");
+        fetch(
+          `https://backend-inventario-t3yr.onrender.com/reportes?usuario=${user.correo}&empresa=${user.empresa}`
+        )
+          .then(res => res.json())
+          .then(data => {
+            setReportes(data);
+          })
+          .catch(err => {
+            console.error("Error al recargar reportes:", err);
+          });
+      }
+    };
+  
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [user]);
+  
   useEffect(() => {
     const cargarReportes = async () => {
       try {
@@ -69,10 +89,10 @@ function Reportes() {
 
   const eliminarReporte = async (fecha) => {
     try {
-      // Si el reporte tiene _id, entonces es del backend
-      if (reporteSeleccionado._id) {
+      // Si el reporte tiene id, entonces es del backend
+      if (reporteSeleccionado.id) {
         const response = await fetch(
-          `https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado._id}`,
+          `https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado.id}`,
           { method: 'DELETE' }
         );
   
@@ -84,12 +104,12 @@ function Reportes() {
         localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
   
         setReportes(prev => prev.filter(r =>
-          r._id !== reporteSeleccionado._id && r.fecha !== reporteSeleccionado.fecha
+          r.id !== reporteSeleccionado.id && r.fecha !== reporteSeleccionado.fecha
         ));
   
         Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
       } else {
-        // Si no tiene _id, solo está en localStorage
+        // Si no tiene id, solo está en localStorage
         const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
         const nuevos = todos.filter(r =>
           r.usuario !== user.username || r.empresa !== user.empresa || r.fecha !== fecha

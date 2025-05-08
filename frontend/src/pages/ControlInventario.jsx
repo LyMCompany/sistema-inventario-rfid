@@ -174,7 +174,7 @@ function ControlInventario() {
     localStorage.setItem(`comparacion_${empresa}`, JSON.stringify(resultadoFinal));
 
     const fechaObj = new Date();
-const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.getMonth() + 1).toString().padStart(2, '0')}/${fechaObj.getFullYear()} ${fechaObj.getHours().toString().padStart(2, '0')}:${fechaObj.getMinutes().toString().padStart(2, '0')}`;
+    const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.getMonth() + 1).toString().padStart(2, '0')}/${fechaObj.getFullYear()} ${fechaObj.getHours().toString().padStart(2, '0')}:${fechaObj.getMinutes().toString().padStart(2, '0')}`;
 
     setFechaComparacion(fecha);
     localStorage.setItem(`fechaComparacion_${empresa}`, fecha);
@@ -203,7 +203,9 @@ const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.get
       `Encontrados: ${encontrados.length}, Faltantes: ${faltantesMarcados.length}, Sobrantes: ${sobrantes.length}`,
       'info'
     );
-  };
+             // Notificar al componente Reportes.jsx para que recargue
+             localStorage.setItem("actualizarReportes", Date.now().toString());
+};
 
   const handleExportar = () => {
     if (!comparacion) {
