@@ -67,33 +67,35 @@ function Reportes() {
   };
   
 
-  const eliminarReporte = (fecha) => {
-    const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-    const nuevos = todos.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha));
-    localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-    setReportes(nuevos.filter(r => r.usuario === user.username && r.empresa === user.empresa));
+  const eliminarReporte = async (fecha) => {
+    // Verifica si es un reporte del backend (tiene _id por ejemplo)
+    if (reporteSeleccionado._id) {
+      try {
+        const response = await fetch(`https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado._id}`, {
+          method: 'DELETE'
+        });
+  
+        if (!response.ok) throw new Error('Error al eliminar desde backend');
+  
+        // Filtra en estado frontend
+        setReportes(prev => prev.filter(r => r._id !== reporteSeleccionado._id));
+        Swal.fire('Eliminado', 'Reporte eliminado correctamente', 'success');
+      } catch (error) {
+        console.error('Error al eliminar reporte del backend:', error);
+        Swal.fire('Error', 'No se pudo eliminar el reporte del servidor', 'error');
+      }
+    } else {
+      // Eliminar desde localStorage
+      const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+      const nuevos = todos.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha));
+      localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
+      setReportes(prev => prev.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha)));
+      Swal.fire('Eliminado', 'Reporte eliminado correctamente', 'success');
+    }
+  
     setReporteSeleccionado(null);
   };
-
-  const limpiarTodosMisReportes = () => {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'Esto eliminará todos tus reportes guardados.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-        const filtrados = todos.filter(r => r.usuario !== user.username || r.empresa !== user.empresa);
-        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
-        setReportes([]);
-        setReporteSeleccionado(null);
-        Swal.fire('Eliminados', 'Tus reportes han sido eliminados.', 'success');
-      }
-    });
-  };
+  
 
   const handleLogout = () => {
     Swal.fire({
