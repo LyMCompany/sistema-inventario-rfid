@@ -199,6 +199,19 @@ const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.get
     reportes.push({ usuario: empresa || 'Desconocido', fecha, ...resultadoFinal });
     localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(reportes));
 
+              // ✅ Enviar al backend aquí, no en useEffect
+                const reporte = {
+                   usuario: username,
+                   empresa: empresa,
+                   fecha,
+                   encontrados: resultadoFinal.encontrados || [],
+                   faltantes: resultadoFinal.faltantes || [],
+                   no_registrados: resultadoFinal.sobrantes || []
+             };
+
+enviarReporteAlBackend(reporte);
+
+
     setIsProcessing(false);
 
     Swal.fire(
