@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
     const result = await pool.query(
       `INSERT INTO reportes (usuario, empresa, fecha, encontrados, faltantes, no_registrados)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [usuario, empresa, fecha, encontrados, faltantes, no_registrados]
+      [usuario, empresa, fecha,JSON.stringify(encontrados), JSON.stringify(faltantes), JSON.stringify(no_registrados)]
     );
     res.status(201).json({ mensaje: 'Reporte guardado correctamente', reporte: result.rows[0] });
   } catch (error) {
