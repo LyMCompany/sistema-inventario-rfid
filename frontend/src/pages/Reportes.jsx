@@ -68,48 +68,45 @@ function Reportes() {
   
 
   const eliminarReporte = async (fecha) => {
-    const esDelBackend = !!reporteSeleccionado._id;
-  
-    if (esDelBackend) {
-      try {
-        const response = await fetch(`https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado._id}`, {
-          method: 'DELETE'
-        });
+    try {
+      // Si el reporte tiene _id, entonces es del backend
+      if (reporteSeleccionado._id) {
+        const response = await fetch(
+          `https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado._id}`,
+          { method: 'DELETE' }
+        );
   
         if (!response.ok) throw new Error('Error al eliminar desde backend');
   
-        setReportes(prev => prev.filter(r => r._id !== reporteSeleccionado._id));
+        // Elimina también del estado y localStorage
+        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+        const nuevos = todos.filter(r => r.fecha !== reporteSeleccionado.fecha);
+        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
+  
+        setReportes(prev => prev.filter(r =>
+          r._id !== reporteSeleccionado._id && r.fecha !== reporteSeleccionado.fecha
+        ));
+  
         Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
-      } catch (error) {
-        console.error('Error al eliminar reporte del backend:', error);
-        Swal.fire('Error', 'No se pudo eliminar el reporte del servidor.', 'error');
+      } else {
+        // Si no tiene _id, solo está en localStorage
+        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+        const nuevos = todos.filter(r =>
+          r.usuario !== user.username || r.empresa !== user.empresa || r.fecha !== fecha
+        );
+        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
+  
+        setReportes(prev => prev.filter(r => r.fecha !== fecha));
+        Swal.fire('Eliminado', 'Reporte eliminado correctamente del navegador.', 'success');
       }
-    } else {
-      const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
   
-      const nuevos = todos.filter(r => {
-        const mismaEmpresa = r.empresa === user.empresa;
-        const mismoUsuario = r.usuario === user.username;
-        const mismaFecha = r.fecha.includes(fecha); // flexible para evitar errores con segundos
-        return !(mismaEmpresa && mismoUsuario && mismaFecha);
-      });
-  
-      localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-  
-      // ✅ Ahora también filtramos bien los reportes cargados en pantalla
-      setReportes(prev => prev.filter(r => {
-        if (r._id) return true; // No tocar los que vienen del backend
-        const mismaEmpresa = r.empresa === user.empresa;
-        const mismoUsuario = r.usuario === user.username;
-        const mismaFecha = r.fecha.includes(fecha);
-        return !(mismaEmpresa && mismoUsuario && mismaFecha);
-      }));
-  
-      Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
+      setReporteSeleccionado(null);
+    } catch (error) {
+      console.error('Error al eliminar reporte:', error);
+      Swal.fire('Error', 'No se pudo eliminar el reporte.', 'error');
     }
-  
-    setReporteSeleccionado(null);
   };
+  
   
   const limpiarTodosMisReportes = () => {
     Swal.fire({
