@@ -13,7 +13,8 @@ function ControlInventario() {
   const { inventarioBase, setInventarioBase } = useInventario();
   const { user } = useUser();
   const empresa = user?.empresa || 'Empresa no definida';
-  const username = user?.username || 'Usuario no definido';
+  const username = user?.correo || 'Usuario no definido';
+
 
 
   const navigate = useNavigate();
