@@ -12,27 +12,7 @@ function Reportes() {
   const navigate = useNavigate();
   const [reportes, setReportes] = useState([]);
   const [reporteSeleccionado, setReporteSeleccionado] = useState(null);
-  useEffect(() => {
-    const handleStorage = (event) => {
-      if (event.key === "actualizarReportes") {
-        console.log("📥 Actualizando lista de reportes...");
-        fetch(
-          `https://backend-inventario-t3yr.onrender.com/reportes?usuario=${user.correo}&empresa=${user.empresa}`
-        )
-          .then(res => res.json())
-          .then(data => {
-            setReportes(data);
-          })
-          .catch(err => {
-            console.error("Error al recargar reportes:", err);
-          });
-      }
-    };
-  
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, [user]);
-  
+
   useEffect(() => {
     const cargarReportes = async () => {
       try {
@@ -58,7 +38,6 @@ function Reportes() {
     );
 
     setReportes(prev => [...prev, ...propios]);
-
   }, [empresa]);
 
   const exportarReporte = (reporte) => {
@@ -73,61 +52,60 @@ function Reportes() {
       Fecha: reporte.fecha,
       Usuario: reporte.usuario,
     });
-  
+
     const data = ['encontrados', 'faltantes', 'no_registrados']
       .flatMap(tipo =>
         (reporte[tipo] || []).map(item => agregarInfo(item, tipo))
       );
-  
+
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    const nombre = `Reporte_${reporte.usuario}_${reporte.fecha.replace(/[/:, ]/g, '_')}.xlsx`;
+    const nombre = `Reporte_${reporte.usuario}_${reporte.fecha.replace(/[\/:, ]/g, '_')}.xlsx`;
     XLSX.writeFile(wb, nombre);
   };
-  
 
   const eliminarReporte = async (fecha) => {
     try {
-      // Si el reporte tiene id, entonces es del backend
-      if (reporteSeleccionado.id) {
+      // Si el reporte tiene _id, entonces es del backend
+      if (reporteSeleccionado._id) {
         const response = await fetch(
-          `https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado.id}`,
+          `https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado._id}`,
           { method: 'DELETE' }
         );
-  
+
         if (!response.ok) throw new Error('Error al eliminar desde backend');
-  
+
         // Elimina también del estado y localStorage
         const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
         const nuevos = todos.filter(r => r.fecha !== reporteSeleccionado.fecha);
+
         localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-  
+
         setReportes(prev => prev.filter(r =>
-          r.id !== reporteSeleccionado.id && r.fecha !== reporteSeleccionado.fecha
+          r._id !== reporteSeleccionado._id && r.fecha !== reporteSeleccionado.fecha
         ));
-  
+
         Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
       } else {
-        // Si no tiene id, solo está en localStorage
+        // Si no tiene _id, solo está en localStorage
         const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
         const nuevos = todos.filter(r =>
           r.usuario !== user.username || r.empresa !== user.empresa || r.fecha !== fecha
         );
         localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-  
+
         setReportes(prev => prev.filter(r => r.fecha !== fecha));
         Swal.fire('Eliminado', 'Reporte eliminado correctamente del navegador.', 'success');
       }
-  
+
       setReporteSeleccionado(null);
     } catch (error) {
       console.error('Error al eliminar reporte:', error);
       Swal.fire('Error', 'No se pudo eliminar el reporte.', 'error');
     }
   };
-  
-  
+
   const limpiarTodosMisReportes = () => {
     Swal.fire({
       title: '¿Estás seguro?',
@@ -144,18 +122,18 @@ function Reportes() {
             `https://backend-inventario-t3yr.onrender.com/reportes?usuario=${user.correo}&empresa=${user.empresa}`,
             { method: 'DELETE' }
           );
-  
+
           if (!response.ok) throw new Error('Error al eliminar del backend');
-  
+
           // 2. Eliminar todos los reportes del localStorage para este usuario
           const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
           const filtrados = todos.filter(r => r.usuario !== user.username || r.empresa !== user.empresa);
           localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
-  
+
           // 3. Limpiar la lista actual en pantalla
           setReportes([]);
           setReporteSeleccionado(null);
-  
+
           Swal.fire('Eliminados', 'Tus reportes han sido eliminados de todos lados.', 'success');
         } catch (error) {
           console.error('Error al limpiar reportes:', error);
@@ -164,7 +142,6 @@ function Reportes() {
       }
     });
   };
-  
 
   const handleLogout = () => {
     Swal.fire({
@@ -203,6 +180,7 @@ function Reportes() {
         <select value={reporteSeleccionado ? reporteSeleccionado.fecha : ''} 
           onChange={(e) => {
             const seleccionado = reportes.find(r => r.fecha === e.target.value);
+
             setReporteSeleccionado(seleccionado);
           }}
         >
@@ -223,34 +201,6 @@ function Reportes() {
             <button onClick={() => eliminarReporte(reporteSeleccionado.fecha)} className="btn-eliminar-reporte">Eliminar Este Reporte</button>
           </div>
 
-          {reporteSeleccionado !== null && (
-            <div className="tabla-reporte">
-            <h3>Encontrados</h3>
-             <ul>
-                {(reporteSeleccionado?.encontrados || []).map((item, i) => (
-               <li key={i}>{item?.Nombre || item?.Codigo || 'Código sin nombre'}</li>
-              ))}
-             </ul>
-
-
-
-<h3>Faltantes</h3>
-<ul>
-  {(reporteSeleccionado?.faltantes || []).map((item, i) => (
-    <li key={i}>{item}</li>
-  ))}
-</ul>
-
-<h3>No Registrados</h3>
-<ul>
-  {(reporteSeleccionado?.no_registrados || []).map((item, i) => (
-    <li key={i}>{item}</li>
-  ))}
-</ul>
-
-            </div>
-          )}
-
           <table className="tabla-comparacion">
             <thead>
               <tr>
@@ -264,20 +214,19 @@ function Reportes() {
               </tr>
             </thead>
             <tbody>
-            {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
-  (reporteSeleccionado?.[tipo] || []).map((item, index) => (
-    <tr key={`${tipo}-${index}`}>
-      <td>{item.Nombre || '-'}</td>
-      <td>{item.Codigo || '-'}</td>
-      <td>{item.SKU || '-'}</td>
-      <td>{item.Marca || '-'}</td>
-      <td>{item.RFID || item.codigo || '-'}</td>
-      <td>{item.Ubicacion || '-'}</td>
-      <td>{item.Estado}</td>
-    </tr>
-  ))
-)}
-
+              {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
+                (reporteSeleccionado?.[tipo] || []).map((item, index) => (
+                  <tr key={`${tipo}-${index}`}>
+                    <td>{item.Nombre || '-'}</td>
+                    <td>{item.Codigo || '-'}</td>
+                    <td>{item.SKU || '-'}</td>
+                    <td>{item.Marca || '-'}</td>
+                    <td>{item.RFID || item.codigo || '-'}</td>
+                    <td>{item.Ubicacion || '-'}</td>
+                    <td>{item.Estado}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
