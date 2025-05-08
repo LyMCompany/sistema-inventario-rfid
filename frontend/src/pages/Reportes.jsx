@@ -65,42 +65,48 @@ function Reportes() {
     XLSX.writeFile(wb, nombre);
   };
 
-    const eliminarReporte = async () => {
+  const eliminarReporte = async () => {
     if (!reporteSeleccionado) return;
   
     const confirmacion = await Swal.fire({
-      title: '¿Eliminar reporte?',
-      text: 'Esta acción no se puede deshacer.',
+      title: '¿Eliminar este reporte?',
+      text: 'Se eliminará localmente y del servidor',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     });
   
-    if (confirmacion.isConfirmed) {
-      const nuevosReportes = reportes.filter(r => r.fecha !== reporteSeleccionado.fecha);
-      localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevosReportes));
-      setReportes(nuevosReportes);
-      setReporteSeleccionado(null);
+    if (!confirmacion.isConfirmed) return;
   
-      // 🔴 NUEVO: eliminar también del backend
-      try {
-        await fetch('https://backend-inventario-t3yr.onrender.com/reportes', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            usuario: reporteSeleccionado.usuario,
-            empresa: reporteSeleccionado.empresa,
-            fecha: reporteSeleccionado.fecha
-          })
-        });
-      } catch (error) {
-        console.error('Error al eliminar del backend:', error);
-      }
+    // 1. Eliminar del localStorage
+    const key = `reportesComparacion_${empresa}`;
+    const reportesGuardados = JSON.parse(localStorage.getItem(key)) || [];
+    const filtrados = reportesGuardados.filter(
+      r => !(r.fecha === reporteSeleccionado.fecha && r.usuario === reporteSeleccionado.usuario)
+    );
+    localStorage.setItem(key, JSON.stringify(filtrados));
+    setReportes(filtrados);
+    setReporteSeleccionado(null);
   
-      Swal.fire('Eliminado', 'Reporte eliminado correctamente del navegador y servidor.', 'success');
+    // 2. Eliminar del backend
+    try {
+      await fetch('https://backend-inventario-t3yr.onrender.com/reportes', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuario: reporteSeleccionado.usuario,
+          empresa: reporteSeleccionado.empresa,
+          fecha: reporteSeleccionado.fecha
+        })
+      });
+    } catch (error) {
+      console.error('Error al eliminar del backend:', error);
     }
+  
+    Swal.fire('Eliminado', 'Reporte eliminado correctamente del navegador y servidor.', 'success');
   };
+  
   
 
   const limpiarTodosMisReportes = () => {
