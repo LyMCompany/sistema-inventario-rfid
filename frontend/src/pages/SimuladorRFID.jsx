@@ -7,7 +7,8 @@ function SimuladorRFID() {
   const codigosGenerados = useRef(new Set());
 
   useEffect(() => {
-    ws.current = new WebSocket('ws://localhost:8080');
+    ws.current = new WebSocket("wss://rfid-websocket-server-production.up.railway.app");
+
 
     ws.current.onopen = () => {
       console.log('[SimuladorRFID] Conectado al WebSocket (Simulador)');

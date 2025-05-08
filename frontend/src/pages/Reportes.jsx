@@ -42,25 +42,30 @@ function Reportes() {
   }, [empresa]);
 
   const exportarReporte = (reporte) => {
-    const agregarInfo = (item) => ({
-      ...item,
+    const agregarInfo = (item, tipo) => ({
+      Nombre: item.Nombre || '-',
+      Codigo: item.Codigo || '-',
+      SKU: item.SKU || '-',
+      Marca: item.Marca || '-',
       RFID: String(item.RFID || item.codigo || '-'),
+      Ubicacion: item.Ubicacion || '-',
+      Estado: item.Estado || tipo, // como fallback
       Fecha: reporte.fecha,
       Usuario: reporte.usuario,
     });
-
-    const data = [
-      ...reporte.encontrados.map(agregarInfo),
-      ...reporte.faltantes.map(agregarInfo),
-      ...reporte.sobrantes.map(agregarInfo),
-    ];
-
+  
+    const data = ['encontrados', 'faltantes', 'no_registrados']
+      .flatMap(tipo =>
+        (reporte[tipo] || []).map(item => agregarInfo(item, tipo))
+      );
+  
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
     const nombre = `Reporte_${reporte.usuario}_${reporte.fecha.replace(/[/:, ]/g, '_')}.xlsx`;
     XLSX.writeFile(wb, nombre);
   };
+  
 
   const eliminarReporte = (fecha) => {
     const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
@@ -185,8 +190,8 @@ function Reportes() {
               </tr>
             </thead>
             <tbody>
-              {['encontrados', 'faltantes', 'sobrantes'].flatMap(tipo =>
-                reporteSeleccionado[tipo].map((item, index) => (
+              {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
+                (reporteSeleccionado?.[tipo] || []).map((item, index) => (
                   <tr key={`${tipo}-${index}`}>
                     <td>{item.Nombre || '-'}</td>
                     <td>{item.Codigo || '-'}</td>

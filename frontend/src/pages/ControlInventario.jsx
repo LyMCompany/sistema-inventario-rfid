@@ -39,7 +39,7 @@ function ControlInventario() {
     const reporte = {
       usuario: username,
       empresa: empresa,
-      fecha: new Date().toISOString(),
+      fecha: fechaComparacion,
       encontrados: comparacion.encontrados?.map(e => e.codigo) || [],
       faltantes: comparacion.faltantes?.map(e => e.codigo) || [],
       no_registrados: comparacion.noRegistrados?.map(e => e.codigo) || []
@@ -100,7 +100,7 @@ function ControlInventario() {
   }, [setInventarioBase]);
 
   useEffect(() => {
-    let ws = new WebSocket('ws://localhost:8080');
+    let ws = new WebSocket("wss://rfid-websocket-server-production.up.railway.app");
     ws.onopen = () => console.log('[RFIDListener] WebSocket conectado');
     ws.onmessage = (event) => {
       try {
@@ -115,7 +115,7 @@ function ControlInventario() {
       console.warn('[RFIDListener] Conexión WebSocket cerrada. Reintentando...');
       setTimeout(() => {
         if (ws.readyState !== WebSocket.OPEN) {
-          ws = new WebSocket('ws://localhost:8080');
+          ws = new WebSocket("wss://rfid-websocket-server-production.up.railway.app");
         }
       }, 5000);
     };
@@ -189,7 +189,9 @@ function ControlInventario() {
     setComparacion(resultadoFinal);
     localStorage.setItem(`comparacion_${empresa}`, JSON.stringify(resultadoFinal));
 
-    const fecha = new Date().toLocaleString();
+    const fechaObj = new Date();
+const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.getMonth() + 1).toString().padStart(2, '0')}/${fechaObj.getFullYear()} ${fechaObj.getHours().toString().padStart(2, '0')}:${fechaObj.getMinutes().toString().padStart(2, '0')}`;
+
     setFechaComparacion(fecha);
     localStorage.setItem(`fechaComparacion_${empresa}`, fecha);
 
