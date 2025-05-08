@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
+app.use(express.json());
 const port = process.env.PORT || 5000;
 
 const reportesRoutes = require('./routes/reportesRoutes');
@@ -22,7 +23,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
-app.use(express.json());
+
 
 // ✅ Rutas del backend
 app.use('/auth', authRoutes);
