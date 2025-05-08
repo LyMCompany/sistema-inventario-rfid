@@ -174,9 +174,17 @@ function ControlInventario() {
     setComparacion(resultadoFinal);
     localStorage.setItem(`comparacion_${empresa}`, JSON.stringify(resultadoFinal));
 
-    const fechaObj = new Date();
-    const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.getMonth() + 1).toString().padStart(2, '0')}/${fechaObj.getFullYear()} ${fechaObj.getHours().toString().padStart(2, '0')}:${fechaObj.getMinutes().toString().padStart(2, '0')}`;
-
+    const fecha = new Date().toLocaleString('es-EC', {
+      timeZone: 'America/Guayaquil',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    
     setFechaComparacion(fecha);
     localStorage.setItem(`fechaComparacion_${empresa}`, fecha);
 
