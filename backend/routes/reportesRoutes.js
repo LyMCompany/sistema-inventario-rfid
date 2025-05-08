@@ -9,13 +9,14 @@ const pool = require('../utils/db');
 router.post('/', async (req, res) => {
     console.log('📦 Body recibido:', req.body);
 
-  const { usuario, empresa, fecha, encontrados, faltantes, no_registrados } = req.body;
+    const { usuario, empresa, fecha, encontrados, faltantes, sobrantes } = req.body;
+
 
   try {
     const result = await pool.query(
       `INSERT INTO reportes (usuario, empresa, fecha, encontrados, faltantes, no_registrados)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [usuario, empresa, fecha,JSON.stringify(encontrados), JSON.stringify(faltantes), JSON.stringify(no_registrados)]
+        VALUES ($1, $2, $3, $4, $5, $6)`,
+      [usuario, empresa, fecha,JSON.stringify(encontrados), JSON.stringify(faltantes), JSON.stringify(sobrantes)]
     );
     res.status(201).json({ mensaje: 'Reporte guardado correctamente', reporte: result.rows[0] });
   } catch (error) {
@@ -54,6 +55,24 @@ router.delete('/', async (req, res) => {
       res.status(500).json({ error: 'Error al eliminar reportes' });
     }
   });
+  // Eliminar un solo reporte por ID
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const result = await pool.query('DELETE FROM reportes WHERE id = $1', [id]);
+  
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Reporte no encontrado' });
+      }
+  
+      res.status(200).json({ mensaje: 'Reporte eliminado correctamente' });
+    } catch (error) {
+      console.error('Error al eliminar reporte por ID:', error);
+      res.status(500).json({ error: 'Error al eliminar el reporte' });
+    }
+  });
+  
   
 
 module.exports = router;
