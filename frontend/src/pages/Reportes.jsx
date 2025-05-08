@@ -17,7 +17,7 @@ function Reportes() {
     const cargarReportes = async () => {
       try {
         const response = await fetch(
-          `https://tu-backend-render.onrender.com/reportes?usuario=${user.username}&empresa=${user.empresa}`
+          `https://backend-inventario-t3yr.onrender.com/reportes?usuario=${user.correo}&empresa=${user.empresa}`
         );
         const data = await response.json();
         setReportes(data);
