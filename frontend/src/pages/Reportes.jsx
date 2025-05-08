@@ -68,7 +68,9 @@ function Reportes() {
   
 
   const eliminarReporte = async (fecha) => {
-    if (reporteSeleccionado._id) {
+    const esDelBackend = !!reporteSeleccionado._id;
+  
+    if (esDelBackend) {
       try {
         const response = await fetch(`https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado._id}`, {
           method: 'DELETE'
@@ -77,17 +79,32 @@ function Reportes() {
         if (!response.ok) throw new Error('Error al eliminar desde backend');
   
         setReportes(prev => prev.filter(r => r._id !== reporteSeleccionado._id));
-        Swal.fire('Eliminado', 'Reporte eliminado correctamente', 'success');
+        Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
       } catch (error) {
         console.error('Error al eliminar reporte del backend:', error);
-        Swal.fire('Error', 'No se pudo eliminar el reporte del servidor', 'error');
+        Swal.fire('Error', 'No se pudo eliminar el reporte del servidor.', 'error');
       }
     } else {
-      // Eliminar desde localStorage por coincidencia exacta de usuario + empresa + fecha
       const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
-      const nuevos = todos.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha));
+  
+      const nuevos = todos.filter(r => {
+        const mismaEmpresa = r.empresa === user.empresa;
+        const mismoUsuario = r.usuario === user.username;
+        const mismaFecha = r.fecha.includes(fecha); // flexible para evitar errores con segundos
+        return !(mismaEmpresa && mismoUsuario && mismaFecha);
+      });
+  
       localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
-      setReportes(prev => prev.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha)));
+  
+      // ✅ Ahora también filtramos bien los reportes cargados en pantalla
+      setReportes(prev => prev.filter(r => {
+        if (r._id) return true; // No tocar los que vienen del backend
+        const mismaEmpresa = r.empresa === user.empresa;
+        const mismoUsuario = r.usuario === user.username;
+        const mismaFecha = r.fecha.includes(fecha);
+        return !(mismaEmpresa && mismoUsuario && mismaFecha);
+      }));
+  
       Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
     }
   
