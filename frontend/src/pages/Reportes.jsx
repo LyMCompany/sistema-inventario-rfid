@@ -95,6 +95,25 @@ function Reportes() {
   
     setReporteSeleccionado(null);
   };
+  const limpiarTodosMisReportes = () => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esto eliminará todos tus reportes guardados.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+        const filtrados = todos.filter(r => r.usuario !== user.username || r.empresa !== user.empresa);
+        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
+        setReportes([]);
+        setReporteSeleccionado(null);
+        Swal.fire('Eliminados', 'Tus reportes han sido eliminados.', 'success');
+      }
+    });
+  };
   
 
   const handleLogout = () => {
