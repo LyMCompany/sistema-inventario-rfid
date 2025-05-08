@@ -52,7 +52,7 @@ function ControlInventario() {
   
   const enviarReporteAlBackend = async (reporte) => {
     try {
-      const response = await fetch("https://tu-backend-render.onrender.com/reportes", {
+      const response = await fetch("https://backend-inventario-t3yr.onrender.com/reportes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
