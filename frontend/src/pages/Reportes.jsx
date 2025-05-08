@@ -65,12 +65,12 @@ function Reportes() {
     XLSX.writeFile(wb, nombre);
   };
 
-  const eliminarReporte = async () => {
+  const handleEliminarReporteActual = async () => {
     if (!reporteSeleccionado) return;
   
     const confirmacion = await Swal.fire({
-      title: '¿Eliminar este reporte?',
-      text: 'Se eliminará localmente y del servidor',
+      title: '¿Estás seguro?',
+      text: 'Este reporte será eliminado definitivamente.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
@@ -80,32 +80,33 @@ function Reportes() {
     if (!confirmacion.isConfirmed) return;
   
     // 1. Eliminar del localStorage
-    const key = `reportesComparacion_${empresa}`;
-    const reportesGuardados = JSON.parse(localStorage.getItem(key)) || [];
-    const filtrados = reportesGuardados.filter(
-      r => !(r.fecha === reporteSeleccionado.fecha && r.usuario === reporteSeleccionado.usuario)
-    );
-    localStorage.setItem(key, JSON.stringify(filtrados));
-    setReportes(filtrados);
-    setReporteSeleccionado(null);
+    const nuevosReportes = reportes.filter(r => r.fecha !== reporteSeleccionado.fecha || r.usuario !== reporteSeleccionado.usuario);
+    localStorage.setItem('reportesComparacion', JSON.stringify(nuevosReportes));
   
     // 2. Eliminar del backend
     try {
       await fetch('https://backend-inventario-t3yr.onrender.com/reportes', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           usuario: reporteSeleccionado.usuario,
           empresa: reporteSeleccionado.empresa,
-          fecha: reporteSeleccionado.fecha
-        })
+          fecha: reporteSeleccionado.fecha,
+        }),
       });
     } catch (error) {
       console.error('Error al eliminar del backend:', error);
     }
   
-    Swal.fire('Eliminado', 'Reporte eliminado correctamente del navegador y servidor.', 'success');
+    // 3. Actualizar el estado en React
+    setReportes(nuevosReportes);
+    setReporteSeleccionado(null);
+  
+    Swal.fire('Eliminado', 'Reporte eliminado correctamente.', 'success');
   };
+  
   
   
 
