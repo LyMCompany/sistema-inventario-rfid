@@ -19,17 +19,17 @@ function ControlInventario() {
   const navigate = useNavigate();
 
   const [escaneados, setEscaneados] = useState(() => {
-    const saved = localStorage.getItem('escaneados');
+    const saved = localStorage.getItem(`escaneados_${empresa}`);
     return saved ? JSON.parse(saved) : [];
   });
   const codigosSet = useRef(new Set(escaneados.map(e => String(e.codigo))));
 
   const [comparacion, setComparacion] = useState(() => {
-    const saved = localStorage.getItem('comparacion');
+    const saved = localStorage.getItem(`comparacion_${empresa}`);
     return saved ? JSON.parse(saved) : null;
   });
   const [fechaComparacion, setFechaComparacion] = useState(() => {
-    const saved = localStorage.getItem('fechaComparacion');
+    const saved = localStorage.getItem(`fechaComparacion_${empresa}`);
     return saved || null;
   });
   
@@ -81,7 +81,7 @@ function ControlInventario() {
       codigosSet.current.add(codigoStr);
       setEscaneados(prev => {
         const nuevos = [...prev, { codigo: codigoStr }];
-        localStorage.setItem('escaneados', JSON.stringify(nuevos));
+        localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevos));
         return nuevos;
       });
       return true;
@@ -90,7 +90,7 @@ function ControlInventario() {
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem('inventarioBase');
+    const saved = localStorage.getItem(`inventarioBase_${empresa}`);
     if (saved) {
       const parsed = JSON.parse(saved);
       setInventarioBase(parsed);
@@ -148,7 +148,7 @@ function ControlInventario() {
 
   const handleComparar = () => {
     setMostrarImportados(false);
-    const actualBase = localStorage.getItem('inventarioBase');
+    const actualBase = localStorage.getItem(`inventarioBase_${empresa}`);
     const base = actualBase ? JSON.parse(actualBase) : [];
 
     if (base.length === 0) {
@@ -185,17 +185,17 @@ function ControlInventario() {
     };
 
     setEscaneados(nuevosEscaneados);
-    localStorage.setItem('escaneados', JSON.stringify(nuevosEscaneados));
+    localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevosEscaneados));
     setComparacion(resultadoFinal);
-    localStorage.setItem('comparacion', JSON.stringify(resultadoFinal));
+    localStorage.setItem(`comparacion_${empresa}`, JSON.stringify(resultadoFinal));
 
     const fecha = new Date().toLocaleString();
     setFechaComparacion(fecha);
-    localStorage.setItem('fechaComparacion', fecha);
+    localStorage.setItem(`fechaComparacion_${empresa}`, fecha);
 
-    const reportes = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
+    const reportes = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
     reportes.push({ usuario: empresa || 'Desconocido', fecha, ...resultadoFinal });
-    localStorage.setItem('reportesComparacion', JSON.stringify(reportes));
+    localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(reportes));
 
     setIsProcessing(false);
 
@@ -255,7 +255,7 @@ function ControlInventario() {
       if (result.isConfirmed) {
         codigosSet.current.clear();
         setEscaneados([]);
-        localStorage.removeItem('escaneados');
+        localStorage.removeItem(`escaneados_${empresa}`);
         Swal.fire('Limpieza exitosa', 'Se ha borrado la lista de artículos importados.', 'success');
       }
     });
@@ -298,7 +298,8 @@ function ControlInventario() {
             codigosSet.current.add(String(codigo));
             setEscaneados(prev => {
               const nuevos = [...prev, { codigo: String(codigo) }];
-              localStorage.setItem('escaneados', JSON.stringify(nuevos));
+              localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevos));
+
               return nuevos;
             });
             Swal.fire('Éxito', 'Artículo escaneado', 'success');

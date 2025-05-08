@@ -16,7 +16,7 @@ function Inventario() {
   const empresa = user?.empresa || 'Empresa no definida';
 
   const [data, setData] = useState(() => {
-    const guardado = localStorage.getItem('inventarioBase');
+    const guardado = localStorage.getItem(`inventarioBase_${empresa}`);
     return guardado
       ? JSON.parse(guardado).map(item => ({
           ...item,
@@ -42,7 +42,7 @@ function Inventario() {
     }));
 
     setData(ejemplo);
-    localStorage.setItem('inventarioBase', JSON.stringify(ejemplo));
+    localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(ejemplo));
     Swal.fire({ icon: 'success', title: 'Información cargada', showConfirmButton: false, timer: 1500 });
   };
 
@@ -77,7 +77,7 @@ function Inventario() {
 
         setData(dataConvertida);
         setInventarioBase(dataConvertida); // Actualizar el contexto compartido
-        localStorage.setItem('inventarioBase', JSON.stringify(dataConvertida));
+        localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(dataConvertida));
         Swal.fire({ icon: 'success', title: `Archivo cargado exitosamente (${dataConvertida.length} filas procesadas)`, showConfirmButton: false, timer: 1500 });
       } catch (error) {
         console.error('Error al procesar el archivo:', error);
@@ -101,7 +101,7 @@ function Inventario() {
     }).then((result) => {
       if (result.isConfirmed) {
         setData([]);
-        localStorage.removeItem('inventarioBase');
+        localStorage.removeItem(`inventarioBase_${empresa}`);
         setInventarioBase([]); // Limpiar el contexto compartido
         Swal.fire('Limpieza exitosa', 'Inventario cargado eliminado.', 'success');
       }

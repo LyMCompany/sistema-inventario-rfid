@@ -5,7 +5,6 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
-
 function Reportes() {
   const { user } = useUser();
   const empresa = user?.empresa || 'Empresa no definida';
@@ -26,17 +25,20 @@ function Reportes() {
         console.error('Error al cargar reportes:', error);
       }
     };
-  
+
     cargarReportes();
   }, [user]);
-  
 
   useEffect(() => {
     const ahora = new Date();
     const tresMesesMs = 1000 * 60 * 60 * 24 * 90;
-    const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
-    const propios = todos.filter(r => r.usuario === empresa && ahora - new Date(r.fecha) <= tresMesesMs);
-    setReportes(propios);
+    const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+    const propios = todos.filter(
+      r => r.usuario === user.username && r.empresa === user.empresa && ahora - new Date(r.fecha) <= tresMesesMs
+    );
+
+    setReportes(prev => [...prev, ...propios]);
+
   }, [empresa]);
 
   const exportarReporte = (reporte) => {
@@ -61,10 +63,10 @@ function Reportes() {
   };
 
   const eliminarReporte = (fecha) => {
-    const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
-    const nuevos = todos.filter(r => !(r.usuario === empresa && r.fecha === fecha));
-    localStorage.setItem('reportesComparacion', JSON.stringify(nuevos));
-    setReportes(nuevos.filter(r => r.usuario === empresa));
+    const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+    const nuevos = todos.filter(r => !(r.usuario === user.username && r.empresa === user.empresa && r.fecha === fecha));
+    localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(nuevos));
+    setReportes(nuevos.filter(r => r.usuario === user.username && r.empresa === user.empresa));
     setReporteSeleccionado(null);
   };
 
@@ -78,9 +80,9 @@ function Reportes() {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        const todos = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
-        const filtrados = todos.filter(r => r.usuario !== empresa);
-        localStorage.setItem('reportesComparacion', JSON.stringify(filtrados));
+        const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
+        const filtrados = todos.filter(r => r.usuario !== user.username || r.empresa !== user.empresa);
+        localStorage.setItem(`reportesComparacion_${empresa}`, JSON.stringify(filtrados));
         setReportes([]);
         setReporteSeleccionado(null);
         Swal.fire('Eliminados', 'Tus reportes han sido eliminados.', 'success');
@@ -115,7 +117,6 @@ function Reportes() {
         <div className="user-info">
           <span className="user-icon">👤</span>
           <span className="username">{empresa}</span>
-
           <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
         </div>
       </div>
@@ -123,8 +124,7 @@ function Reportes() {
       <h2>Reportes de Comparación</h2>
 
       <div className="barra-reportes">
-        <select
-          value={reporteSeleccionado ? reporteSeleccionado.fecha : ''}
+        <select value={reporteSeleccionado ? reporteSeleccionado.fecha : ''} 
           onChange={(e) => {
             const seleccionado = reportes.find(r => r.fecha === e.target.value);
             setReporteSeleccionado(seleccionado);
@@ -133,7 +133,7 @@ function Reportes() {
           <option value="">Selecciona un reporte</option>
           {reportes.map((r, i) => (
             <option key={i} value={r.fecha}>
-              {r.fecha} - {r.usuario}
+              {new Date(r.fecha).toLocaleString()} - {r.usuario}
             </option>
           ))}
         </select>
@@ -147,44 +147,30 @@ function Reportes() {
             <button onClick={() => eliminarReporte(reporteSeleccionado.fecha)} className="btn-eliminar-reporte">Eliminar Este Reporte</button>
           </div>
 
-          <select
-  value={reporteSeleccionado}
-  onChange={(e) => setReporteSeleccionado(e.target.value)}
->
-  <option value="">Seleccionar reporte</option>
-  {reportes.map((r, i) => (
-    <option key={i} value={i}>
-      {new Date(r.fecha).toLocaleString()} - {r.usuario}
-    </option>
-  ))}
-</select>
+          {reporteSeleccionado !== null && (
+            <div className="tabla-reporte">
+              <h3>Encontrados</h3>
+              <ul>
+                {reporteSeleccionado.encontrados.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
 
+              <h3>Faltantes</h3>
+              <ul>
+                {reporteSeleccionado.faltantes.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
 
-{reporteSeleccionado !== null && (
-  <div className="tabla-reporte">
-    <h3>Encontrados</h3>
-    <ul>
-      {reportes[reporteSeleccionado].encontrados.map((item, i) => (
-        <li key={i}>{item}</li>
-      ))}
-    </ul>
-
-    <h3>Faltantes</h3>
-    <ul>
-      {reportes[reporteSeleccionado].faltantes.map((item, i) => (
-        <li key={i}>{item}</li>
-      ))}
-    </ul>
-
-    <h3>No Registrados</h3>
-    <ul>
-      {reportes[reporteSeleccionado].no_registrados.map((item, i) => (
-        <li key={i}>{item}</li>
-      ))}
-    </ul>
-  </div>
-)}
-
+              <h3>No Registrados</h3>
+              <ul>
+                {reporteSeleccionado.no_registrados.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <table className="tabla-comparacion">
             <thead>
