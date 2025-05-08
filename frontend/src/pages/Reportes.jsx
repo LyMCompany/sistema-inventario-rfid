@@ -110,7 +110,7 @@ function Reportes() {
   
   
 
-  const limpiarTodosMisReportes = () => {
+  const eliminarReporte = () => {
     Swal.fire({
       title: '¿Estás seguro?',
       text: 'Esto eliminará todos tus reportes guardados del navegador y del servidor.',
