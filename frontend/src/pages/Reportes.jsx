@@ -202,7 +202,9 @@ function Reportes() {
         <div className="tabla-contenedor">
           <div className="acciones-reporte">
             <button onClick={() => exportarReporte(reporteSeleccionado)}>Exportar Reporte</button>
-            <button onClick={() => eliminarReporte(reporteSeleccionado.fecha)} className="btn-eliminar-reporte">Eliminar Este Reporte</button>
+            <button onClick={handleEliminarReporteActual} className="btn-eliminar-reporte"> Eliminar Este Reporte
+            </button>
+
           </div>
 
           <table className="tabla-comparacion">
