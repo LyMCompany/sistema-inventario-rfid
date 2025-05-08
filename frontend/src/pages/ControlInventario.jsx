@@ -193,10 +193,6 @@ const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.get
     };
     
     enviarReporteAlBackend(reporte);
-    
-
-enviarReporteAlBackend(reporte);
-
 
     setIsProcessing(false);
 
