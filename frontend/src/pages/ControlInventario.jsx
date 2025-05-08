@@ -189,9 +189,10 @@ const fecha = `${fechaObj.getDate().toString().padStart(2, '0')}/${(fechaObj.get
       fecha,
       encontrados: resultadoFinal.encontrados || [],
       faltantes: resultadoFinal.faltantes || [],
-      no_registrados: resultadoFinal.no_registrados || []
+      no_registrados: resultadoFinal.sobrantes || []
     };
-    
+    Swal.fire('Éxito', 'Reporte enviado al backend correctamente', 'success');
+
     enviarReporteAlBackend(reporte);
 
     setIsProcessing(false);
