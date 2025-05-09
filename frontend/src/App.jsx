@@ -10,9 +10,10 @@ import Reportes from './pages/Reportes';
 import AdminPanel from './components/AdminPanel';
 
 const ProtectedRoute = ({ children }) => {
-  const isLoggedIn = !!localStorage.getItem('username');
-  return isLoggedIn ? children : <Navigate to="/" />;
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  return usuario ? children : <Navigate to="/" />;
 };
+
 
 const AdminRoute = ({ children }) => {
   const usuario = JSON.parse(localStorage.getItem('usuario'));
