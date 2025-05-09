@@ -155,7 +155,7 @@ function Inventario() {
 
       <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Cargar Inventario</h2>
       <div className="inventario-buttons">
-        <button className="btn btn-primary uniform-button" onClick={handleWebService}>Cargar mediante WebService</button>
+        
         <label className="custom-file-upload uniform-button">
           <input type="file" accept=".xlsx, .xls" onChange={handleArchivo} />
           Cargar Excel
