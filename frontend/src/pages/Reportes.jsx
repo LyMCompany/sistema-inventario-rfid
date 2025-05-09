@@ -157,7 +157,16 @@ function Reportes() {
   };
 
   const handleVolver = () => navigate('/dashboard');
-
+  
+  function parseIfString(data) {
+    try {
+      return typeof data === 'string' ? JSON.parse(data) : data;
+    } catch (e) {
+      console.error('Error al parsear JSON:', e);
+      return [];
+    }
+  }
+  
   return (
     <div className="reporte-container">
       <div className="control-header">
@@ -175,11 +184,18 @@ function Reportes() {
 
       <div className="barra-reportes">
         <select value={reporteSeleccionado ? reporteSeleccionado.fecha : ''} 
-          onChange={(e) => {
-            const seleccionado = reportes.find(r => r.fecha === e.target.value);
-
-            setReporteSeleccionado(seleccionado);
-          }}
+        onChange={(e) => {
+          const seleccionado = reportes.find(r => r.fecha === e.target.value);
+          if (seleccionado) {
+            setReporteSeleccionado({
+              ...seleccionado,
+              encontrados: parseIfString(seleccionado.encontrados),
+              faltantes: parseIfString(seleccionado.faltantes),
+              no_registrados: parseIfString(seleccionado.no_registrados),
+            });
+          }
+        }}
+        
         >
           <option value="">Selecciona un reporte</option>
           {reportes.map((r, i) => (
