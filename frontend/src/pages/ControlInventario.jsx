@@ -359,25 +359,37 @@ function ControlInventario() {
       {mostrarImportados && (
         <div className="tabla-contenedor">
 
-             <button onClick={() => {
-          const codigo = prompt('Escanea o escribe el código:');
-          if (codigo && !codigosSet.current.has(String(codigo))) {
-            codigosSet.current.add(String(codigo));
-            setEscaneados(prev => {
-              const nuevos = [...prev, { codigo: String(codigo) }];
-              localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevos));
+              <button className="btn"
+               style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px' }}
+               onClick={() => {setEscaneoActivo(true);
+                Swal.fire({
+                 toast: true,
+                 position: 'top-end',
+                 icon: 'success',
+                 title: 'WebSocket conectado',
+                 showConfirmButton: false,
+                timer: 1200
+                   });
+                 }}
+                 > Escanear</button>
 
-              return nuevos;
-            });
-            Swal.fire('Éxito', 'Artículo escaneado', 'success');
-          } else if (codigo) {
-            Swal.fire('Advertencia', 'El artículo ya fue escaneado', 'warning');
-          }
-           }}>Escanear</button>
 
-               <button onClick={() => setEscaneoActivo(false)}
-               style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px' }} >
-               Terminar</button>
+
+                  <button
+                 className="btn"
+                  style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px' }}
+                  onClick={() => {setEscaneoActivo(false);
+                  Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'info',
+                  title: 'WebSocket desconectado',
+                 showConfirmButton: false,
+               timer: 1200
+             });
+           }}
+          >Terminar</button>
+
 
           <h3>Artículos Escaneados</h3>
           <table className="tabla-comparacion">
