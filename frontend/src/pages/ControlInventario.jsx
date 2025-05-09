@@ -249,7 +249,7 @@ function ControlInventario() {
   const handleLimpiarEscaneados = () => {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: 'Estas seguro que quieres borrar la lista de Artículos Importados?',
+      text: 'Estas seguro que quieres borrar la lista de Artículos Escaneados?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, borrar',
@@ -259,7 +259,7 @@ function ControlInventario() {
         codigosSet.current.clear();
         setEscaneados([]);
         localStorage.removeItem(`escaneados_${empresa}`);
-        Swal.fire('Limpieza exitosa', 'Se ha borrado la lista de artículos importados.', 'success');
+        Swal.fire('Limpieza exitosa', 'Se ha borrado la lista de artículos Escaneados.', 'success');
       }
     });
   };
@@ -295,22 +295,7 @@ function ControlInventario() {
       <h2>Control de Inventario</h2>
 
       <div className="control-buttons">
-        <button onClick={() => {
-          const codigo = prompt('Escanea o escribe el código:');
-          if (codigo && !codigosSet.current.has(String(codigo))) {
-            codigosSet.current.add(String(codigo));
-            setEscaneados(prev => {
-              const nuevos = [...prev, { codigo: String(codigo) }];
-              localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevos));
-
-              return nuevos;
-            });
-            Swal.fire('Éxito', 'Artículo escaneado', 'success');
-          } else if (codigo) {
-            Swal.fire('Advertencia', 'El artículo ya fue escaneado', 'warning');
-          }
-        }}>Escanear</button>
-
+     
         <button onClick={handleComparar} disabled={isProcessing}>
           {isProcessing ? 'Procesando...' : 'Comparar'}
         </button>
@@ -323,11 +308,11 @@ function ControlInventario() {
           setMostrarImportados(true);
           setComparacion(null);
         }}>
-          Artículos Importados
+          Artículos Escaneados
         </button>
 
         <button onClick={handleLimpiarEscaneados} disabled={isProcessing}>
-          Limpiar Importados
+          Limpiar Escaneados
         </button>
       </div>
 
@@ -371,11 +356,35 @@ function ControlInventario() {
 
       {mostrarImportados && (
         <div className="tabla-contenedor">
-          <h3>Artículos Importados</h3>
+
+             <button onClick={() => {
+          const codigo = prompt('Escanea o escribe el código:');
+          if (codigo && !codigosSet.current.has(String(codigo))) {
+            codigosSet.current.add(String(codigo));
+            setEscaneados(prev => {
+              const nuevos = [...prev, { codigo: String(codigo) }];
+              localStorage.setItem(`escaneados_${empresa}`, JSON.stringify(nuevos));
+
+              return nuevos;
+            });
+            Swal.fire('Éxito', 'Artículo escaneado', 'success');
+          } else if (codigo) {
+            Swal.fire('Advertencia', 'El artículo ya fue escaneado', 'warning');
+          }
+        }}>Escanear</button>
+
+<button
+    onClick={() => setEscaneoActivo(false)}
+    style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px' }}
+  >
+    Terminar
+  </button>
+
+          <h3>Artículos Escaneados</h3>
           <table className="tabla-comparacion">
             <thead>
               <tr>
-                <th>#</th>
+                <th>N.º</th>
                 <th>Código RFID</th>
                 <th>Estado</th>
               </tr>
