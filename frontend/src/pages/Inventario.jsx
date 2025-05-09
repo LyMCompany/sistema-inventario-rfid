@@ -186,14 +186,24 @@ function Inventario() {
                   <td>{fila.Codigo}</td>
                   <td>{fila.SKU}</td>
                   <td>{fila.Marca}</td>
-                  <td>
-                  <button
-  onClick={() => copiarAlPortapapeles(String(fila.RFID))}
-  style={{ background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
->
-  {String(fila.RFID)}
-</button>
-                  </td>
+                  <td className="celda-rfid">
+  <button
+    onClick={() => copiarAlPortapapeles(String(fila.RFID))}
+    style={{
+      background: 'none',
+      border: 'none',
+      padding: 0,
+      color: 'blue',
+      textDecoration: 'underline',
+      cursor: 'pointer',
+      wordBreak: 'break-word',
+      whiteSpace: 'normal'
+    }}
+  >
+    {String(fila.RFID)}
+  </button>
+</td>
+
                   <td>{fila.Ubicacion}</td>
                 </tr>
               ))}
