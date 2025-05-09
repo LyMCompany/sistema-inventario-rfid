@@ -26,9 +26,10 @@ function Login() {
       const response = await fetch(`${BACKEND_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empresa, contrasena })
+        body: JSON.stringify({ empresa, contrasena }),
+        credentials: 'include' // ✅ correcto
       });
-
+      
       const data = await response.json();
 
       if (response.ok) {

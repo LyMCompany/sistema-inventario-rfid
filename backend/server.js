@@ -7,6 +7,21 @@ const reportesRoutes = require('./routes/reportesRoutes');
 const app = express();
 const port = process.env.PORT || 5000;
 
+const session = require('express-session');
+app.set('trust proxy', 1); // ⚠️ Esto es obligatorio en Render si usas cookies seguras
+
+
+app.use(session({
+  secret: 'clave_super_segura',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    sameSite: 'none',  // necesario para cross-site cookies en Render
+    secure: true       // obligatorio en producción con HTTPS
+  }
+}));
+
+
 // ✅ Configuración CORS
 const corsOptions = {
   origin: (origin, callback) => {
