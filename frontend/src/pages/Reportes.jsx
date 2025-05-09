@@ -233,10 +233,10 @@ function Reportes() {
               {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
                 (reporteSeleccionado?.[tipo] || []).map((item, index) => (
                   <tr key={`${tipo}-${index}`}>
-                    <td>{item.nombre || '-'}</td>
-                    <td>{item.codigo || '-'}</td>
-                    <td>{item.sku || '-'}</td>
-                    <td>{item.marca || '-'}</td>
+                    <td>{item.Nombre || item.nombre || '-'}</td>
+                    <td>{item.Codigo || item.codigo || item['Código'] || item['Código Barras'] || '-'}</td>
+                    <td>{item.SKU || item.sku || '-'}</td>
+                    <td>{item.Marca || item.marca || '-'}</td>
                     <td>{item.rfid || '-'}</td>
                     <td>{item.ubicacion || '-'}</td>
                     <td>{item.estado || '-'}</td>
