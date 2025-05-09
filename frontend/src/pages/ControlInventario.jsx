@@ -14,6 +14,8 @@ function ControlInventario() {
   const { user } = useUser();
   const empresa = user?.empresa || 'Empresa no definida';
   const username = user?.correo || 'Usuario no definido';
+  const [escaneoActivo, setEscaneoActivo] = useState(false);
+
 
 
 
@@ -207,13 +209,13 @@ function ControlInventario() {
     );
              // Notificar al componente Reportes.jsx para que recargue
              localStorage.setItem("actualizarReportes", Date.now().toString());
-};
+     };
 
-  const handleExportar = () => {
-    if (!comparacion) {
+      const handleExportar = () => {
+      if (!comparacion) {
       Swal.fire('Error', 'No hay resultados para exportar', 'error');
       return;
-    }
+      }
 
     setIsProcessing(true);
 
@@ -371,14 +373,11 @@ function ControlInventario() {
           } else if (codigo) {
             Swal.fire('Advertencia', 'El artículo ya fue escaneado', 'warning');
           }
-        }}>Escanear</button>
+           }}>Escanear</button>
 
-<button
-    onClick={() => setEscaneoActivo(false)}
-    style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px' }}
-  >
-    Terminar
-  </button>
+               <button onClick={() => setEscaneoActivo(false)}
+               style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px' }} >
+               Terminar</button>
 
           <h3>Artículos Escaneados</h3>
           <table className="tabla-comparacion">
@@ -394,12 +393,11 @@ function ControlInventario() {
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>
-                  <button
-  onClick={() => copiarAlPortapapeles(String(item.codigo))}
-  style={{ background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
->
-  {String(item.codigo)}
-</button>
+                  <button onClick={() => copiarAlPortapapeles(String(item.codigo))}
+                  style={{ background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+                 >
+                  {String(item.codigo)}
+                   </button>
 
 
                   </td>
