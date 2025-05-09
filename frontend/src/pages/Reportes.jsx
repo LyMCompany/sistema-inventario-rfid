@@ -230,21 +230,21 @@ function Reportes() {
               </tr>
             </thead>
             <tbody>
-              {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
-                (reporteSeleccionado?.[tipo] || []).map((item, index) => (
-                  <tr key={`${tipo}-${index}`}>
-                    <td>{item.Nombre || item.nombre || '-'}</td>
-                    <td>{item.Codigo || item.codigo || item['Código'] || item['Código Barras'] || '-'}</td>
-                    <td>{item.SKU || item.sku || '-'}</td>
-                    <td>{item.Marca || item.marca || '-'}</td>
-                    <td>{item.rfid || '-'}</td>
-                    <td>{item.ubicacion || '-'}</td>
-                    <td>{item.estado || '-'}</td>
-
-                  </tr>
-                ))
+                     {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
+                       (reporteSeleccionado?.[tipo] || []).map((item, index) => (
+                       <tr key={`${tipo}-${index}`}>
+                       <td>{item.Nombre || item.nombre || '-'}</td>
+                       <td>{item.Codigo || item.codigo || item['Código'] || item['Código Barras'] || '-'}</td>
+                       <td>{item.SKU || item.sku || '-'}</td>
+                       <td>{item.Marca || item.marca || '-'}</td>
+                       <td>{item.RFID || item.rfid || item.codigo || '-'}</td>
+                       <td>{item.Ubicacion || item.ubicacion || item['Ubicación'] || '-'}</td>
+                       <td>{item.Estado || item.estado || tipo}</td>
+                   </tr>
+                 ))
               )}
             </tbody>
+
           </table>
         </div>
       )}
