@@ -358,7 +358,7 @@ function ControlInventario() {
 
       {mostrarImportados && (
         <div className="tabla-contenedor">
-
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '12px' }}>
               <button className="btn"
                style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px' }}
                onClick={() => {setEscaneoActivo(true);
@@ -372,8 +372,6 @@ function ControlInventario() {
                    });
                  }}
                  > Escanear</button>
-
-
 
                   <button
                  className="btn"
@@ -389,12 +387,12 @@ function ControlInventario() {
              });
            }}
           >Terminar</button>
+         </div>
+        <h3>Artículos Escaneados</h3>
 
-
-          <h3>Artículos Escaneados</h3>
           <table className="tabla-comparacion">
-            <thead>
-              <tr>
+                <thead>
+                <tr>
                 <th>N.º</th>
                 <th>Código RFID</th>
                 <th>Estado</th>
@@ -419,6 +417,7 @@ function ControlInventario() {
             </tbody>
           </table>
         </div>
+        
       )}
     </div>
   );
