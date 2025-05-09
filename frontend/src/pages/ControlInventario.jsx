@@ -356,39 +356,61 @@ function ControlInventario() {
         </div>
       )}
 
-      {mostrarImportados && (
-        <div className="tabla-contenedor">
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '12px' }}>
-              <button className="btn"
-               style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px' }}
-               onClick={() => {setEscaneoActivo(true);
-                Swal.fire({
-                 toast: true,
-                 position: 'top-end',
-                 icon: 'success',
-                 title: 'WebSocket conectado',
-                 showConfirmButton: false,
-                timer: 1200
-                   });
-                 }}
-                 > Escanear</button>
+{mostrarImportados && (
+  <div className="tabla-contenedor">
+    <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', margin: '20px 0' }}>
+      <button
+        className="btn"
+        style={{
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          fontWeight: 'bold'
+        }}
+        onClick={() => {
+          setEscaneoActivo(true);
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'WebSocket conectado',
+            showConfirmButton: false,
+            timer: 1200
+          });
+        }}
+      >
+        Escanear
+      </button>
 
-                  <button
-                 className="btn"
-                  style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px' }}
-                  onClick={() => {setEscaneoActivo(false);
-                  Swal.fire({
-                  toast: true,
-                  position: 'top-end',
-                  icon: 'info',
-                  title: 'WebSocket desconectado',
-                 showConfirmButton: false,
-               timer: 1200
-             });
-           }}
-          >Terminar</button>
-         </div>
-        <h3>Artículos Escaneados</h3>
+      <button
+        className="btn"
+        style={{
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          fontWeight: 'bold'
+        }}
+        onClick={() => {
+          setEscaneoActivo(false);
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'info',
+            title: 'WebSocket desconectado',
+            showConfirmButton: false,
+            timer: 1200
+          });
+        }}
+      >
+        Terminar
+      </button>
+    </div>
+
+    <h3>Artículos Escaneados</h3>
 
           <table className="tabla-comparacion">
                 <thead>
