@@ -7,6 +7,8 @@ import Swal from 'sweetalert2';
 import '../styles/ControlInventario.css';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import RFIDListener from './RFIDListener';
+import { getSocket } from '../utils/websocket';
+
 
 function ControlInventario() {
   const { logout } = useUser();

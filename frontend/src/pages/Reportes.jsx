@@ -4,6 +4,8 @@ import '../styles/Reportes.css';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { getSocket } from '../utils/websocket';
+
 
 function Reportes() {
   const { user } = useUser();
