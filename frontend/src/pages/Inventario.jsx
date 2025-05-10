@@ -118,6 +118,8 @@ const payload = {
   }))
   
 };
+console.log("📤 Payload WebSocket:", JSON.stringify(payload, null, 2));
+
 socket.send(JSON.stringify(payload));
 
     enviarInventarioAlBackend(ejemplo);
