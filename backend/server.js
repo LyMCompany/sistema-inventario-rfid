@@ -10,6 +10,9 @@ const port = process.env.PORT || 5000;
 const session = require('express-session');
 app.set('trust proxy', 1); // ⚠️ Esto es obligatorio en Render si usas cookies seguras
 
+const inventarioRoutes = require('./routes/inventarioRoutes');
+app.use('/inventarios', inventarioRoutes);
+
 
 app.use(session({
   secret: 'clave_super_segura',

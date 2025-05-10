@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { useInventario } from '../context/InventarioContext';
 import { useUser } from '../context/UserContext';
+import { getSocket } from '../utils/websocket';
 
 
 import '../styles/Inventario.css';
@@ -15,16 +16,75 @@ function Inventario() {
   const { user } = useUser();
   const empresa = user?.empresa || 'Empresa no definida';
 
-  const [data, setData] = useState(() => {
-    const guardado = localStorage.getItem(`inventarioBase_${empresa}`);
-    return guardado
-      ? JSON.parse(guardado).map(item => ({
-          ...item,
-          RFID: String(item.RFID), // Convertir RFID a cadena
-        }))
-      : [];
-  });
+  const [data, setData] = useState([]);
 
+  useEffect(() => {
+    const cargarInventario = async () => {
+      const local = localStorage.getItem(`inventarioBase_${empresa}`);
+      if (local) {
+        const json = JSON.parse(local).map(item => ({
+          ...item,
+          RFID: String(item.RFID)
+        }));
+        setData(json);
+        setInventarioBase(json);
+      } else {
+        // Consultar backend si no hay inventario local
+        try {
+          const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios?usuario=${user.correo}&empresa=${user.empresa}`);
+          const json = await res.json();
+          if (json && json.length > 0) {
+            const transformado = json.map(item => ({
+              Nombre: item.nombre,
+              Codigo: item.codigo,
+              SKU: item.sku,
+              Marca: item.marca,
+              RFID: String(item.rfid),
+              Ubicacion: item.ubicacion
+            }));
+            setData(transformado);
+            setInventarioBase(transformado);
+            localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
+          }
+        } catch (error) {
+          console.error('Error al cargar inventario desde backend:', error);
+        }
+      }
+    };
+  
+    if (user?.empresa && user?.correo) {
+      cargarInventario();
+    }
+  }, [user, empresa, setInventarioBase]);
+  
+  const enviarInventarioAlBackend = async (inventario) => {
+    try {
+      const response = await fetch('https://backend-inventario-t3yr.onrender.com/inventarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          usuario: user.correo,
+          empresa: user.empresa,
+          inventario: inventario.map(item => ({
+            nombre: item.Nombre || "-",
+            codigo: item.Codigo || "-",
+            sku: item.SKU || "-",
+            marca: item.Marca || "-",
+            rfid: String(item.RFID),
+            ubicacion: item.Ubicacion || "-"
+          }))
+        })
+      });
+  
+      if (!response.ok) throw new Error('Error al subir inventario');
+      console.log('✅ Inventario enviado al backend');
+    } catch (error) {
+      console.error('❌ Error al enviar inventario:', error);
+    }
+  };
+  
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -43,18 +103,37 @@ function Inventario() {
 
     setData(ejemplo);
     localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(ejemplo));
+    const socket = getSocket();
+const payload = {
+  tipo: 'inventario',
+  usuario: user.correo,
+  empresa: user.empresa,
+  inventario: ejemplo.map(item => ({
+    nombre: item.Nombre || "-",
+    codigo: item.Codigo || "-",
+    sku: item.SKU || "-",
+    marca: item.Marca || "-",
+    rfid: String(item.RFID),
+    ubicacion: item.Ubicacion || "-"
+  }))
+  
+};
+socket.send(JSON.stringify(payload));
+
+    enviarInventarioAlBackend(ejemplo);
+
     Swal.fire({ icon: 'success', title: 'Información cargada', showConfirmButton: false, timer: 1500 });
   };
 
   const handleArchivo = (e) => {
     const file = e.target.files[0];
     if (!file) return Swal.fire('Error', 'No se seleccionó ningún archivo', 'error');
-
+  
     if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
       Swal.fire('Error', 'El archivo debe ser un Excel (.xlsx o .xls)', 'error');
       return;
     }
-
+  
     setIsLoading(true);
     const reader = new FileReader();
     reader.onload = (evt) => {
@@ -64,21 +143,47 @@ function Inventario() {
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
         const jsonData = XLSX.utils.sheet_to_json(ws, { raw: false });
-
+  
         if (!jsonData || jsonData.length === 0) {
           Swal.fire('Error', 'El archivo está vacío o no tiene datos válidos', 'error');
           return;
         }
-
+  
         const dataConvertida = jsonData.map(item => ({
           ...item,
-          RFID: String(item.RFID), // Convertir RFID a cadena
+          RFID: String(item.RFID)
         }));
-
+  
         setData(dataConvertida);
-        setInventarioBase(dataConvertida); // Actualizar el contexto compartido
+        setInventarioBase(dataConvertida);
         localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(dataConvertida));
-        Swal.fire({ icon: 'success', title: `Archivo cargado exitosamente (${dataConvertida.length} filas procesadas)`, showConfirmButton: false, timer: 1500 });
+  
+        // WebSocket: enviar inventario en tiempo real
+        const socket = getSocket();
+        const payload = {
+          tipo: 'inventario',
+          usuario: user.correo,
+          empresa: user.empresa,
+          inventario: dataConvertida.map(item => ({
+            nombre: item.Nombre || "-",
+            codigo: item.Codigo || "-",
+            sku: item.SKU || "-",
+            marca: item.Marca || "-",
+            rfid: String(item.RFID),
+            ubicacion: item.Ubicacion || "-"
+          }))
+        };
+        socket.send(JSON.stringify(payload));
+  
+        enviarInventarioAlBackend(dataConvertida);
+  
+        Swal.fire({
+          icon: 'success',
+          title: `Archivo cargado exitosamente (${dataConvertida.length} filas procesadas)`,
+          showConfirmButton: false,
+          timer: 1500
+        });
+  
       } catch (error) {
         console.error('Error al procesar el archivo:', error);
         Swal.fire('Error', 'Hubo un problema al procesar el archivo', 'error');
