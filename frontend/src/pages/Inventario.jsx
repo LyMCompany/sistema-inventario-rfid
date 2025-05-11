@@ -22,24 +22,30 @@ function Inventario() {
 
   useEffect(() => {
     const cargarInventario = async () => {
-
+      // Esperar hasta 2 segundos si aún no hay inventario por WebSocket
+      let espera = 0;
+      while (!inventarioWebSocketRecibido.current && espera < 2000) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        espera += 100;
+      }
+  
       if (inventarioWebSocketRecibido.current) {
         console.log('⚠️ Ya se recibió inventario por WebSocket, se omite carga desde backend');
         return;
       }
-      
-       try {
-         const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios/ultimo?usuario=${user.correo}&empresa=${user.empresa}`);
-         const json = await res.json();
-         if (json && Array.isArray(json.inventario)) {
-         const transformado = json.inventario.map(item => ({
-         Nombre: item.nombre,
-         Codigo: item.codigo,
-         SKU: item.sku,
-         Marca: item.marca,
-         RFID: String(item.rfid),
-          Ubicacion: item.ubicacion
-        }));
+  
+      try {
+        const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios/ultimo?usuario=${user.correo}&empresa=${user.empresa}`);
+        const json = await res.json();
+        if (json && Array.isArray(json.inventario)) {
+          const transformado = json.inventario.map(item => ({
+            Nombre: item.nombre,
+            Codigo: item.codigo,
+            SKU: item.sku,
+            Marca: item.marca,
+            RFID: String(item.rfid),
+            Ubicacion: item.ubicacion
+          }));
           setData(transformado);
           setInventarioBase(transformado);
           localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
@@ -64,6 +70,7 @@ function Inventario() {
       cargarInventario();
     }
   }, [user, empresa, setInventarioBase]);
+  
   
   useEffect(() => {
     const socket = getSocket();
