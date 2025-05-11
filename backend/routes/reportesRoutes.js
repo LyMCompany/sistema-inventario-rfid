@@ -6,8 +6,7 @@ const pool = require('../utils/db');
 router.post('/', async (req, res) => {
   console.log('📦 Body recibido:', req.body);
 
-  const { usuario, empresa, fecha, encontrados, faltantes, noregistrados } = req.body;
-
+  const { usuario, empresa, fecha, encontrados, faltantes, no_registrados } = req.body;
 
   if (
     typeof usuario !== 'string' ||
@@ -15,17 +14,16 @@ router.post('/', async (req, res) => {
     typeof fecha !== 'string' ||
     !Array.isArray(encontrados) ||
     !Array.isArray(faltantes) ||
-    !Array.isArray(noregistrados)
+    !Array.isArray(no_registrados)
   ) {
     return res.status(400).json({ error: 'Faltan datos válidos en el cuerpo de la solicitud' });
   }
-  
+
   try {
     const result = await pool.query(
-      `INSERT INTO reportes (usuario, empresa, fecha, encontrados, faltantes, noregistrados)
+      `INSERT INTO reportes (usuario, empresa, fecha, encontrados, faltantes, no_registrados)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-       [usuario, empresa, fecha, JSON.stringify(encontrados), JSON.stringify(faltantes), JSON.stringify(noregistrados)]
-
+      [usuario, empresa, fecha, JSON.stringify(encontrados), JSON.stringify(faltantes), JSON.stringify(no_registrados)]
     );
 
     res.status(201).json({ mensaje: '✅ Reporte guardado correctamente', reporte: result.rows[0] });
@@ -55,24 +53,20 @@ router.get('/', async (req, res) => {
   }
 });
 
-
 // ✅ Eliminar todos los reportes por usuario y empresa
 router.delete('/todos', async (req, res) => {
   const { usuario, empresa } = req.body;
-  console.log('🟡 DELETE /reportes/todos BODY:', req.body); // Log para verificar qué llega
+  console.log('🟡 DELETE /reportes/todos BODY:', req.body);
 
   if (!usuario || !empresa) {
     return res.status(400).json({ error: 'Faltan parámetros: usuario y empresa son requeridos' });
   }
 
   try {
-    await pool.query(
-      'DELETE FROM reportes WHERE usuario = $1 AND empresa = $2',
-      [usuario, empresa]
-    );
+    await pool.query('DELETE FROM reportes WHERE usuario = $1 AND empresa = $2', [usuario, empresa]);
     res.status(200).json({ mensaje: '✅ Todos los reportes eliminados correctamente' });
   } catch (error) {
-    console.error('❌ Error al eliminar reportes:', error); // Muy útil para revisar en Render
+    console.error('❌ Error al eliminar reportes:', error);
     res.status(500).json({ error: 'Error interno al eliminar reportes' });
   }
 });
@@ -102,7 +96,6 @@ router.delete('/por-fecha', async (req, res) => {
   }
 });
 
-
 // ✅ Eliminar un solo reporte por ID
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
@@ -120,7 +113,5 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: 'Error interno al eliminar el reporte' });
   }
 });
-
-
 
 module.exports = router;
