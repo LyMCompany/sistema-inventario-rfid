@@ -68,25 +68,6 @@ router.delete('/todos', async (req, res) => {
   }
 });
 
-// ✅ Eliminar un solo reporte por ID
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const result = await pool.query('DELETE FROM reportes WHERE id = $1', [id]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Reporte no encontrado' });
-    }
-
-    res.status(200).json({ mensaje: '✅ Reporte eliminado correctamente' });
-  } catch (error) {
-    console.error('❌ Error al eliminar reporte por ID:', error);
-    res.status(500).json({ error: 'Error interno al eliminar el reporte' });
-  }
-});
-
-
 // ✅ Eliminar un reporte específico por usuario, empresa y fecha
 router.delete('/por-fecha', async (req, res) => {
   const { usuario, empresa, fecha } = req.body;
@@ -111,5 +92,26 @@ router.delete('/por-fecha', async (req, res) => {
     res.status(500).json({ error: 'Error interno al eliminar reporte' });
   }
 });
+
+
+// ✅ Eliminar un solo reporte por ID
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('DELETE FROM reportes WHERE id = $1', [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Reporte no encontrado' });
+    }
+
+    res.status(200).json({ mensaje: '✅ Reporte eliminado correctamente' });
+  } catch (error) {
+    console.error('❌ Error al eliminar reporte por ID:', error);
+    res.status(500).json({ error: 'Error interno al eliminar el reporte' });
+  }
+});
+
+
 
 module.exports = router;
