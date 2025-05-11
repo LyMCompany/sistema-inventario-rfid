@@ -150,44 +150,46 @@ console.log("📤 Payload WebSocket:", JSON.stringify(payload, null, 2));
         const wb = XLSX.read(bstr, { type: 'binary' });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
+
+        // Convertir la hoja a JSON
         const jsonData = XLSX.utils.sheet_to_json(ws, { raw: false });
-  
+
+        // Validar que el archivo tenga datos
         if (!jsonData || jsonData.length === 0) {
           Swal.fire('Error', 'El archivo está vacío o no tiene datos válidos', 'error');
           return;
         }
-  
-        const dataConvertida = jsonData.map(item => ({
+
+         
+         const dataConvertida = jsonData.map(item => ({
           ...item,
           RFID: String(item.RFID)
         }));
-  
+          
         setData(dataConvertida);
         setInventarioBase(dataConvertida);
         localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(dataConvertida));
-  
-        // WebSocket: enviar inventario en tiempo real
-        const socket = getSocket();
-socket.onopen = () => {
-  const payload = {
-    tipo: 'inventario',
-    usuario: user.correo,
-    empresa: user.empresa,
-    inventario: dataConvertida.map(item => ({
-      nombre: item.Nombre || "-",
-      codigo: item.Codigo || "-",
-      sku: item.SKU || "-",
-      marca: item.Marca || "-",
-      rfid: String(item.RFID),
-      ubicacion: item.Ubicacion || "-"
-    }))
-  };
-  // Enviar el payload al WebSocket  
-  socket.send(JSON.stringify(payload));
-  console.log("📤 Enviado por WebSocket:", JSON.stringify(payload, null, 2));
-};
 
-        
+         // WebSocket: enviar inventario en tiempo real
+         const socket = getSocket();
+         socket.onopen = () => {
+           const payload = {
+             tipo: 'inventario',
+             usuario: user.correo,
+             empresa: user.empresa,
+             inventario: dataConvertida.map(item => ({
+               nombre: item.Nombre || "-",
+               codigo: item.Codigo || "-",
+               sku: item.SKU || "-",
+               marca: item.Marca || "-",
+               rfid: String(item.RFID),
+               ubicacion: item.Ubicacion || "-"
+             }))
+           };
+           // Enviar el payload al WebSocket  
+           socket.send(JSON.stringify(payload));
+           console.log("📤 Enviado por WebSocket:", JSON.stringify(payload, null, 2));
+         };
   
         enviarInventarioAlBackend(dataConvertida);
   
