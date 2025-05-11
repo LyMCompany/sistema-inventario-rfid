@@ -24,22 +24,19 @@ function Inventario() {
     const cargarInventario = async () => {
       try {
         const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios/ultimo?usuario=${user.correo}&empresa=${user.empresa}`);
-
-        const json = await res.json();
-  
-        if (json && json.length > 0) {
-          const transformado = json.map(item => ({
-            Nombre: item.nombre,
-            Codigo: item.codigo,
-            SKU: item.sku,
-            Marca: item.marca,
-            RFID: String(item.rfid),
-            Ubicacion: item.ubicacion
-          }));
-  
-          setData(transformado);
-          setInventarioBase(transformado);
-          localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
+const json = await res.json();
+if (json && Array.isArray(json.inventario)) {
+  const transformado = json.inventario.map(item => ({
+    Nombre: item.nombre,
+    Codigo: item.codigo,
+    SKU: item.sku,
+    Marca: item.marca,
+    RFID: String(item.rfid),
+    Ubicacion: item.ubicacion
+  }));
+  setData(transformado);
+  setInventarioBase(transformado);
+  localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
           console.log('✅ Inventario cargado desde backend');
         }
       } catch (error) {
