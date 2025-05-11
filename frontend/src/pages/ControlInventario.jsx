@@ -31,8 +31,17 @@ function ControlInventario() {
 
   const [comparacion, setComparacion] = useState(() => {
     const saved = localStorage.getItem(`comparacion_${empresa}`);
-    return saved ? JSON.parse(saved) : null;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        encontrados: parsed.encontrados || [],
+        faltantes: parsed.faltantes || [],
+        no_registrados: parsed.no_registrados || [],
+      };
+    }
+    return null;
   });
+  
   const [fechaComparacion, setFechaComparacion] = useState(() => {
     const saved = localStorage.getItem(`fechaComparacion_${empresa}`);
     return saved || null;
