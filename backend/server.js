@@ -28,7 +28,13 @@ app.use(session({
 // ✅ Configuración CORS
 const corsOptions = {
   origin: (origin, callback) => {
-    const permitido = !origin || origin === 'https://frontend-inventario-tmzb.onrender.com';
+    const permitidos = [
+      'http://localhost:3000',
+      'https://frontend-inventario-tmzb.onrender.com',
+    ];
+    
+    const permitido = permitidos.includes(origin);
+    
     if (permitido) {
       callback(null, true);
     } else {
