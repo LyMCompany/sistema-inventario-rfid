@@ -56,7 +56,7 @@ app.use(express.json());
 // ✅ Rutas del backend
 app.use('/auth', authRoutes);
 app.use('/reportes', reportesRoutes);
-app.use('/inventarios', inventarioRoutes);
+app.use('/inventario', inventarioRoutes);
 
 // ✅ Ruta adicional para WebSocket desde Android
 app.post('/websocket/emitir', (req, res) => {

@@ -35,7 +35,7 @@ function Inventario() {
       }
   
       try {
-        const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios/ultimo?usuario=${user.correo}&empresa=${user.empresa}`);
+        const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventario/ultimo?usuario=${user.correo}&empresa=${user.empresa}`);
         const json = await res.json();
         if (json && Array.isArray(json.inventario)) {
           const transformado = json.inventario.map(item => ({
@@ -49,7 +49,17 @@ function Inventario() {
           }));
           
           setData(transformado);
-          setInventarioBase(transformado);
+          const normalizado = transformado.map(item => ({
+            Nombre: item.nombre || "-",
+            Codigo: item.codigo || "-",
+            SKU: item.sku || "-",
+            Marca: item.marca || "-",
+            RFID: item.rfid || "-",
+            Ubicacion: item.ubicacion || "-",
+            Estado: item.estado || "-"
+          }));
+          setInventarioBase(normalizado);
+          
           localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
           console.log('✅ Inventario cargado desde backend');
         }
@@ -107,7 +117,7 @@ function Inventario() {
   
   const enviarInventarioAlBackend = async (inventario) => {
     try {
-      const response = await fetch('https://backend-inventario-t3yr.onrender.com/inventarios', {
+      const response = await fetch('https://backend-inventario-t3yr.onrender.com/inventario', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
