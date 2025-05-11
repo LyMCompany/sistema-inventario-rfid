@@ -103,24 +103,30 @@ function Inventario() {
 
     setData(ejemplo);
     localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(ejemplo));
+    
     const socket = getSocket();
-const payload = {
-  tipo: 'inventario',
-  usuario: user.correo,
-  empresa: user.empresa,
-  inventario: ejemplo.map(item => ({
-    nombre: item.Nombre || "-",
-    codigo: item.Codigo || "-",
-    sku: item.SKU || "-",
-    marca: item.Marca || "-",
-    rfid: String(item.RFID),
-    ubicacion: item.Ubicacion || "-"
-  }))
-  
-};
+    socket.onopen = () => {
+      const payload = {
+        tipo: 'inventario',
+        usuario: user.correo,
+        empresa: user.empresa,
+        inventario: dataConvertida.map(item => ({
+          nombre: item.Nombre || "-",
+          codigo: item.Codigo || "-",
+          sku: item.SKU || "-",
+          marca: item.Marca || "-",
+          rfid: String(item.RFID),
+          ubicacion: item.Ubicacion || "-"
+        }))
+      };
+      // Enviar el payload al WebSocket      
+      socket.send(JSON.stringify(payload));
+      console.log("📤 Enviado por WebSocket:", JSON.stringify(payload, null, 2));
+    };
+    
 console.log("📤 Payload WebSocket:", JSON.stringify(payload, null, 2));
 
-socket.send(JSON.stringify(payload));
+
 
     enviarInventarioAlBackend(ejemplo);
 
@@ -162,20 +168,26 @@ socket.send(JSON.stringify(payload));
   
         // WebSocket: enviar inventario en tiempo real
         const socket = getSocket();
-        const payload = {
-          tipo: 'inventario',
-          usuario: user.correo,
-          empresa: user.empresa,
-          inventario: dataConvertida.map(item => ({
-            nombre: item.Nombre || "-",
-            codigo: item.Codigo || "-",
-            sku: item.SKU || "-",
-            marca: item.Marca || "-",
-            rfid: String(item.RFID),
-            ubicacion: item.Ubicacion || "-"
-          }))
-        };
-        socket.send(JSON.stringify(payload));
+socket.onopen = () => {
+  const payload = {
+    tipo: 'inventario',
+    usuario: user.correo,
+    empresa: user.empresa,
+    inventario: dataConvertida.map(item => ({
+      nombre: item.Nombre || "-",
+      codigo: item.Codigo || "-",
+      sku: item.SKU || "-",
+      marca: item.Marca || "-",
+      rfid: String(item.RFID),
+      ubicacion: item.Ubicacion || "-"
+    }))
+  };
+  // Enviar el payload al WebSocket  
+  socket.send(JSON.stringify(payload));
+  console.log("📤 Enviado por WebSocket:", JSON.stringify(payload, null, 2));
+};
+
+        
   
         enviarInventarioAlBackend(dataConvertida);
   
