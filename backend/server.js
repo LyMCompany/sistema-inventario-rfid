@@ -29,13 +29,10 @@ app.use(session({
 const corsOptions = {
   origin: (origin, callback) => {
     const permitidos = [
-      'http://localhost:3000',
       'https://frontend-inventario-tmzb.onrender.com',
+      'http://localhost:3000'
     ];
-    
-    const permitido = permitidos.includes(origin);
-    
-    if (permitido) {
+    if (!origin || permitidos.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('No autorizado por política CORS'));
@@ -45,6 +42,7 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 };
+// ✅ Middleware de CORS
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // ⚠️ Para preflight requests
