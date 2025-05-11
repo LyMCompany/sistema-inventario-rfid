@@ -338,7 +338,12 @@ function ControlInventario() {
               </tr>
             </thead>
             <tbody>
-              {[...comparacion.encontrados, ...comparacion.faltantes, ...comparacion.no_registrados].map((item, index) => (
+            {[
+  ...(Array.isArray(comparacion.encontrados) ? comparacion.encontrados : []),
+  ...(Array.isArray(comparacion.faltantes) ? comparacion.faltantes : []),
+  ...(Array.isArray(comparacion.no_registrados) ? comparacion.no_registrados : [])
+].map((item, index) => (
+
                 <tr key={index}>
                   <td>{item.Nombre || '-'}</td>
                   <td>{item.Codigo || '-'}</td>
