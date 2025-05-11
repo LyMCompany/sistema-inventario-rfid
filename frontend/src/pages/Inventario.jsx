@@ -17,6 +17,8 @@ function Inventario() {
   const empresa = user?.empresa || 'Empresa no definida';
 
   const [data, setData] = useState([]);
+  const inventarioWebSocketRecibido = useRef(false);
+
 
   useEffect(() => {
     const cargarInventario = async () => {
@@ -73,13 +75,14 @@ function Inventario() {
             RFID: String(item.rfid),
             Ubicacion: item.ubicacion
           }));
-
+        
           setData(transformado);
           setInventarioBase(transformado);
           localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
-
-          console.log('📥 Inventario actualizado desde WebSocket:', transformado);
+          inventarioWebSocketRecibido.current = true; // 🔁 evitar que se reemplace por localStorage luego
+          console.log('📥 Inventario recibido desde WebSocket:', transformado);
         }
+        
       } catch (err) {
         console.error('❌ Error al procesar mensaje WebSocket:', err);
       }
