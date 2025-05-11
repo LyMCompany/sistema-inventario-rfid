@@ -83,6 +83,7 @@ function Reportes() {
     if (!confirmacion.isConfirmed) return;
   
     try {
+      console.log('Body recibido en DELETE /todos:', req.body);
       // 1. Eliminar del backend
       const usuario = user?.correo;
       const empresa = user?.empresa;
@@ -127,6 +128,7 @@ function Reportes() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          console.log('Body recibido en DELETE /todos:', req.body);
           // 1. Eliminar todos los reportes del backend para este usuario y empresa
           const response = await fetch('https://backend-inventario-t3yr.onrender.com/reportes/todos', {
             method: 'DELETE',
