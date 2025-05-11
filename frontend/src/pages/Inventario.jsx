@@ -39,7 +39,7 @@ function Inventario() {
         const json = await res.json();
         if (json && Array.isArray(json.inventario)) {
           const transformado = json.inventario.map(item => ({
-            Nombre: item.nombre || "-",
+            Nombre: item.Nombre || "-",
             Codigo: item.codigo || "-",
             SKU: item.sku || "-",
             Marca: item.marca || "-",
@@ -50,7 +50,7 @@ function Inventario() {
           
           setData(transformado);
           const normalizado = transformado.map(item => ({
-            Nombre: item.nombre || "-",
+            Nombre: item.Nombre || "-",
             Codigo: item.codigo || "-",
             SKU: item.sku || "-",
             Marca: item.marca || "-",
@@ -93,7 +93,7 @@ function Inventario() {
 
         if (msg.tipo === 'inventario' && Array.isArray(msg.inventario)) {
           const transformado = msg.inventario.map(item => ({
-            Nombre: item.nombre,
+            Nombre: item.Nombre,
             Codigo: item.codigo,
             SKU: item.sku,
             Marca: item.marca,
@@ -126,7 +126,7 @@ function Inventario() {
           usuario: user.correo,
           empresa: user.empresa,
           inventario: inventario.map(item => ({
-            nombre: item.Nombre || "-",
+            Nombre: item.Nombre || "-",
             codigo: item.Codigo || "-",
             sku: item.SKU || "-",
             marca: item.Marca || "-",
@@ -169,7 +169,7 @@ function Inventario() {
         usuario: user.correo,
         empresa: user.empresa,
         inventario: ejemplo.map(item => ({
-          nombre: item.Nombre || "-",
+          Nombre: item.Nombre || "-",
           codigo: item.Codigo || "-",
           sku: item.SKU || "-",
           marca: item.Marca || "-",
@@ -233,7 +233,7 @@ function Inventario() {
              usuario: user.correo,
              empresa: user.empresa,
              inventario: dataConvertida.map(item => ({
-               nombre: item.Nombre || "-",
+               Nombre: item.Nombre || "-",
                codigo: item.Codigo || "-",
                sku: item.SKU || "-",
                marca: item.Marca || "-",
