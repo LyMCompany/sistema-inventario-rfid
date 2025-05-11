@@ -9,6 +9,7 @@ import { getSocket } from '../utils/websocket';
 
 function Reportes() {
   const { user } = useUser();
+  const usuario = user?.correo;
   const empresa = user?.empresa || 'Empresa no definida';
 
   const navigate = useNavigate();
@@ -83,11 +84,12 @@ function Reportes() {
   
     try {
       // 1. Eliminar del backend
-      await fetch(`https://backend-inventario-t3yr.onrender.com/reportes?usuario=${usuario}&empresa=${empresa}`, {
+      const response = await fetch(`https://backend-inventario-t3yr.onrender.com/reportes?usuario=${usuario}&empresa=${empresa}`, {
         method: 'DELETE',
       });
-  
-      if (!res.ok) throw new Error('No se pudo eliminar del backend');
+      
+      if (!response.ok) throw new Error('No se pudo eliminar del backend');
+      
   
       // 2. Eliminar también del localStorage (con clave por empresa)
       const todos = JSON.parse(localStorage.getItem(`reportesComparacion_${empresa}`)) || [];
