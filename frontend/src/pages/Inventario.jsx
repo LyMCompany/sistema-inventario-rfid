@@ -22,6 +22,12 @@ function Inventario() {
 
   useEffect(() => {
     const cargarInventario = async () => {
+
+      if (inventarioWebSocketRecibido.current) {
+        console.log('⚠️ Ya se recibió inventario por WebSocket, se omite carga desde backend');
+        return;
+      }
+      
        try {
          const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios/ultimo?usuario=${user.correo}&empresa=${user.empresa}`);
          const json = await res.json();
