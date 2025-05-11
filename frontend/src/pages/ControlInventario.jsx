@@ -229,10 +229,12 @@ function ControlInventario() {
     });
 
     const dataFinal = [
-      ...comparacion.encontrados.map(agregarInfoExtra),
-      ...comparacion.faltantes.map(agregarInfoExtra),
-      ...comparacion.no_registrados.map(agregarInfoExtra),
+      ...(Array.isArray(comparacion.encontrados) ? comparacion.encontrados : []),
+      ...(Array.isArray(comparacion.faltantes) ? comparacion.faltantes : []),
+      ...(Array.isArray(comparacion.no_registrados) ? comparacion.no_registrados : [])
     ];
+    
+
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(dataFinal);
