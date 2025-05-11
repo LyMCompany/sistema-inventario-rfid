@@ -5,25 +5,44 @@ const router = express.Router();
 const pool = require('../utils/db');
 
 // ✅ Guardar inventario base
+// backend/routes/inventarioRoutes.js
+
 router.post('/', async (req, res) => {
   const { usuario, empresa, inventario } = req.body;
 
-  if (!usuario || !empresa || !Array.isArray(inventario)) {
-    return res.status(400).json({ error: 'Faltan datos requeridos o formato inválido' });
-  }
-
   try {
+    // Elimina inventario previo del usuario y empresa
     await pool.query(
-      `INSERT INTO inventario (usuario, empresa, inventario, fecha)
-       VALUES ($1, $2, $3, NOW())`,
-      [usuario, empresa, JSON.stringify(inventario)]
+      'DELETE FROM inventarios WHERE usuario = $1 AND empresa = $2',
+      [usuario, empresa]
     );
-    res.status(201).json({ mensaje: '✅ Inventario guardado correctamente' });
+
+    // Inserta el nuevo inventario
+    for (const item of inventario) {
+      await pool.query(
+        `INSERT INTO inventarios (usuario, empresa, nombre, codigo, sku, marca, rfid, ubicacion, estado)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          usuario,
+          empresa,
+          item.nombre || "-",
+          item.codigo || "-",
+          item.sku || "-",
+          item.marca || "-",
+          item.rfid,
+          item.ubicacion || "-",
+          item.estado || "Faltante"
+        ]
+      );
+    }
+
+    res.status(200).json({ mensaje: 'Inventario actualizado correctamente' });
   } catch (error) {
-    console.error('❌ Error al guardar inventario:', error);
-    res.status(500).json({ error: 'Error interno al guardar inventario' });
+    console.error('Error al guardar inventario:', error);
+    res.status(500).json({ error: 'Error al guardar inventario' });
   }
 });
+
 
 // ✅ Obtener último inventario por usuario y empresa
 router.get('/ultimo', async (req, res) => {
