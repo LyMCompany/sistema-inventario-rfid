@@ -24,6 +24,8 @@ app.use(session({
   }
 }));
 
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // ⚠️ Para preflight requests
 
 // ✅ Configuración CORS
 const corsOptions = {
@@ -44,8 +46,6 @@ const corsOptions = {
 };
 // ✅ Middleware de CORS
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // ⚠️ Para preflight requests
 
 app.use(express.json());
 
