@@ -67,20 +67,24 @@ router.delete('/:id', async (req, res) => {
 // ✅ Eliminar todos los reportes por usuario y empresa
 router.delete('/todos', async (req, res) => {
   const { usuario, empresa } = req.body;
-
+  console.log('🟡 DELETE /reportes/todos BODY:', req.body); // Log para verificar qué llega
 
   if (!usuario || !empresa) {
     return res.status(400).json({ error: 'Faltan parámetros: usuario y empresa son requeridos' });
   }
 
   try {
-    await pool.query('DELETE FROM reportes WHERE usuario = $1 AND empresa = $2', [usuario, empresa]);
+    await pool.query(
+      'DELETE FROM reportes WHERE usuario = $1 AND empresa = $2',
+      [usuario, empresa]
+    );
     res.status(200).json({ mensaje: '✅ Todos los reportes eliminados correctamente' });
   } catch (error) {
-    console.error('❌ Error al eliminar todos los reportes:', error);
+    console.error('❌ Error al eliminar reportes:', error); // Muy útil para revisar en Render
     res.status(500).json({ error: 'Error interno al eliminar reportes' });
   }
 });
+
 
 // ✅ Eliminar un reporte específico por usuario, empresa y fecha
 router.delete('/por-fecha', async (req, res) => {
