@@ -22,34 +22,36 @@ function Inventario() {
 
   useEffect(() => {
     const cargarInventario = async () => {
-      const local = localStorage.getItem(`inventarioBase_${empresa}`);
-      if (local) {
-        const json = JSON.parse(local).map(item => ({
-          ...item,
-          RFID: String(item.RFID)
-        }));
-        setData(json);
-        setInventarioBase(json);
-      } else {
-        // Consultar backend si no hay inventario local
-        try {
-          const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios?usuario=${user.correo}&empresa=${user.empresa}`);
-          const json = await res.json();
-          if (json && json.length > 0) {
-            const transformado = json.map(item => ({
-              Nombre: item.nombre,
-              Codigo: item.codigo,
-              SKU: item.sku,
-              Marca: item.marca,
-              RFID: String(item.rfid),
-              Ubicacion: item.ubicacion
-            }));
-            setData(transformado);
-            setInventarioBase(transformado);
-            localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
-          }
-        } catch (error) {
-          console.error('Error al cargar inventario desde backend:', error);
+      try {
+        const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios?usuario=${user.correo}&empresa=${user.empresa}`);
+        const json = await res.json();
+  
+        if (json && json.length > 0) {
+          const transformado = json.map(item => ({
+            Nombre: item.nombre,
+            Codigo: item.codigo,
+            SKU: item.sku,
+            Marca: item.marca,
+            RFID: String(item.rfid),
+            Ubicacion: item.ubicacion
+          }));
+  
+          setData(transformado);
+          setInventarioBase(transformado);
+          localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
+          console.log('✅ Inventario cargado desde backend');
+        }
+      } catch (error) {
+        console.error('Error al cargar inventario desde backend:', error);
+        const local = localStorage.getItem(`inventarioBase_${empresa}`);
+        if (local) {
+          const json = JSON.parse(local).map(item => ({
+            ...item,
+            RFID: String(item.RFID)
+          }));
+          setData(json);
+          setInventarioBase(json);
+          console.log('📦 Inventario cargado desde localStorage como respaldo');
         }
       }
     };
