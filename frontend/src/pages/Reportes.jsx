@@ -87,7 +87,7 @@ function Reportes() {
       const usuario = user?.correo;
       const empresa = user?.empresa;
 
-      await fetch('https://backend-inventario-t3yr.onrender.com/reportes/todos', {
+      const response = await fetch('https://backend-inventario-t3yr.onrender.com/reportes/todos', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario, empresa })
