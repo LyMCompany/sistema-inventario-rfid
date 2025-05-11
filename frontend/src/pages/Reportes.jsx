@@ -128,10 +128,13 @@ function Reportes() {
       if (result.isConfirmed) {
         try {
           // 1. Eliminar todos los reportes del backend para este usuario y empresa
-          const response = await fetch(
-            `https://backend-inventario-t3yr.onrender.com/reportes?usuario=${user.correo}&empresa=${user.empresa}`,
-            { method: 'DELETE' }
-          );
+          const response = await fetch('https://backend-inventario-t3yr.onrender.com/reportes/todos', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ usuario, empresa }),
+          });
 
           if (!response.ok) throw new Error('Error al eliminar del backend');
 
