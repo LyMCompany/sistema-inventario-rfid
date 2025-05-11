@@ -58,7 +58,7 @@ function Inventario() {
       cargarInventario();
     }
   }, [user, empresa, setInventarioBase]);
-
+  
   useEffect(() => {
     const socket = getSocket();
 
