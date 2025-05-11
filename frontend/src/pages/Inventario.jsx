@@ -39,14 +39,14 @@ function Inventario() {
         const json = await res.json();
         if (json && Array.isArray(json.inventario)) {
           const transformado = json.inventario.map(item => ({
-            nombre: item.nombre,
-            codigo: item.codigo,
-            sku: item.sku,
-            marca: item.marca,
-            rfid: String(item.rfid),
-            ubicacion: item.ubicacion,
-            estado: item.estado || "Faltante"
+            Nombre: item.nombre || "-",
+            Codigo: item.codigo || "-",
+            SKU: item.sku || "-",
+            Marca: item.marca || "-",
+            RFID: String(item.rfid),
+            Ubicacion: item.ubicacion || "-"
           }));
+        
           
           setData(transformado);
           const normalizado = transformado.map(item => ({
