@@ -83,7 +83,7 @@ function Reportes() {
   
     try {
       // 1. Eliminar del backend
-      const res = await fetch(`https://backend-inventario-t3yr.onrender.com/reportes/${reporteSeleccionado.id}`, {
+      await fetch(`https://backend-inventario-t3yr.onrender.com/reportes?usuario=${usuario}&empresa=${empresa}`, {
         method: 'DELETE',
       });
   
