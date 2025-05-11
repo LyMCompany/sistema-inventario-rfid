@@ -2,7 +2,7 @@ let socket = null;
 
 export const getSocket = () => {
   if (!socket || socket.readyState === WebSocket.CLOSED) {
-    socket = new WebSocket('wss://rfid-websocket-server-production.up.railway.app');
+    socket = new WebSocket('wss://RFID-websocket-server-production.up.railway.app');
 
     socket.onmessage = (event) => {
       try {
@@ -13,13 +13,13 @@ export const getSocket = () => {
           const empresa = data.empresa || 'empresa_default';
 
           const normalizado = data.inventario.map(item => ({
-            nombre: item.nombre,
-            codigo: item.codigo,
-            sku: item.sku,
-            marca: item.marca,
-            rfid: String(item.rfid),
-            ubicacion: item.ubicacion,
-            estado: item.estado || 'Faltante',
+            Nombre: item.Nombre,
+            Codigo: item.Codigo,
+            SKU: item.SKU,
+            Marca: item.Marca,
+            RFID: String(item.RFID),
+            Ubicacion: item.Ubicacion,
+            Estado: item.Estado || 'Faltante',
           }));
 
           localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(normalizado));

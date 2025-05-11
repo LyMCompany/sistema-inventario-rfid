@@ -49,7 +49,7 @@ function Reportes() {
       Codigo: item.Codigo || '-',
       SKU: item.SKU || '-',
       Marca: item.Marca || '-',
-      RFID: String(item.RFID || item.codigo || '-'),
+      RFID: String(item.RFID || item.Codigo || '-'),
       Ubicacion: item.Ubicacion || '-',
       Estado: item.Estado || tipo, // como fallback
       Fecha: reporte.fecha,
@@ -64,8 +64,8 @@ function Reportes() {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    const nombre = `Reporte_${reporte.usuario}_${reporte.fecha.replace(/[\/:, ]/g, '_')}.xlsx`;
-    XLSX.writeFile(wb, nombre);
+    const Nombre = `Reporte_${reporte.usuario}_${reporte.fecha.replace(/[\/:, ]/g, '_')}.xlsx`;
+    XLSX.writeFile(wb, Nombre);
   };
 
   const handleEliminarReporteActual = async () => {
@@ -249,13 +249,13 @@ function Reportes() {
   {['encontrados', 'faltantes', 'no_registrados'].flatMap(tipo =>
     (reporteSeleccionado?.[tipo] || []).map((item, index) => (
       <tr key={`${tipo}-${index}`}>
-        <td>{item.Nombre || item.nombre || '-'}</td>
-        <td>{item.Codigo || item.codigo || item['Código'] || item['Código Barras'] || '-'}</td>
-        <td>{item.SKU || item.sku || '-'}</td>
-        <td>{item.Marca || item.marca || '-'}</td>
-        <td>{item.RFID || item.rfid || item.codigo || '-'}</td>
+        <td>{item.Nombre || item.Nombre || '-'}</td>
+        <td>{item.Codigo || item.Codigo || item['Código'] || item['Código Barras'] || '-'}</td>
+        <td>{item.SKU || item.SKU || '-'}</td>
+        <td>{item.Marca || item.Marca || '-'}</td>
+        <td>{item.RFID || item.RFID || item.Codigo || '-'}</td>
         <td>{item.Ubicacion || item.ubicacion || item['Ubicación'] || '-'}</td>
-        <td>{item.Estado || item.estado || tipo}</td>
+        <td>{item.Estado || item.Estado || tipo}</td>
       </tr>
     ))
   )}
