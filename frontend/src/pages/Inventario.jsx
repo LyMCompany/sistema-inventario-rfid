@@ -56,6 +56,36 @@ function Inventario() {
       cargarInventario();
     }
   }, [user, empresa, setInventarioBase]);
+
+  useEffect(() => {
+    const socket = getSocket();
+
+    socket.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+
+        if (msg.tipo === 'inventario' && Array.isArray(msg.inventario)) {
+          const transformado = msg.inventario.map(item => ({
+            Nombre: item.nombre,
+            Codigo: item.codigo,
+            SKU: item.sku,
+            Marca: item.marca,
+            RFID: String(item.rfid),
+            Ubicacion: item.ubicacion
+          }));
+
+          setData(transformado);
+          setInventarioBase(transformado);
+          localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
+
+          console.log('📥 Inventario actualizado desde WebSocket:', transformado);
+        }
+      } catch (err) {
+        console.error('❌ Error al procesar mensaje WebSocket:', err);
+      }
+    };
+  }, []);
+
   
   const enviarInventarioAlBackend = async (inventario) => {
     try {
