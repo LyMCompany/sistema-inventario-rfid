@@ -13,14 +13,14 @@ router.post('/', async (req, res) => {
   try {
     // Elimina inventario previo del usuario y empresa
     await pool.query(
-      'DELETE FROM inventarios WHERE usuario = $1 AND empresa = $2',
+      'DELETE FROM inventario WHERE usuario = $1 AND empresa = $2',
       [usuario, empresa]
     );
 
     // Inserta el nuevo inventario
     for (const item of inventario) {
       await pool.query(
-        `INSERT INTO inventarios (usuario, empresa, nombre, codigo, sku, marca, rfid, ubicacion, estado)
+        `INSERT INTO inventario (usuario, empresa, nombre, codigo, sku, marca, rfid, ubicacion, estado)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
         [
           usuario,
