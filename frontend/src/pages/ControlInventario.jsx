@@ -149,7 +149,7 @@ function ControlInventario() {
     setIsProcessing(true);
 
     const encontrados = [];
-    const sobrantes = [];
+    const no_registrados = [];
     const faltantesMap = new Map(base.map(item => [String(item.RFID), item]));
 
     const nuevosEscaneados = escaneados.map(scan => {
@@ -160,7 +160,7 @@ function ControlInventario() {
         faltantesMap.delete(codigo);
         return { ...scan, Estado: 'Encontrado' };
       } else {
-        sobrantes.push({ RFID: codigo, Estado: 'Sobrante' });
+        no_registrados.push({ RFID: codigo, Estado: 'Sobrante' });
         return { ...scan, Estado: 'Sobrante' };
       }
     });
@@ -170,7 +170,7 @@ function ControlInventario() {
     const resultadoFinal = {
       encontrados,
       faltantes: faltantesMarcados,
-      sobrantes,
+      no_registrados,
     };
 
     setEscaneados(nuevosEscaneados);
@@ -195,7 +195,7 @@ function ControlInventario() {
       fecha,
       encontrados: resultadoFinal.encontrados || [],
       faltantes: resultadoFinal.faltantes || [],
-      sobrantes: resultadoFinal.sobrantes || []
+      no_registrados: resultadoFinal.no_registrados || []
 
     };
     Swal.fire('Éxito', 'Reporte enviado al backend correctamente', 'success');
@@ -206,7 +206,7 @@ function ControlInventario() {
 
     Swal.fire(
       'Comparación completada',
-      `Encontrados: ${encontrados.length}, Faltantes: ${faltantesMarcados.length}, Sobrantes: ${sobrantes.length}`,
+      `Encontrados: ${encontrados.length}, Faltantes: ${faltantesMarcados.length}, no_registrados: ${no_registrados.length}`,
       'info'
     );
              // Notificar al componente Reportes.jsx para que recargue
@@ -231,7 +231,7 @@ function ControlInventario() {
     const dataFinal = [
       ...comparacion.encontrados.map(agregarInfoExtra),
       ...comparacion.faltantes.map(agregarInfoExtra),
-      ...comparacion.sobrantes.map(agregarInfoExtra),
+      ...comparacion.no_registrados.map(agregarInfoExtra),
     ];
 
     const wb = XLSX.utils.book_new();
@@ -336,7 +336,7 @@ function ControlInventario() {
               </tr>
             </thead>
             <tbody>
-              {[...comparacion.encontrados, ...comparacion.faltantes, ...comparacion.sobrantes].map((item, index) => (
+              {[...comparacion.encontrados, ...comparacion.faltantes, ...comparacion.no_registrados].map((item, index) => (
                 <tr key={index}>
                   <td>{item.Nombre || '-'}</td>
                   <td>{item.Codigo || '-'}</td>
