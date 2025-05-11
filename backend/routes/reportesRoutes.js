@@ -6,7 +6,7 @@ const pool = require('../utils/db');
 router.post('/', async (req, res) => {
   console.log('📦 Body recibido:', req.body);
 
-  const { usuario, empresa, fecha, encontrados, faltantes, no_registrados } = req.body;
+  const { usuario, empresa, fecha, encontrados, faltantes, noregistrados } = req.body;
 
 
   if (
@@ -15,16 +15,16 @@ router.post('/', async (req, res) => {
     typeof fecha !== 'string' ||
     !Array.isArray(encontrados) ||
     !Array.isArray(faltantes) ||
-    !Array.isArray(no_registrados)
+    !Array.isArray(noregistrados)
   ) {
     return res.status(400).json({ error: 'Faltan datos válidos en el cuerpo de la solicitud' });
   }
   
   try {
     const result = await pool.query(
-      `INSERT INTO reportes (usuario, empresa, fecha, encontrados, faltantes, no_registrados)
+      `INSERT INTO reportes (usuario, empresa, fecha, encontrados, faltantes, noregistrados)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-       [usuario, empresa, fecha, JSON.stringify(encontrados), JSON.stringify(faltantes), JSON.stringify(no_registrados)]
+       [usuario, empresa, fecha, JSON.stringify(encontrados), JSON.stringify(faltantes), JSON.stringify(noregistrados)]
 
     );
 
