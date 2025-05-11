@@ -124,10 +124,7 @@ function Inventario() {
       console.log("📤 Enviado por WebSocket:", JSON.stringify(payload, null, 2));
     };
     
-console.log("📤 Payload WebSocket:", JSON.stringify(payload, null, 2));
-
-
-
+    // Enviar inventario al backend
     enviarInventarioAlBackend(ejemplo);
 
     Swal.fire({ icon: 'success', title: 'Información cargada', showConfirmButton: false, timer: 1500 });
