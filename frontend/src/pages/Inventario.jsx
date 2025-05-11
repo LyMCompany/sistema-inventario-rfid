@@ -40,22 +40,22 @@ function Inventario() {
         if (json && Array.isArray(json.inventario)) {
           const transformado = json.inventario.map(item => ({
             Nombre: item.Nombre || "-",
-            Codigo: item.codigo || "-",
-            SKU: item.sku || "-",
-            Marca: item.marca || "-",
-            RFID: String(item.rfid),
-            Ubicacion: item.ubicacion || "-"
+            Codigo: item.Codigo || "-",
+            SKU: item.SKU || "-",
+            Marca: item.Marca || "-",
+            RFID: String(item.RFID),
+            Ubicacion: item.Ubicacion || "-"
           }));
         
           
           setData(transformado);
           const normalizado = transformado.map(item => ({
             Nombre: item.Nombre || "-",
-            Codigo: item.codigo || "-",
-            SKU: item.sku || "-",
-            Marca: item.marca || "-",
-            RFID: item.rfid || "-",
-            Ubicacion: item.ubicacion || "-",
+            Codigo: item.Codigo || "-",
+            SKU: item.SKU || "-",
+            Marca: item.Marca || "-",
+            RFID: item.RFID || "-",
+            Ubicacion: item.Ubicacion || "-",
             Estado: item.estado || "-"
           }));
           setInventarioBase(normalizado);
@@ -94,11 +94,11 @@ function Inventario() {
         if (msg.tipo === 'inventario' && Array.isArray(msg.inventario)) {
           const transformado = msg.inventario.map(item => ({
             Nombre: item.Nombre,
-            Codigo: item.codigo,
-            SKU: item.sku,
-            Marca: item.marca,
-            RFID: String(item.rfid),
-            Ubicacion: item.ubicacion
+            Codigo: item.Codigo,
+            SKU: item.SKU,
+            Marca: item.Marca,
+            RFID: String(item.RFID),
+            Ubicacion: item.Ubicacion
           }));
         
           setData(transformado);
@@ -127,11 +127,11 @@ function Inventario() {
           empresa: user.empresa,
           inventario: inventario.map(item => ({
             Nombre: item.Nombre || "-",
-            codigo: item.Codigo || "-",
-            sku: item.SKU || "-",
-            marca: item.Marca || "-",
-            rfid: String(item.RFID),
-            ubicacion: item.Ubicacion || "-"
+            Codigo: item.Codigo || "-",
+            SKU: item.SKU || "-",
+            Marca: item.Marca || "-",
+            RFID: String(item.RFID),
+            Ubicacion: item.Ubicacion || "-"
           }))
         })
       });
@@ -170,11 +170,11 @@ function Inventario() {
         empresa: user.empresa,
         inventario: ejemplo.map(item => ({
           Nombre: item.Nombre || "-",
-          codigo: item.Codigo || "-",
-          sku: item.SKU || "-",
-          marca: item.Marca || "-",
-          rfid: String(item.RFID),
-          ubicacion: item.Ubicacion || "-"
+          Codigo: item.Codigo || "-",
+          SKU: item.SKU || "-",
+          Marca: item.Marca || "-",
+          RFID: String(item.RFID),
+          Ubicacion: item.Ubicacion || "-"
         }))
       };
       // Enviar el payload al WebSocket      
@@ -234,11 +234,11 @@ function Inventario() {
              empresa: user.empresa,
              inventario: dataConvertida.map(item => ({
                Nombre: item.Nombre || "-",
-               codigo: item.Codigo || "-",
-               sku: item.SKU || "-",
-               marca: item.Marca || "-",
-               rfid: String(item.RFID),
-               ubicacion: item.Ubicacion || "-"
+               Codigo: item.Codigo || "-",
+               SKU: item.SKU || "-",
+               Marca: item.Marca || "-",
+               RFID: String(item.RFID),
+               Ubicacion: item.Ubicacion || "-"
              }))
            };
            // Enviar el payload al WebSocket  
@@ -348,11 +348,11 @@ function Inventario() {
             <thead>
               <tr>
                 <th>Nombre</th>
-                <th>Código</th>
+                <th>Codigo</th>
                 <th>SKU</th>
                 <th>Marca</th>
                 <th>RFID</th>
-                <th>Ubicación</th>
+                <th>Ubicacion</th>
               </tr>
             </thead>
             <tbody>
@@ -362,7 +362,7 @@ function Inventario() {
                   <td>{fila.Codigo}</td>
                   <td>{fila.SKU}</td>
                   <td>{fila.Marca}</td>
-                  <td className="celda-rfid">
+                  <td className="celda-RFID">
   <button
     onClick={() => copiarAlPortapapeles(String(fila.RFID))}
     style={{
