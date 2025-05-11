@@ -87,16 +87,12 @@ function Reportes() {
       const usuario = user?.correo;
       const empresa = user?.empresa;
 
-      const response = await fetch('https://backend-inventario-t3yr.onrender.com/reportes', {
+      await fetch('https://backend-inventario-t3yr.onrender.com/reportes/todos', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          usuario,
-          empresa,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, empresa })
       });
+  
       
       
       if (!response.ok) throw new Error('No se pudo eliminar del backend');
