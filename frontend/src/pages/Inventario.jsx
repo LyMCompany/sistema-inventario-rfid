@@ -39,13 +39,15 @@ function Inventario() {
         const json = await res.json();
         if (json && Array.isArray(json.inventario)) {
           const transformado = json.inventario.map(item => ({
-            Nombre: item.nombre,
-            Codigo: item.codigo,
-            SKU: item.sku,
-            Marca: item.marca,
-            RFID: String(item.rfid),
-            Ubicacion: item.ubicacion
+            nombre: item.nombre,
+            codigo: item.codigo,
+            sku: item.sku,
+            marca: item.marca,
+            rfid: String(item.rfid),
+            ubicacion: item.ubicacion,
+            estado: item.estado || "Faltante"
           }));
+          
           setData(transformado);
           setInventarioBase(transformado);
           localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
