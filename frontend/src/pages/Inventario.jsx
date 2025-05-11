@@ -205,56 +205,56 @@ function Inventario() {
         const wb = XLSX.read(bstr, { type: 'binary' });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
-
-        // Convertir la hoja a JSON
         const jsonData = XLSX.utils.sheet_to_json(ws, { raw: false });
-
-        // Validar que el archivo tenga datos
+    
         if (!jsonData || jsonData.length === 0) {
           Swal.fire('Error', 'El archivo está vacío o no tiene datos válidos', 'error');
           return;
         }
-
-         
-         const dataConvertida = jsonData.map(item => ({
+    
+        const dataConvertida = jsonData.map(item => ({
           ...item,
           RFID: String(item.RFID)
         }));
-          
+    
         setData(dataConvertida);
         setInventarioBase(dataConvertida);
         localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(dataConvertida));
-
-         // WebSocket: enviar inventario en tiempo real
-         const socket = getSocket();
-         socket.onopen = () => {
-           const payload = {
-             tipo: 'inventario',
-             usuario: user.correo,
-             empresa: user.empresa,
-             inventario: dataConvertida.map(item => ({
-               Nombre: item.Nombre || "-",
-               Codigo: item.Codigo || "-",
-               SKU: item.SKU || "-",
-               Marca: item.Marca || "-",
-               RFID: String(item.RFID),
-               Ubicacion: item.Ubicacion || "-"
-             }))
-           };
-           // Enviar el payload al WebSocket  
-           socket.send(JSON.stringify(payload));
-           console.log("📤 Enviado por WebSocket:", JSON.stringify(payload, null, 2));
-         };
-  
+    
+        const socket = getSocket();
+        const payload = {
+          tipo: 'inventario',
+          usuario: user.correo,
+          empresa: user.empresa,
+          inventario: dataConvertida.map(item => ({
+            Nombre: item.Nombre || "-",
+            Codigo: item.Codigo || "-",
+            SKU: item.SKU || "-",
+            Marca: item.Marca || "-",
+            RFID: String(item.RFID),
+            Ubicacion: item.Ubicacion || "-",
+            Estado: "Faltante"
+          }))
+        };
+    
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify(payload));
+          console.log("📤 Enviado por WebSocket:", JSON.stringify(payload, null, 2));
+        } else {
+          socket.addEventListener('open', () => {
+            socket.send(JSON.stringify(payload));
+            console.log("📤 (retrasado) Enviado por WebSocket:", JSON.stringify(payload, null, 2));
+          }, { once: true });
+        }
+    
         enviarInventarioAlBackend(dataConvertida);
-  
+    
         Swal.fire({
           icon: 'success',
           title: `Archivo cargado exitosamente (${dataConvertida.length} filas procesadas)`,
           showConfirmButton: false,
           timer: 1500
         });
-  
       } catch (error) {
         console.error('Error al procesar el archivo:', error);
         Swal.fire('Error', 'Hubo un problema al procesar el archivo', 'error');
@@ -262,6 +262,7 @@ function Inventario() {
         setIsLoading(false);
       }
     };
+    
     reader.readAsBinaryString(file);
     e.target.value = null;
   };
