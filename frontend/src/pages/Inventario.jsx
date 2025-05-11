@@ -23,7 +23,8 @@ function Inventario() {
   useEffect(() => {
     const cargarInventario = async () => {
       try {
-        const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios?usuario=${user.correo}&empresa=${user.empresa}`);
+        const res = await fetch(`https://backend-inventario-t3yr.onrender.com/inventarios/ultimo?usuario=${user.correo}&empresa=${user.empresa}`);
+
         const json = await res.json();
   
         if (json && json.length > 0) {
