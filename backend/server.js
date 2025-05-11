@@ -24,8 +24,7 @@ app.use(session({
   }
 }));
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // ⚠️ Para preflight requests
+
 
 // ✅ Configuración CORS
 const corsOptions = {
@@ -44,7 +43,10 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 };
+
 // ✅ Middleware de CORS
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // ⚠️ Para preflight requests
 
 
 app.use(express.json());
