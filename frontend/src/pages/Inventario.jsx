@@ -92,6 +92,26 @@ function Inventario() {
         const msg = JSON.parse(event.data);
 
         if (msg.tipo === 'inventario' && Array.isArray(msg.inventario)) {
+
+          if (msg.usuario === user.correo && msg.empresa === user.empresa) {
+            const transformado = msg.inventario.map(item => ({
+              Nombre: item.Nombre,
+              Codigo: item.Codigo,
+              SKU: item.SKU,
+              Marca: item.Marca,
+              RFID: String(item.RFID),
+              Ubicacion: item.Ubicacion,
+              Estado: item.Estado || "Faltante"
+            }));
+          
+            setData(transformado);
+            setInventarioBase(transformado);
+            localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
+            inventarioWebSocketRecibido.current = true;
+            console.log('📥 Inventario recibido desde WebSocket:', transformado);
+          }
+          
+
           const transformado = msg.inventario.map(item => ({
             Nombre: item.Nombre,
             Codigo: item.Codigo,
