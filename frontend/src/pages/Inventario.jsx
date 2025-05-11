@@ -110,7 +110,7 @@ function Inventario() {
         tipo: 'inventario',
         usuario: user.correo,
         empresa: user.empresa,
-        inventario: dataConvertida.map(item => ({
+        inventario: ejemplo.map(item => ({
           nombre: item.Nombre || "-",
           codigo: item.Codigo || "-",
           sku: item.SKU || "-",
