@@ -66,7 +66,8 @@ router.delete('/:id', async (req, res) => {
 
 // ✅ Eliminar todos los reportes por usuario y empresa
 router.delete('/todos', async (req, res) => {
-  const { usuario, empresa } = req.query;
+  const { usuario, empresa } = req.body;
+
 
   if (!usuario || !empresa) {
     return res.status(400).json({ error: 'Faltan parámetros: usuario y empresa son requeridos' });
