@@ -82,9 +82,7 @@ function Reportes() {
   
     if (!confirmacion.isConfirmed) return;
   
-    try {
-      console.log('Body recibido en DELETE /todos:', req.body);
-      // 1. Eliminar del backend
+    try {      // 1. Eliminar del backend
       const usuario = user?.correo;
       const empresa = user?.empresa;
 
