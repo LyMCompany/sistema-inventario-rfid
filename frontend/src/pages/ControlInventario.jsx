@@ -354,19 +354,19 @@ function ControlInventario() {
 ].map((item, index) => (
 
                 <tr key={index}>
-                  <td>{item.Nombre || '-'}</td>
-                  <td>{item.Codigo || '-'}</td>
-                  <td>{item.SKU || '-'}</td>
-                  <td>{item.Marca || '-'}</td>
+                  <td>{item.nombre || '-'}</td>
+                  <td>{item.codigo || '-'}</td>
+                  <td>{item.sku || '-'}</td>
+                  <td>{item.marca || '-'}</td>
                   <td className="celda-rfid">
-                  <button onClick={() => copiarAlPortapapeles(String(item.RFID || item.codigo || '-'))}
+                  <button onClick={() => copiarAlPortapapeles(String(item.rfid || item.codigo || '-'))}
                    style={{ background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer', wordBreak: 'break-word', whiteSpace: 'normal' }}
                   >
-                   {String(item.RFID || item.codigo || '-')}
+                   {String(item.rfid || item.codigo || '-')}
                   </button>
                   </td>
-                  <td>{item.Ubicacion || '-'}</td>
-                  <td>{item.Estado}</td>
+                  <td>{item.ubicacion || '-'}</td>
+                  <td>{item.estado}</td>
                 </tr>
               ))}
             </tbody>
