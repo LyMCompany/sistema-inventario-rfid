@@ -17,24 +17,12 @@ router.post('/', async (req, res) => {
       [usuario, empresa]
     );
 
-    // Inserta el nuevo inventario
-    for (const item of inventario) {
-      await pool.query(
-        `INSERT INTO inventario (usuario, empresa, nombre, codigo, sku, marca, rfid, ubicacion, estado)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [
-          usuario,
-          empresa,
-          item.nombre || "-",
-          item.codigo || "-",
-          item.sku || "-",
-          item.marca || "-",
-          item.rfid,
-          item.ubicacion || "-",
-          item.estado || "Faltante"
-        ]
-      );
-    }
+    // Inserta el inventario completo como JSON
+    await pool.query(
+      `INSERT INTO inventario (usuario, empresa, inventario)
+       VALUES ($1, $2, $3)`,
+      [usuario, empresa, JSON.stringify(inventario)]
+    );
 
     res.status(200).json({ mensaje: 'Inventario actualizado correctamente' });
   } catch (error) {
@@ -42,6 +30,7 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Error al guardar inventario' });
   }
 });
+
 
 
 // ✅ Obtener último inventario por usuario y empresa
