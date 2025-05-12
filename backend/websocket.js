@@ -19,20 +19,22 @@ function setupWebSocket(server) {
 }
 
 function emitirInventario(inventario, usuario, empresa) {
-  const payload = JSON.stringify({
+  const payload = {
     tipo: 'inventario',
     usuario,
     empresa,
     inventario
-  });
+  };
+
+  const json = JSON.stringify(payload);
 
   sockets.forEach(ws => {
     if (ws.readyState === ws.OPEN) {
-      ws.send(payload);
+      ws.send(json); // ✅ Enviar directamente como objeto, no dentro de otra propiedad
     }
   });
 
-  console.log(`📦 Inventario enviado por WebSocket a ${sockets.length} clientes`);
+  console.log(`📦 Inventario enviado por WebSocket (${sockets.length} clientes)`);
 }
 
 
