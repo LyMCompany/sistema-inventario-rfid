@@ -11,18 +11,28 @@ router.post('/', async (req, res) => {
   const { usuario, empresa, inventario } = req.body;
 
   try {
-    // Elimina inventario previo del usuario y empresa
     await pool.query(
       'DELETE FROM inventario WHERE usuario = $1 AND empresa = $2',
       [usuario, empresa]
     );
 
-    // Inserta el inventario completo como JSON
     await pool.query(
       `INSERT INTO inventario (usuario, empresa, inventario)
        VALUES ($1, $2, $3)`,
       [usuario, empresa, JSON.stringify(inventario)]
     );
+
+    // ✅ Emitir inventario actualizado por WebSocket
+    wss.clients.forEach(client => {
+      if (client.readyState === 1) {
+        client.send(JSON.stringify({
+          tipo: 'inventario',
+          usuario,
+          empresa,
+          inventario
+        }));
+      }
+    });
 
     res.status(200).json({ mensaje: 'Inventario actualizado correctamente' });
   } catch (error) {
