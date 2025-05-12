@@ -58,7 +58,7 @@ function Login() {
 
   return (
     <div className="login-container">
-      
+      <div className="login-wrapper"></div>
       <img src={logo} alt="Logo" className="login-logo" />
 
       <div className="login-box">
