@@ -125,7 +125,7 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f0f0;
+  background-color: #f4f4f4;
 }
 
 .login-wrapper {
@@ -135,10 +135,9 @@
 }
 
 .login-logo {
-  width: 280px;
+  width: 290px;
   height: auto;
-  margin-bottom: -20px; /* se acerca al cuadro */
-  margin-top: -40px;    /* opcional si quieres subirlo más */
+  margin-bottom: -20px; /* ajusta para que quede justo encima del login-box */
 }
 
 .login-box {
@@ -147,4 +146,5 @@
   border-radius: 12px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
   width: 320px;
+  text-align: center;
 }
