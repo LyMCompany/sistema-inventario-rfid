@@ -60,7 +60,7 @@ function Inventario() {
           }));
           setInventarioBase(normalizado);
           
-          localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
+          localStorage.setItem(`inventarioBase_${user.empresa}`, JSON.stringify(transformado));
           console.log('✅ Inventario cargado desde backend');
         }
       } catch (error) {
@@ -91,27 +91,29 @@ function Inventario() {
       try {
         const msg = JSON.parse(event.data);
 
-        if (msg.tipo === 'inventario' && Array.isArray(msg.inventario)) {
-
-          if (msg.usuario === user.correo && msg.empresa === user.empresa) {
-            const transformado = msg.inventario.map(item => ({
-              Nombre: item.Nombre,
-              Codigo: item.Codigo,
-              SKU: item.SKU,
-              Marca: item.Marca,
-              RFID: String(item.RFID),
-              Ubicacion: item.Ubicacion,
-              Estado: item.Estado || "Faltante"
-            }));
-          
-            setData(transformado);
-            setInventarioBase(transformado);
-            localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
-            inventarioWebSocketRecibido.current = true;
-            console.log('📥 Inventario recibido desde WebSocket:', transformado);
-          }
-          
+        if (
+          msg.tipo === 'inventario' &&
+          Array.isArray(msg.inventario) &&
+          msg.usuario?.toLowerCase().trim() === user.correo?.toLowerCase().trim() &&
+          msg.empresa?.toLowerCase().trim() === user.empresa?.toLowerCase().trim()
+        ) {
+          const transformado = msg.inventario.map(item => ({
+            Nombre: item.Nombre || "-",
+            Codigo: item.Codigo || "-",
+            SKU: item.SKU || "-",
+            Marca: item.Marca || "-",
+            RFID: String(item.RFID),
+            Ubicacion: item.Ubicacion || "-",
+            Estado: item.Estado || "Faltante"
+          }));
+        
+          setData(transformado);
+          setInventarioBase(transformado);
+          localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
+          inventarioWebSocketRecibido.current = true;
+          console.log("📦 Inventario recibido desde WebSocket:", transformado);
         }
+      
         
       } catch (err) {
         console.error('❌ Error al procesar mensaje WebSocket:', err);
