@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../styles/Login.css';
 import { useUser } from '../context/UserContext';
-import logo from '../assets/logo.png'; // ajusta la ruta si es necesario
+import logo from '../assets/logo.png';
+
 
 
 const BACKEND_URL = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BACKEND_URL
