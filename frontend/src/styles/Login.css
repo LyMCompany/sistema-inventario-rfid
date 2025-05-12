@@ -128,19 +128,16 @@
   background-color: #f4f4f4;
 }
 
-.login-wrapper {
+.login-content {
   display: flex;
-  flex-direction: column; /* ✅ Esto es CLAVE */
+  flex-direction: row; /* ← horizontal */
   align-items: center;
-  gap: 5px; /* opcional para espacio entre logo y caja */
+  gap: 40px; /* ← separación entre logo y caja */
 }
 
-
 .login-logo {
-  width: 640px;
+  width: 680px;
   height: auto;
-  margin-bottom: -5px; /* ajusta para que quede justo encima del login-box */
-  margin-right: +40px; /* 🔽 mueve el logo más a la izquierda */
 }
 
 .login-box {
