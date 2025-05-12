@@ -21,11 +21,16 @@ router.post('/', async (req, res) => {
       [usuario, empresa, JSON.stringify(inventario)]
     );
 
-    // 3. Enviar inventario por WebSocket a todos los clientes
-    emitirInventario(inventario, usuario, empresa);
+    // 3. Emitir inventario por WebSocket (si es válido)
+    if (Array.isArray(inventario) && inventario.length > 0) {
+      emitirInventario(inventario, usuario, empresa);
+    } else {
+      console.warn('⚠️ Inventario vacío o inválido, no se emitió por WebSocket');
+    }
 
-    // 4. Responder
+    // 4. Responder al frontend
     res.status(200).json({ mensaje: 'Inventario actualizado correctamente' });
+
   } catch (error) {
     console.error('❌ Error al guardar inventario:', error);
     res.status(500).json({ error: 'Error al guardar inventario' });

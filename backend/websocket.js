@@ -1,4 +1,5 @@
 // backend/websocket.js
+
 let sockets = [];
 
 function setupWebSocket(server) {
@@ -6,7 +7,7 @@ function setupWebSocket(server) {
   const wss = new WebSocket.Server({ server });
 
   wss.on('connection', (ws) => {
-    console.log('🔌 Cliente WebSocket conectado');
+    console.log('✅ Cliente WebSocket conectado');
     sockets.push(ws);
 
     ws.on('close', () => {
@@ -18,6 +19,16 @@ function setupWebSocket(server) {
   return wss;
 }
 
+function emitirEtiqueta(codigo) {
+  const payload = JSON.stringify({ codigo });
+  sockets.forEach(ws => {
+    if (ws.readyState === ws.OPEN) {
+      ws.send(payload);
+    }
+  });
+  console.log(`📤 Código enviado a ${sockets.length} clientes: ${codigo}`);
+}
+
 function emitirInventario(inventario, usuario, empresa) {
   const payload = {
     tipo: 'inventario',
@@ -26,16 +37,17 @@ function emitirInventario(inventario, usuario, empresa) {
     inventario
   };
 
-  const json = JSON.stringify(payload);
-
   sockets.forEach(ws => {
     if (ws.readyState === ws.OPEN) {
-      ws.send(json); // ✅ Enviar directamente como objeto, no dentro de otra propiedad
+      ws.send(JSON.stringify(payload));
     }
   });
 
-  console.log(`📦 Inventario enviado por WebSocket (${sockets.length} clientes)`);
+  console.log(`📦 Inventario enviado por WebSocket a ${sockets.length} clientes`);
 }
 
-
-module.exports = {setupWebSocket, emitirInventario};
+module.exports = {
+  setupWebSocket,
+  emitirEtiqueta,
+  emitirInventario
+};

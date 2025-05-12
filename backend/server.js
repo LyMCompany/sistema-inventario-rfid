@@ -3,32 +3,31 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
+const http = require('http');
 
 const authRoutes = require('./routes/authRoutes');
 const reportesRoutes = require('./routes/reportesRoutes');
 const inventarioRoutes = require('./routes/inventarioRoutes');
-const pool = require('./utils/db'); // Tu conexión PostgreSQL
-const http = require('http');
-const WebSocket = require('ws');
-
+const pool = require('./utils/db');
+const { setupWebSocket } = require('./websocket'); // ✅ Usamos setupWebSocket
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 // ✅ Configuración de sesiones con PostgreSQL
-app.set('trust proxy', 1); // ⚠️ Obligatorio en Render
+app.set('trust proxy', 1);
 
 app.use(session({
   store: new pgSession({
-    pool: pool,               // Ya definido en utils/db.js
-    tableName: 'session'      // Asegúrate que esta tabla exista (ya creada)
+    pool: pool,
+    tableName: 'session'
   }),
-  secret: 'clave_super_segura', // Puedes usar process.env.SECRET si lo prefieres
+  secret: 'clave_super_segura',
   resave: false,
   saveUninitialized: false,
   cookie: {
     sameSite: 'none',
-    secure: true // ⚠️ Obligatorio para Render con HTTPS
+    secure: true
   }
 }));
 
@@ -51,9 +50,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // ⚠️ Necesario para preflight requests
+app.options('*', cors(corsOptions));
 
-// ✅ Middleware para parsear JSON
 app.use(express.json());
 
 // ✅ Rutas del backend
@@ -61,7 +59,7 @@ app.use('/auth', authRoutes);
 app.use('/reportes', reportesRoutes);
 app.use('/inventario', inventarioRoutes);
 
-// ✅ Ruta adicional para WebSocket desde Android
+// ✅ Endpoint adicional si lo usas desde Android para pruebas
 app.post('/websocket/emitir', (req, res) => {
   const { codigo } = req.body;
   if (!codigo) {
@@ -72,18 +70,15 @@ app.post('/websocket/emitir', (req, res) => {
   res.status(200).json({ mensaje: 'Código recibido exitosamente' });
 });
 
-// ✅ Middleware global de errores
+// ✅ Manejo de errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({ mensaje: err.message || 'Error interno del servidor' });
 });
 
-// ✅ Iniciar el servidor
+// ✅ Iniciar servidor y WebSocket
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
+setupWebSocket(server); // 👈 Esta es la forma correcta
 server.listen(port, '0.0.0.0', () => {
   console.log(`Servidor corriendo en http://0.0.0.0:${port}`);
 });
-module.exports = { wss };
-
