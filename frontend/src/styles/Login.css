@@ -120,9 +120,20 @@
   color: red;
 }
 
-.login-logo-externo {
-  display: block;
-  margin: 40px auto 10px auto;
-  max-width: 480px;
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -20px;
+  margin-top: 20px;
+}
+
+.login-logo {
+  width: 100px;
   height: auto;
+  margin-bottom: -40px;
+  z-index: 10;
+}
+
+.login-logo {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
