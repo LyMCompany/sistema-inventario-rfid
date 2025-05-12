@@ -122,7 +122,7 @@
 
 .login-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 100vh;
   background-color: #f4f4f4;
