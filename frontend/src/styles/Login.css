@@ -140,7 +140,7 @@
   width: 640px;
   height: auto;
   margin-bottom: -12px; /* ajusta para que quede justo encima del login-box */
-  margin-right: -30px; /* 🔽 mueve el logo más a la izquierda */
+  margin-right: +20px; /* 🔽 mueve el logo más a la izquierda */
 }
 
 .login-box {
