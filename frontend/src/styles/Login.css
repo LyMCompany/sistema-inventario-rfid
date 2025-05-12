@@ -122,7 +122,6 @@
 .login-logo {
   display: block;
   margin: 0 auto 20px auto;
-  width: 100px; /* o el tamaño que desees */
+  max-width: 160px;
   height: auto;
 }
-

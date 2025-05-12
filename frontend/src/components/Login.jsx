@@ -58,7 +58,9 @@ function Login() {
 
   return (
     <div className="login-container">
+      
       <img src={logo} alt="Logo" className="login-logo" />
+
       <div className="login-box">
         <h2 className="login-title">Inicio de Sesión</h2>
         <form onSubmit={handleLogin}>
