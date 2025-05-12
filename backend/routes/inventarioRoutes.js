@@ -1,49 +1,36 @@
-// backend/routes/inventarioRoutes.js
-
 const express = require('express');
 const router = express.Router();
 const pool = require('../utils/db');
-const { wss } = require('../server'); // Importa el WebSocket Server
-
+const { emitirInventario } = require('../websocket'); // ✅ Importación correcta
 
 // ✅ Guardar inventario base
-// backend/routes/inventarioRoutes.js
-
 router.post('/', async (req, res) => {
   const { usuario, empresa, inventario } = req.body;
 
   try {
+    // 1. Eliminar inventario anterior
     await pool.query(
       'DELETE FROM inventario WHERE usuario = $1 AND empresa = $2',
       [usuario, empresa]
     );
 
+    // 2. Insertar nuevo inventario
     await pool.query(
       `INSERT INTO inventario (usuario, empresa, inventario)
        VALUES ($1, $2, $3)`,
       [usuario, empresa, JSON.stringify(inventario)]
     );
 
-    // ✅ Emitir inventario actualizado por WebSocket
-    wss.clients.forEach(client => {
-      if (client.readyState === 1) {
-        client.send(JSON.stringify({
-          tipo: 'inventario',
-          usuario,
-          empresa,
-          inventario
-        }));
-      }
-    });
+    // 3. Enviar inventario por WebSocket a todos los clientes
+    emitirInventario(inventario, usuario, empresa);
 
+    // 4. Responder
     res.status(200).json({ mensaje: 'Inventario actualizado correctamente' });
   } catch (error) {
-    console.error('Error al guardar inventario:', error);
+    console.error('❌ Error al guardar inventario:', error);
     res.status(500).json({ error: 'Error al guardar inventario' });
   }
 });
-
-
 
 // ✅ Obtener último inventario por usuario y empresa
 router.get('/ultimo', async (req, res) => {
