@@ -86,11 +86,11 @@ function Inventario() {
   
   useEffect(() => {
     const socket = getSocket();
-
-    socket.onmessage = (event) => {
+  
+    const handleMessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
-
+  
         if (
           msg.tipo === 'inventario' &&
           Array.isArray(msg.inventario) &&
@@ -106,20 +106,24 @@ function Inventario() {
             Ubicacion: item.Ubicacion || "-",
             Estado: item.Estado || "Faltante"
           }));
-        
+  
           setData(transformado);
           setInventarioBase(transformado);
           localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
           inventarioWebSocketRecibido.current = true;
           console.log("📦 Inventario recibido desde WebSocket:", transformado);
         }
-      
-        
       } catch (err) {
         console.error('❌ Error al procesar mensaje WebSocket:', err);
       }
     };
-  }, []);
+  
+    socket.addEventListener('message', handleMessage);
+  
+    return () => {
+      socket.removeEventListener('message', handleMessage); // Limpieza
+    };
+  }, [user.correo, user.empresa]);
 
   
   const enviarInventarioAlBackend = async (inventario) => {
