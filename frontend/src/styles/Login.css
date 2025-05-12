@@ -120,20 +120,31 @@
   color: red;
 }
 
-.logo-wrapper {
+.login-container {
   display: flex;
   justify-content: center;
-  margin-bottom: -20px;
-  margin-top: 20px;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .login-logo {
-  width: 220px;
+  width: 280px;
   height: auto;
-  margin-bottom: -40px;
-  z-index: 10;
+  margin-bottom: -20px; /* se acerca al cuadro */
+  margin-top: -40px;    /* opcional si quieres subirlo más */
 }
 
-.login-logo {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+.login-box {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  width: 320px;
 }
