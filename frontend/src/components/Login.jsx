@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../styles/Login.css';
 import { useUser } from '../context/UserContext';
+import logo from '../assets/logo.png'; // ajusta la ruta si es necesario
+
 
 const BACKEND_URL = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BACKEND_URL
   ? import.meta.env.VITE_BACKEND_URL
@@ -55,6 +57,7 @@ function Login() {
 
   return (
     <div className="login-container">
+      <img src={logo} alt="Logo" className="login-logo" />
       <div className="login-box">
         <h2 className="login-title">Inicio de Sesión</h2>
         <form onSubmit={handleLogin}>
