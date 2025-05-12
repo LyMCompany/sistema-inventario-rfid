@@ -11,7 +11,7 @@ wss.on('connection', (ws) => {
   ws.on('message', (msg) => {
     // ✅ No modificar el mensaje, reenviar tal como se recibió
     const payload = msg;
-
+  
     clients.forEach(client => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(payload); // 🔁 Reenvía el mensaje original sin alterar
