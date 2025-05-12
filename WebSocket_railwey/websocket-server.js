@@ -9,12 +9,12 @@ wss.on('connection', (ws) => {
   clients.push(ws);
 
   ws.on('message', (msg) => {
-    // Convertimos todo a JSON con clave "codigo"
-    const payload = JSON.stringify({ codigo: msg.toString() });
+    // ✅ No modificar el mensaje, reenviar tal como se recibió
+    const payload = msg;
 
     clients.forEach(client => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(payload);
+        client.send(payload); // 🔁 Reenvía el mensaje original sin alterar
       }
     });
   });
@@ -24,4 +24,4 @@ wss.on('connection', (ws) => {
   });
 });
 
-console.log(`✅ Servidor WebSocket activo en el puerto ${PORT}`);
+console.log(`🟢 Servidor WebSocket activo en el puerto ${PORT}`);
