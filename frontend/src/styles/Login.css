@@ -122,9 +122,10 @@
 
 .login-container {
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-start; /* ← Alinea a la izquierda */
   align-items: center;
   height: 100vh;
+  padding-left: 60px; /* ← Controla cuánto se aleja del borde izquierdo */
   background-color: #f4f4f4;
 }
 
