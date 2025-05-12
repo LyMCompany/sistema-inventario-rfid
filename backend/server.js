@@ -8,6 +8,9 @@ const authRoutes = require('./routes/authRoutes');
 const reportesRoutes = require('./routes/reportesRoutes');
 const inventarioRoutes = require('./routes/inventarioRoutes');
 const pool = require('./utils/db'); // Tu conexión PostgreSQL
+const http = require('http');
+const WebSocket = require('ws');
+
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -76,6 +79,11 @@ app.use((err, req, res, next) => {
 });
 
 // ✅ Iniciar el servidor
-app.listen(port, '0.0.0.0', () => {
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+server.listen(port, '0.0.0.0', () => {
   console.log(`Servidor corriendo en http://0.0.0.0:${port}`);
 });
+module.exports = { wss };
+

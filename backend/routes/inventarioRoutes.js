@@ -3,6 +3,8 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../utils/db');
+const { wss } = require('../server'); // Importa el WebSocket Server
+
 
 // ✅ Guardar inventario base
 // backend/routes/inventarioRoutes.js
