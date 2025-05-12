@@ -132,14 +132,14 @@
   display: flex;
   flex-direction: column; /* ✅ Esto es CLAVE */
   align-items: center;
-  gap: 20px; /* opcional para espacio entre logo y caja */
+  gap: 12px; /* opcional para espacio entre logo y caja */
 }
 
 
 .login-logo {
   width: 640px;
   height: auto;
-  margin-bottom: -20px; /* ajusta para que quede justo encima del login-box */
+  margin-bottom: -12px; /* ajusta para que quede justo encima del login-box */
 }
 
 .login-box {
