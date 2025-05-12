@@ -18,14 +18,22 @@ function setupWebSocket(server) {
   return wss;
 }
 
-function emitirEtiqueta(codigo) {
-  const payload = JSON.stringify({ codigo });
+function emitirInventario(inventario, usuario, empresa) {
+  const payload = JSON.stringify({
+    tipo: 'inventario',
+    usuario,
+    empresa,
+    inventario
+  });
+
   sockets.forEach(ws => {
     if (ws.readyState === ws.OPEN) {
       ws.send(payload);
     }
   });
-  console.log(`📡 Código enviado a ${sockets.length} clientes: ${codigo}`);
+
+  console.log(`📦 Inventario enviado por WebSocket a ${sockets.length} clientes`);
 }
 
-module.exports = { setupWebSocket, emitirEtiqueta };
+
+module.exports = {setupWebSocket, emitirInventario};
