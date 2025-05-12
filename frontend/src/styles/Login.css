@@ -130,9 +130,11 @@
 
 .login-wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* ✅ Esto es CLAVE */
   align-items: center;
+  gap: 20px; /* opcional para espacio entre logo y caja */
 }
+
 
 .login-logo {
   width: 640px;
