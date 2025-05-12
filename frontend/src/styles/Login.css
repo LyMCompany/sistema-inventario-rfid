@@ -119,9 +119,10 @@
 .error {
   color: red;
 }
-.login-logo {
+
+.login-logo-externo {
   display: block;
-  margin: 0 auto 20px auto;
-  max-width: 160px;
+  margin: 40px auto 10px auto;
+  max-width: 120px;
   height: auto;
 }
