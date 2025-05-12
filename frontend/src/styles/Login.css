@@ -119,3 +119,10 @@
 .error {
   color: red;
 }
+.login-logo {
+  display: block;
+  margin: 0 auto 20px auto;
+  width: 100px; /* o el tamaño que desees */
+  height: auto;
+}
+
