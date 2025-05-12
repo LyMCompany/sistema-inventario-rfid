@@ -46,7 +46,7 @@ function Dashboard() {
       </header>
 
       <main className="dashboard-main">
-        <h1>Sistema de Inventario RFID LyM Company</h1>
+        <h1>Sistema de Inventario RFID</h1>
 
         <div className="dashboard-buttons">
           <button className="btn-dashboard" onClick={() => navigate('/inventario')}>
