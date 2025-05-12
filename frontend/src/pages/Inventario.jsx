@@ -111,21 +111,6 @@ function Inventario() {
             console.log('📥 Inventario recibido desde WebSocket:', transformado);
           }
           
-
-          const transformado = msg.inventario.map(item => ({
-            Nombre: item.Nombre,
-            Codigo: item.Codigo,
-            SKU: item.SKU,
-            Marca: item.Marca,
-            RFID: String(item.RFID),
-            Ubicacion: item.Ubicacion
-          }));
-        
-          setData(transformado);
-          setInventarioBase(transformado);
-          localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(transformado));
-          inventarioWebSocketRecibido.current = true; // 🔁 evitar que se reemplace por localStorage luego
-          console.log('📥 Inventario recibido desde WebSocket:', transformado);
         }
         
       } catch (err) {
