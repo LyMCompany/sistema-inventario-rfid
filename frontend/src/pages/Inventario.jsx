@@ -56,7 +56,7 @@ function Inventario() {
             Marca: item.Marca || "-",
             RFID: item.RFID || "-",
             Ubicacion: item.Ubicacion || "-",
-            Estado: item.estado || "-"
+            Estado: item.Estado || "-"
           }));
           setInventarioBase(normalizado);
           
@@ -170,24 +170,31 @@ function Inventario() {
     localStorage.setItem(`inventarioBase_${empresa}`, JSON.stringify(ejemplo));
     
     const socket = getSocket();
-    socket.onopen = () => {
-      const payload = {
-        tipo: 'inventario',
-        usuario: user.correo,
-        empresa: user.empresa,
-        inventario: ejemplo.map(item => ({
-          Nombre: item.Nombre || "-",
-          Codigo: item.Codigo || "-",
-          SKU: item.SKU || "-",
-          Marca: item.Marca || "-",
-          RFID: String(item.RFID),
-          Ubicacion: item.Ubicacion || "-"
-        }))
-      };
-      // Enviar el payload al WebSocket      
-      socket.send(JSON.stringify(payload));
-      console.log("📤 Enviado por WebSocket:", JSON.stringify(payload, null, 2));
-    };
+
+const payload = {
+  tipo: 'inventario',
+  usuario: user.correo,
+  empresa: user.empresa,
+  inventario: ejemplo.map(item => ({
+    Nombre: item.Nombre || "-",
+    Codigo: item.Codigo || "-",
+    SKU: item.SKU || "-",
+    Marca: item.Marca || "-",
+    RFID: String(item.RFID),
+    Ubicacion: item.Ubicacion || "-"
+  }))
+};
+
+if (socket.readyState === WebSocket.OPEN) {
+  socket.send(JSON.stringify(payload));
+  console.log("📤 Enviado por WebSocket (abierto):", JSON.stringify(payload, null, 2));
+} else {
+  socket.addEventListener('open', () => {
+    socket.send(JSON.stringify(payload));
+    console.log("📤 Enviado por WebSocket (retrasado):", JSON.stringify(payload, null, 2));
+  }, { once: true });
+}
+
     
     // Enviar inventario al backend
     enviarInventarioAlBackend(ejemplo);
