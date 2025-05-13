@@ -175,12 +175,10 @@ function EscanadorBarras() {
 
   return (
     <div className="control-inventario">
-
-
-      <div className="header">
-        <button onClick={logout}>Cerrar sesión</button>
-        <span className="usuario">{user?.nombre} - {empresa}</span>
-      </div>
+    <div className="control-header">
+      <button onClick={logout}>Cerrar sesión</button>
+      <span className="usuario">{user?.nombre} - {empresa}</span>
+    </div>
 
       <h2>Escanear Etiqueta</h2>
       <div className="acciones">
