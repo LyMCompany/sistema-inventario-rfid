@@ -96,7 +96,17 @@ function EscanadorBarras() {
 
   const compararConInventario = () => {
     setVistaActiva('comparar');
-    const inventario = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
+    const inventarioRaw = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
+
+        const inventario = inventarioRaw.map(item => ({
+        Nombre: item.Nombre || '-',
+        Codigo: item.Codigo || '-',
+        SKU: item.SKU || '-',           // ← asegura que no sea una fecha u otra columna
+        Marca: item.Marca || '-',
+        RFID: String(item.RFID || '-'),
+        Ubicacion: item.Ubicacion || '-',
+        }));
+
     let encontrados = 0;
     let noRegistrados = 0;
 
