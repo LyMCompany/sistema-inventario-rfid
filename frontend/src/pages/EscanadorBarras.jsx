@@ -240,35 +240,35 @@ function EscanadorBarras() {
       )}
 
       {vistaActiva === 'comparar' && resultadosComparacion.length > 0 && (
-        <div className="tabla">
-          <h3>Resultado de Comparación</h3>
-          <table className="tabla-comparacion">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Código</th>
-                <th>SKU</th>
-                <th>Marca</th>
-                <th>RFID</th>
-                <th>Ubicación</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {resultadosComparacion.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.Nombre}</td>
-                  <td>{item.Codigo}</td>
-                  <td>{item.SKU}</td>
-                  <td>{item.Marca}</td>
-                  <td>{item.RFID}</td>
-                  <td>{item.Ubicacion}</td>
-                  <td>{item.Estado}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+       <div className="tabla">
+       <h3><b>Artículos Escaneados</b></h3>
+       <table className="tabla">
+         <thead>
+           <tr>
+             <th>N.º</th>
+             <th>Código de Barra</th>
+             <th>Cantidad</th>
+             <th>Estado</th>
+           </tr>
+         </thead>
+         <tbody>
+           {codigosBarras.map((item, index) => (
+             <tr key={index}>
+               <td>{index + 1}</td>
+               <td style={{ wordBreak: 'break-word' }}>{item.Codigo}</td>
+               <td
+                 onClick={() => editarCantidad(index)}
+                 style={{ cursor: 'pointer', color: 'blue' }}
+               >
+                 {item.Cantidad}
+               </td>
+               <td>{item.Estado}</td>
+             </tr>
+           ))}
+         </tbody>
+       </table>
+     </div>
+     
       )}
     </div>
   );
