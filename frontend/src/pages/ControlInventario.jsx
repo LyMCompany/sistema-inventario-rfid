@@ -10,6 +10,10 @@ import RFIDListener from './RFIDListener';
 import { getSocket } from '../utils/websocket';
 
 
+
+
+
+
 function ControlInventario() {
   const { logout } = useUser();
   const { inventarioBase, setInventarioBase } = useInventario();
@@ -291,6 +295,11 @@ function ControlInventario() {
       });
     });
   };
+
+const activarEscaneoEtiqueta = () => {
+  navigate('/escanador-barras'); // Asegúrate que esta ruta exista
+};
+
 
   return (
     <div className="control-container">
