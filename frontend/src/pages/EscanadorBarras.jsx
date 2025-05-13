@@ -93,19 +93,26 @@ function EscanadorBarras() {
       });
     }
   };
+  console.log("🔍 Inventario recibido:", JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`))[0]);
 
   const compararConInventario = () => {
     setVistaActiva('comparar');
     const inventarioRaw = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
 
-        const inventario = inventarioRaw.map(item => ({
-        Nombre: item.Nombre || '-',
-        Codigo: item.Codigo || '-',
-        SKU: item.SKU || '-',           // ← asegura que no sea una fecha u otra columna
-        Marca: item.Marca || '-',
-        RFID: String(item.RFID || '-'),
-        Ubicacion: item.Ubicacion || '-',
-        }));
+    const inventario = inventarioRaw.map(item => {
+        const columnas = Object.keys(item);
+        const campoSKU = columnas.find(col => col.toLowerCase().trim() === 'sku') || columnas[3] || 'SKU';
+      
+        return {
+          Nombre: item.Nombre || '-',
+          Codigo: item.Codigo || '-',
+          SKU: item[campoSKU] || '-', // ← lectura segura
+          Marca: item.Marca || '-',
+          RFID: String(item.RFID || '-'),
+          Ubicacion: item.Ubicacion || '-',
+        };
+      });
+      
 
     let encontrados = 0;
     let noRegistrados = 0;
