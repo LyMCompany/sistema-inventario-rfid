@@ -174,7 +174,8 @@ function EscanadorBarras() {
   };
 
   return (
-    <div className="control-container">
+    <div className="control-inventario">
+
 
       <div className="header">
         <button onClick={logout}>Cerrar sesión</button>
