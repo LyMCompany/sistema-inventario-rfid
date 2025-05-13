@@ -205,7 +205,7 @@ function EscanadorBarras() {
       empresa: empresa,
       fecha: new Date().toLocaleString(),
       encontrados: resultadosComparacion.filter(e => e.Estado === 'Encontrado'),
-      faltantes: [],
+      faltantes: resultadosComparacion.filter(e => e.Estado === 'Faltante'),
       no_registrados: resultadosComparacion.filter(e => e.Estado === 'No Registrado')
     };
 
