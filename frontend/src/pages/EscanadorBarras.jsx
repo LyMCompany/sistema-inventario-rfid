@@ -9,20 +9,24 @@ import { useNavigate } from 'react-router-dom';
 
 function EscanadorBarras() {
   const { logout, user } = useUser();
-  const empresa = user?.empresa || 'Empresa no definida';
   const navigate = useNavigate();
+  const empresa = user?.empresa || 'Empresa no definida';
 
   const [codigosBarras, setCodigosBarras] = useState(() => {
-    const guardado = localStorage.getItem(`codigosBarras_${empresa}`);
-    return guardado ? JSON.parse(guardado) : [];
+    const guardados = localStorage.getItem(`escaneados_barras_${empresa}`);
+    return guardados ? JSON.parse(guardados) : [];
   });
 
   const [resultadosComparacion, setResultadosComparacion] = useState([]);
   const [vistaActiva, setVistaActiva] = useState('escanear');
 
   useEffect(() => {
-    localStorage.setItem(`codigosBarras_${empresa}`, JSON.stringify(codigosBarras));
+    localStorage.setItem(`escaneados_barras_${empresa}`, JSON.stringify(codigosBarras));
   }, [codigosBarras, empresa]);
+
+  const handleBack = () => {
+    navigate('/control-inventario');
+  };
 
   const agregarCodigoBarra = (codigo) => {
     setCodigosBarras((prev) => {
@@ -67,7 +71,7 @@ function EscanadorBarras() {
 
   const limpiarTabla = () => {
     setCodigosBarras([]);
-    localStorage.removeItem(`codigosBarras_${empresa}`);
+    localStorage.removeItem(`escaneados_barras_${empresa}`);
     Swal.fire('Limpieza Exitosa', 'Tabla de artículos escaneados limpiada.', 'success');
   };
 
@@ -128,6 +132,19 @@ function EscanadorBarras() {
 
     setResultadosComparacion(nuevosResultados);
 
+    const nuevoReporte = {
+      usuario: user?.correo,
+      empresa: empresa,
+      fecha: new Date().toLocaleString(),
+      encontrados: nuevosResultados.filter(e => e.Estado === 'Encontrado'),
+      faltantes: [],
+      no_registrados: nuevosResultados.filter(e => e.Estado === 'No Registrado')
+    };
+
+    const reportesPrevios = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
+    reportesPrevios.push(nuevoReporte);
+    localStorage.setItem('reportesComparacion', JSON.stringify(reportesPrevios));
+
     Swal.fire({
       title: 'Resultado de la Comparación',
       html: `
@@ -167,21 +184,16 @@ function EscanadorBarras() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
   return (
     <div className="control-inventario">
       <div className="control-header">
         <div className="left-actions">
-          <button className="btn-regresar" onClick={() => navigate('/control-inventario')}>Regresar</button>
+          <button className="btn-regresar" onClick={handleBack}>Regresar</button>
         </div>
         <div className="user-info">
           <span className="user-icon">👤</span>
           <span className="username">{empresa}</span>
-          <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
+          <button className="btn-logout" onClick={logout}>Cerrar sesión</button>
         </div>
       </div>
 
@@ -211,9 +223,7 @@ function EscanadorBarras() {
                 <tr key={index}>
                   <td>{item.ID}</td>
                   <td>{item.Codigo}</td>
-                  <td onClick={() => editarCantidad(index)} style={{ cursor: 'pointer', color: 'blue' }}>
-                    {item.Cantidad}
-                  </td>
+                  <td onClick={() => editarCantidad(index)} style={{ cursor: 'pointer', color: 'blue' }}>{item.Cantidad}</td>
                   <td>{item.Estado}</td>
                 </tr>
               ))}
@@ -225,7 +235,7 @@ function EscanadorBarras() {
       {vistaActiva === 'comparar' && resultadosComparacion.length > 0 && (
         <div className="tabla">
           <h3>Resultado de Comparación</h3>
-          <table>
+          <table className="tabla-comparacion">
             <thead>
               <tr>
                 <th>Nombre</th>
