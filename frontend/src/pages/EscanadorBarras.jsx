@@ -5,14 +5,25 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import '../styles/ControlInventario.css';
 import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 function EscanadorBarras() {
   const { logout, user } = useUser();
+  const navigate = useNavigate();
   const empresa = user?.empresa || 'Empresa no definida';
 
   const [codigosBarras, setCodigosBarras] = useState([]);
   const [resultadosComparacion, setResultadosComparacion] = useState([]);
   const [vistaActiva, setVistaActiva] = useState('escanear');
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const handleBack = () => {
+    navigate('/control-inventario');
+  };
 
   const agregarCodigoBarra = (codigo) => {
     setCodigosBarras((prev) => {
@@ -122,7 +133,7 @@ function EscanadorBarras() {
       empresa: empresa,
       fecha: new Date().toLocaleString(),
       encontrados: nuevosResultados.filter(e => e.Estado === 'Encontrado'),
-      faltantes: faltantes,
+      faltantes: [],
       no_registrados: nuevosResultados.filter(e => e.Estado === 'No Registrado')
     };
 
@@ -170,10 +181,16 @@ function EscanadorBarras() {
   };
 
   return (
-    <div className="control-inventario">
+    <div className="control-container">
       <div className="control-header">
-        <button onClick={logout}>Cerrar sesión</button>
-        <span className="usuario">{user?.nombre} - {empresa}</span>
+        <div className="btn-regresar">
+          <button onClick={handleBack}>Regresar</button>
+        </div>
+        <div className="user-info">
+          <span className="user-icon">👤</span>
+          <span className="username">{empresa}</span>
+          <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
+        </div>
       </div>
 
       <h2>Escanear Etiqueta</h2>
