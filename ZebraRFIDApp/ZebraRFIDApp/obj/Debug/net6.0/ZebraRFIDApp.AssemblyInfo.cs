@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ZebraRFIDApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c72055e793a5369d78eac4f829b6eaf176883b5e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d82fbe22c71085e1ed208c339498efed9da4151f")]
 [assembly: System.Reflection.AssemblyProductAttribute("ZebraRFIDApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ZebraRFIDApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

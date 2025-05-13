@@ -329,6 +329,9 @@ function ControlInventario() {
         <button onClick={handleLimpiarEscaneados} disabled={isProcessing}>
           Limpiar Escaneados
         </button>
+
+        <button onClick={activarEscaneoEtiqueta}>Escanear Etiqueta</button>
+
       </div>
 
       {comparacion && (
