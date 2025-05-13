@@ -6,6 +6,8 @@ import * as XLSX from 'xlsx';
 import '../styles/ControlInventario.css';
 import { useUser } from '../context/UserContext';
 
+
+
 function EscanadorBarras() {
   const { logout, user } = useUser();
   const empresa = user?.empresa || 'Empresa no definida';
@@ -84,6 +86,11 @@ function EscanadorBarras() {
     let encontrados = 0;
     let noRegistrados = 0;
 
+    const faltantes = inventario.filter(prod => {
+        return !codigosBarras.find(item => item.Codigo === prod.Codigo);
+      });
+      
+
     const nuevosResultados = codigosBarras.map(item => {
       const encontrado = inventario.find(prod => prod.Codigo === item.Codigo);
       if (encontrado) {
@@ -127,13 +134,15 @@ function EscanadorBarras() {
     localStorage.setItem('reportesComparacion', JSON.stringify(reportesPrevios));
 
     Swal.fire({
-      title: 'Resultado de la Comparación',
-      html: `
-        <p><strong>Encontrados:</strong> ${encontrados}</p>
-        <p><strong>No Registrados:</strong> ${noRegistrados}</p>
-      `,
-      icon: 'info'
-    });
+        title: 'Resultado de la Comparación',
+        html: `
+          <p><strong>Encontrados:</strong> ${encontrados}</p>
+          <p><strong>Faltantes:</strong> ${faltantes.length}</p>
+          <p><strong>No Registrados:</strong> ${noRegistrados}</p>
+        `,
+        icon: 'info'
+      });
+      
   };
 
   const subirReporte = async () => {
@@ -165,7 +174,8 @@ function EscanadorBarras() {
   };
 
   return (
-    <div className="control-inventario">
+    <div className="control-container">
+
       <div className="header">
         <button onClick={logout}>Cerrar sesión</button>
         <span className="usuario">{user?.nombre} - {empresa}</span>
