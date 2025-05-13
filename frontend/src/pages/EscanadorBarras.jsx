@@ -1,6 +1,6 @@
 // frontend/src/pages/EscanadorBarras.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import '../styles/ControlInventario.css';
@@ -9,21 +9,22 @@ import { useNavigate } from 'react-router-dom';
 
 function EscanadorBarras() {
   const { logout, user } = useUser();
-  const navigate = useNavigate();
   const empresa = user?.empresa || 'Empresa no definida';
+  const navigate = useNavigate();
 
-  const [codigosBarras, setCodigosBarras] = useState([]);
+  const [codigosBarras, setCodigosBarras] = useState(() => {
+    const saved = localStorage.getItem(`escaneadosBarras_${empresa}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [resultadosComparacion, setResultadosComparacion] = useState([]);
   const [vistaActiva, setVistaActiva] = useState('escanear');
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  useEffect(() => {
+    localStorage.setItem(`escaneadosBarras_${empresa}`, JSON.stringify(codigosBarras));
+  }, [codigosBarras, empresa]);
 
-  const handleBack = () => {
-    navigate('/control-inventario');
-  };
+  const handleBack = () => navigate('/control-inventario');
 
   const agregarCodigoBarra = (codigo) => {
     setCodigosBarras((prev) => {
@@ -133,7 +134,7 @@ function EscanadorBarras() {
       empresa: empresa,
       fecha: new Date().toLocaleString(),
       encontrados: nuevosResultados.filter(e => e.Estado === 'Encontrado'),
-      faltantes: [],
+      faltantes: faltantes,
       no_registrados: nuevosResultados.filter(e => e.Estado === 'No Registrado')
     };
 
@@ -181,20 +182,18 @@ function EscanadorBarras() {
   };
 
   return (
-    <div className="control-container">
+    <div className="control-inventario">
       <div className="control-header">
-        <div className="btn-regresar">
-          <button onClick={handleBack}>Regresar</button>
-        </div>
+        <button className="btn-regresar" onClick={handleBack}>Regresar</button>
         <div className="user-info">
           <span className="user-icon">👤</span>
           <span className="username">{empresa}</span>
-          <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
+          <button className="btn-logout" onClick={logout}>Cerrar sesión</button>
         </div>
       </div>
 
       <h2>Escanear Etiqueta</h2>
-      <div className="control-buttons">
+      <div className="acciones">
         <button onClick={escanearCodigoBarra}>Iniciar Escaneo</button>
         <button onClick={compararConInventario}>Comparar con Inventario</button>
         <button onClick={subirReporte}>Subir Reporte</button>
@@ -205,7 +204,7 @@ function EscanadorBarras() {
       {vistaActiva === 'escanear' && (
         <div className="tabla">
           <h3>Artículos Escaneados</h3>
-          <table className="tabla-comparacion">
+          <table>
             <thead>
               <tr>
                 <th>N.º</th>
@@ -233,7 +232,7 @@ function EscanadorBarras() {
       {vistaActiva === 'comparar' && resultadosComparacion.length > 0 && (
         <div className="tabla">
           <h3>Resultado de Comparación</h3>
-          <table className="tabla-comparacion">
+          <table>
             <thead>
               <tr>
                 <th>Nombre</th>
