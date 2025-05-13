@@ -9,25 +9,21 @@ import { useNavigate } from 'react-router-dom';
 
 function EscanadorBarras() {
   const { logout, user } = useUser();
-  const empresa = user?.empresa || 'Empresa no definida';
   const navigate = useNavigate();
+  const empresa = user?.empresa ?? 'Empresa no definida';
+
 
   const [codigosBarras, setCodigosBarras] = useState(() => {
-    const saved = localStorage.getItem(`codigosBarras_${empresa}`);
-    return saved ? JSON.parse(saved) : [];
+    const guardados = localStorage.getItem(`escaneados_barras_${empresa}`);
+    return guardados ? JSON.parse(guardados) : [];
   });
 
   const [resultadosComparacion, setResultadosComparacion] = useState([]);
   const [vistaActiva, setVistaActiva] = useState('escanear');
 
   useEffect(() => {
-    localStorage.setItem(`codigosBarras_${empresa}`, JSON.stringify(codigosBarras));
+    localStorage.setItem(`escaneados_barras_${empresa}`, JSON.stringify(codigosBarras));
   }, [codigosBarras, empresa]);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
 
   const handleBack = () => {
     navigate('/control-inventario');
@@ -76,6 +72,7 @@ function EscanadorBarras() {
 
   const limpiarTabla = () => {
     setCodigosBarras([]);
+    localStorage.removeItem(`escaneados_barras_${empresa}`);
     Swal.fire('Limpieza Exitosa', 'Tabla de artículos escaneados limpiada.', 'success');
   };
 
@@ -189,16 +186,20 @@ function EscanadorBarras() {
   };
 
   return (
-    <div className="control-container">
+    <div className="control-inventario">
       <div className="control-header">
         <div className="left-actions">
           <button className="btn-regresar" onClick={handleBack}>Regresar</button>
         </div>
-        <div className="user-info">
-          <span className="user-icon">👤</span>
-          <span className="username">{empresa}</span>
-          <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
+        <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span className="user-icon">👤</span>
+        <span className="username" style={{ fontWeight: 'bold', color: 'white' }}>
+            {user?.empresa ?? 'Empresa no definida'}
+        </span>
+        <button className="btn-logout" onClick={logout}>Cerrar sesión</button>
         </div>
+
+
       </div>
 
       <h2>Escanear Etiqueta</h2>
@@ -211,31 +212,31 @@ function EscanadorBarras() {
       </div>
 
       {vistaActiva === 'escanear' && (
-        <div className="tabla">
-          <h3>Artículos Escaneados</h3>
-          <table>
+        <table className="tabla">
             <thead>
-              <tr>
+                <tr>
                 <th>N.º</th>
                 <th>Código de Barra</th>
                 <th>Cantidad</th>
                 <th>Estado</th>
-              </tr>
+                </tr>
             </thead>
             <tbody>
-              {codigosBarras.map((item, index) => (
+                {codigosBarras.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.ID}</td>
-                  <td>{item.Codigo}</td>
-                  <td onClick={() => editarCantidad(index)} style={{ cursor: 'pointer', color: 'blue' }}>
+                    <td>{index + 1}</td>
+                    <td style={{ wordBreak: 'break-word' }}>{item.Codigo}</td>
+                    <td onClick={() => editarCantidad(index)} style={{ cursor: 'pointer', color: 'blue' }}>
                     {item.Cantidad}
-                  </td>
-                  <td>{item.Estado}</td>
+                    </td>
+                    <td>{item.Estado}</td>
                 </tr>
-              ))}
+                ))}
             </tbody>
-          </table>
-        </div>
+            </table>
+
+   
+       
       )}
 
       {vistaActiva === 'comparar' && resultadosComparacion.length > 0 && (
