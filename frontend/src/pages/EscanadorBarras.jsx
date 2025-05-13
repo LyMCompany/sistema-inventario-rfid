@@ -101,7 +101,7 @@ function EscanadorBarras() {
 
     const inventario = inventarioRaw.map(item => {
         const columnas = Object.keys(item);
-        const campoSKU = columnas.find(col => col.toLowerCase().trim() === 'sku') || columnas[3] || 'SKU';
+        const campoSKU = columnas.find(col => col.toLowerCase().trim() === 'sku') || columnas[4] || 'SKU';
       
         return {
           Nombre: item.Nombre || '-',
