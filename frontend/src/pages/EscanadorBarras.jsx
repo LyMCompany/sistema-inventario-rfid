@@ -84,6 +84,20 @@ function EscanadorBarras() {
       inputValue: codigosBarras[index].Cantidad,
       showCancelButton: true
     });
+    const eliminarCodigo = (index) => {
+        Swal.fire({
+          title: '¿Eliminar este artículo?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setCodigosBarras((prev) => prev.filter((_, i) => i !== index));
+          }
+        });
+      };
+      
 
     if (nuevaCantidad !== undefined && nuevaCantidad !== null && nuevaCantidad !== '') {
       setCodigosBarras((prev) => {
@@ -247,28 +261,45 @@ function EscanadorBarras() {
                 <h3>Artículos Escaneados</h3>
                 <table className="tabla-inventario">
                 <thead>
-                    <tr>
+                <tr>
                     <th>N.º</th>
                     <th>Código de Barra</th>
                     <th>Cantidad</th>
                     <th>Estado</th>
-                    </tr>
+                    <th>Acciones</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {codigosBarras.map((item, index) => (
-                        <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>{item.Codigo}</td>
-                        <td
+                {codigosBarras.map((item, index) => (
+                    <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{item.Codigo}</td>
+                    <td
                         onClick={() => editarCantidad(index)}
                         style={{ cursor: 'pointer', color: 'blue' }}
-                        >
+                    >
                         {item.Cantidad}
-                        </td>
-                        <td>{item.Estado}</td>
+                    </td>
+                    <td>{item.Estado}</td>
+                    <td>
+                        <button
+                        onClick={() => eliminarCodigo(index)}
+                        style={{
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                        >
+                        Eliminar
+                        </button>
+                    </td>
                     </tr>
-                    ))}
+                ))}
                 </tbody>
+
                 </table>
             </div>
             )}
