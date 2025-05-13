@@ -100,17 +100,15 @@ function EscanadorBarras() {
     const inventarioRaw = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
 
     const inventario = inventarioRaw.map(item => {
-        const columnas = Object.keys(item);
-        const campoSKU = columnas.find(col => col.toLowerCase().trim() === 'SKU') || columnas.find(c => !c.toLowerCase().includes('fecha')) || 'SKU';
-      
         return {
-          Nombre: item.Nombre || '-',
-          Codigo: item.Codigo || '-',
-          SKU: item[campoSKU] || '-', // ← lectura segura
-          Marca: item.Marca || '-',
-          RFID: String(item.RFID || '-'),
-          Ubicacion: item.Ubicacion || '-',
-        };
+            Nombre: item.Nombre || '-',
+            Codigo: item.Codigo || '-',
+            SKU: (item.SKU && isNaN(Date.parse(item.SKU))) ? item.SKU : '-', // evita fechas
+            Marca: item.Marca || '-',
+            RFID: String(item.RFID || '-'),
+            Ubicacion: item.Ubicacion || '-',
+          };
+          
       });
       
 
