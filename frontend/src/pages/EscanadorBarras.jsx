@@ -13,7 +13,7 @@ function EscanadorBarras() {
   const navigate = useNavigate();
 
   const [codigosBarras, setCodigosBarras] = useState(() => {
-    const guardado = localStorage.getItem(`escaneados_barras_${empresa}`);
+    const guardado = localStorage.getItem(`codigosBarras_${empresa}`);
     return guardado ? JSON.parse(guardado) : [];
   });
 
@@ -21,7 +21,7 @@ function EscanadorBarras() {
   const [vistaActiva, setVistaActiva] = useState('escanear');
 
   useEffect(() => {
-    localStorage.setItem(`escaneados_barras_${empresa}`, JSON.stringify(codigosBarras));
+    localStorage.setItem(`codigosBarras_${empresa}`, JSON.stringify(codigosBarras));
   }, [codigosBarras, empresa]);
 
   const agregarCodigoBarra = (codigo) => {
@@ -67,6 +67,7 @@ function EscanadorBarras() {
 
   const limpiarTabla = () => {
     setCodigosBarras([]);
+    localStorage.removeItem(`codigosBarras_${empresa}`);
     Swal.fire('Limpieza Exitosa', 'Tabla de artículos escaneados limpiada.', 'success');
   };
 
@@ -127,19 +128,6 @@ function EscanadorBarras() {
 
     setResultadosComparacion(nuevosResultados);
 
-    const nuevoReporte = {
-      usuario: user?.correo,
-      empresa: empresa,
-      fecha: new Date().toLocaleString(),
-      encontrados: nuevosResultados.filter(e => e.Estado === 'Encontrado'),
-      faltantes: [],
-      no_registrados: nuevosResultados.filter(e => e.Estado === 'No Registrado')
-    };
-
-    const reportesPrevios = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
-    reportesPrevios.push(nuevoReporte);
-    localStorage.setItem('reportesComparacion', JSON.stringify(reportesPrevios));
-
     Swal.fire({
       title: 'Resultado de la Comparación',
       html: `
@@ -179,20 +167,21 @@ function EscanadorBarras() {
     }
   };
 
-  const handleBack = () => {
-    navigate('/control-inventario');
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
-    <div className="control-container">
+    <div className="control-inventario">
       <div className="control-header">
         <div className="left-actions">
-          <button className="btn-regresar" onClick={handleBack}>Regresar</button>
+          <button className="btn-regresar" onClick={() => navigate('/control-inventario')}>Regresar</button>
         </div>
         <div className="user-info">
           <span className="user-icon">👤</span>
           <span className="username">{empresa}</span>
-          <button className="btn-logout" onClick={logout}>Cerrar sesión</button>
+          <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
         </div>
       </div>
 
