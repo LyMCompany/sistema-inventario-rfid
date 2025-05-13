@@ -131,6 +131,19 @@ function EscanadorBarras() {
       }
     });
 
+    const faltantesConvertidos = faltantes.map(prod => ({
+        Nombre: prod.Nombre || '-',
+        Codigo: prod.Codigo || '-',
+        SKU: prod.SKU || '-',
+        Marca: prod.Marca || '-',
+        RFID: prod.RFID || '-',
+        Ubicacion: prod.Ubicacion || '-',
+        Estado: 'Faltante'
+      }));
+      
+      nuevosResultados.push(...faltantesConvertidos);
+      
+
     setResultadosComparacion(nuevosResultados);
 
     const nuevoReporte = {
