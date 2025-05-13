@@ -84,21 +84,7 @@ function EscanadorBarras() {
       inputValue: codigosBarras[index].Cantidad,
       showCancelButton: true
     });
-    const eliminarCodigo = (index) => {
-        Swal.fire({
-          title: '¿Eliminar este artículo?',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Sí, eliminar',
-          cancelButtonText: 'Cancelar'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setCodigosBarras((prev) => prev.filter((_, i) => i !== index));
-          }
-        });
-      };
-      
-
+  
     if (nuevaCantidad !== undefined && nuevaCantidad !== null && nuevaCantidad !== '') {
       setCodigosBarras((prev) => {
         const copia = [...prev];
@@ -106,6 +92,20 @@ function EscanadorBarras() {
         return copia;
       });
     }
+  };
+
+  const eliminarCodigo = (index) => {
+    Swal.fire({
+      title: '¿Eliminar este artículo?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setCodigosBarras((prev) => prev.filter((_, i) => i !== index));
+      }
+    });
   };
   console.log("🔍 Inventario recibido:", JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`))[0]);
 
