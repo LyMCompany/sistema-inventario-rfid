@@ -13,18 +13,16 @@ function EscanadorBarras() {
   const navigate = useNavigate();
 
   const [codigosBarras, setCodigosBarras] = useState(() => {
-    const saved = localStorage.getItem(`escaneadosBarras_${empresa}`);
-    return saved ? JSON.parse(saved) : [];
+    const guardado = localStorage.getItem(`escaneados_barras_${empresa}`);
+    return guardado ? JSON.parse(guardado) : [];
   });
 
   const [resultadosComparacion, setResultadosComparacion] = useState([]);
   const [vistaActiva, setVistaActiva] = useState('escanear');
 
   useEffect(() => {
-    localStorage.setItem(`escaneadosBarras_${empresa}`, JSON.stringify(codigosBarras));
+    localStorage.setItem(`escaneados_barras_${empresa}`, JSON.stringify(codigosBarras));
   }, [codigosBarras, empresa]);
-
-  const handleBack = () => navigate('/control-inventario');
 
   const agregarCodigoBarra = (codigo) => {
     setCodigosBarras((prev) => {
@@ -134,7 +132,7 @@ function EscanadorBarras() {
       empresa: empresa,
       fecha: new Date().toLocaleString(),
       encontrados: nuevosResultados.filter(e => e.Estado === 'Encontrado'),
-      faltantes: faltantes,
+      faltantes: [],
       no_registrados: nuevosResultados.filter(e => e.Estado === 'No Registrado')
     };
 
@@ -181,10 +179,16 @@ function EscanadorBarras() {
     }
   };
 
+  const handleBack = () => {
+    navigate('/control-inventario');
+  };
+
   return (
-    <div className="control-inventario">
+    <div className="control-container">
       <div className="control-header">
-        <button className="btn-regresar" onClick={handleBack}>Regresar</button>
+        <div className="left-actions">
+          <button className="btn-regresar" onClick={handleBack}>Regresar</button>
+        </div>
         <div className="user-info">
           <span className="user-icon">👤</span>
           <span className="username">{empresa}</span>
@@ -193,7 +197,7 @@ function EscanadorBarras() {
       </div>
 
       <h2>Escanear Etiqueta</h2>
-      <div className="acciones">
+      <div className="control-buttons">
         <button onClick={escanearCodigoBarra}>Iniciar Escaneo</button>
         <button onClick={compararConInventario}>Comparar con Inventario</button>
         <button onClick={subirReporte}>Subir Reporte</button>
