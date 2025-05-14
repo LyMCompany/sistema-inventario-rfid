@@ -140,65 +140,70 @@ function EscanadorBarras() {
     const faltantes = [];
     const noRegistrados = [];
   
-    // Map para llevar la cantidad ya contada como encontrada
-    const conteoEncontrado = new Map();
-  
-    codigosBarras.forEach(escaneado => {
-      const inventarioItem = inventarioMap.get(escaneado.Codigo);
-      const cantidadEscaneada = escaneado.Cantidad;
-  
-      if (inventarioItem) {
-        const cantidadInventario = inventarioItem.Cantidad;
-        const yaEncontrado = conteoEncontrado.get(escaneado.Codigo) || 0;
-  
-        const disponibles = cantidadInventario - yaEncontrado;
-        const cantidadEncontrada = Math.min(disponibles, cantidadEscaneada);
-        const excedente = cantidadEscaneada - cantidadEncontrada;
-  
-        if (cantidadEncontrada > 0) {
-          encontrados.push({
-            ...inventarioItem,
-            Cantidad: cantidadEncontrada,
-            Estado: 'Encontrado'
-          });
-          conteoEncontrado.set(escaneado.Codigo, yaEncontrado + cantidadEncontrada);
-        }
-  
-        if (excedente > 0) {
-          noRegistrados.push({
-            ...inventarioItem,
-            Cantidad: excedente,
-            Estado: 'No Registrado'
-          });
-        }
-      } else {
-        // Código que no está en inventario
-        noRegistrados.push({
-          Nombre: '-',
-          Codigo: escaneado.Codigo,
-          SKU: '-',
-          Marca: '-',
-          RFID: '-',
-          Ubicacion: '-',
-          Cantidad: escaneado.Cantidad,
-          Estado: 'No Registrado'
-        });
-      }
-    });
+            // Map para llevar la cantidad ya contada como encontrada
+            // AGRUPAR códigos por suma de cantidad antes de comparar
+            const codigosAgrupados = new Map();
+
+            codigosBarras.forEach(({ Codigo, Cantidad }) => {
+            if (codigosAgrupados.has(Codigo)) {
+                codigosAgrupados.set(Codigo, codigosAgrupados.get(Codigo) + Cantidad);
+            } else {
+                codigosAgrupados.set(Codigo, Cantidad);
+            }
+            });
+
+            codigosAgrupados.forEach((cantidadEscaneada, codigo) => {
+            const inventarioItem = inventarioMap.get(codigo);
+
+            if (inventarioItem) {
+                const cantidadInventario = inventarioItem.Cantidad;
+                const cantidadEncontrada = Math.min(cantidadInventario, cantidadEscaneada);
+                const excedente = cantidadEscaneada - cantidadEncontrada;
+
+                if (cantidadEncontrada > 0) {
+                encontrados.push({
+                    ...inventarioItem,
+                    Cantidad: cantidadEncontrada,
+                    Estado: 'Encontrado'
+                });
+                }
+
+                if (excedente > 0) {
+                noRegistrados.push({
+                    ...inventarioItem,
+                    Cantidad: excedente,
+                    Estado: 'No Registrado'
+                });
+                }
+            } else {
+                // No existe en inventario
+                noRegistrados.push({
+                Nombre: '-',
+                Codigo: codigo,
+                SKU: '-',
+                Marca: '-',
+                RFID: '-',
+                Ubicacion: '-',
+                Cantidad: cantidadEscaneada,
+                Estado: 'No Registrado'
+                });
+            }
+            });
   
     // Verifica faltantes por cada código no cubierto por los escaneos
     inventarioReducido.forEach(item => {
-      const yaEncontrado = conteoEncontrado.get(item.Codigo) || 0;
-      const faltan = item.Cantidad - yaEncontrado;
-  
-      if (faltan > 0) {
-        faltantes.push({
-          ...item,
-          Cantidad: faltan,
-          Estado: 'Faltante'
-        });
-      }
-    });
+        const escaneado = codigosAgrupados.get(item.Codigo) || 0;
+        const faltan = item.Cantidad - escaneado;
+      
+        if (faltan > 0) {
+          faltantes.push({
+            ...item,
+            Cantidad: faltan,
+            Estado: 'Faltante'
+          });
+        }
+      });
+      
   
     const resultados = [...encontrados, ...faltantes, ...noRegistrados];
     setResultadosComparacion(resultados);
