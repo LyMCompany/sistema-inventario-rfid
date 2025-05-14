@@ -113,7 +113,14 @@ function EscanadorBarras() {
     setVistaActiva('comparar');
     const inventarioRaw = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
   
-    const inventario = inventarioRaw.map(item => ({
+    const inventarioReducido = [];
+
+inventarioRaw.forEach(item => {
+  const index = inventarioReducido.findIndex(i => i.Codigo === item.Codigo);
+  if (index !== -1) {
+    inventarioReducido[index].Cantidad += parseInt(item.Cantidad || 1);
+  } else {
+    inventarioReducido.push({
       Nombre: item.Nombre || '-',
       Codigo: item.Codigo || '-',
       SKU: (item.SKU && isNaN(Date.parse(item.SKU))) ? item.SKU : '-',
@@ -121,10 +128,13 @@ function EscanadorBarras() {
       RFID: String(item.RFID || '-'),
       Ubicacion: item.Ubicacion || '-',
       Cantidad: parseInt(item.Cantidad || 1)
-    }));
+    });
+  }
+});
+
   
     const inventarioMap = new Map();
-    inventario.forEach(item => {
+    inventarioReducido.forEach(item => {
       inventarioMap.set(item.Codigo, item);
     });
   
@@ -172,7 +182,7 @@ function EscanadorBarras() {
     });
   
     // Agregar artículos no escaneados en absoluto
-    inventario.forEach(item => {
+    inventarioReducido.forEach(item => {
       const escaneado = codigosBarras.find(e => e.Codigo === item.Codigo);
       if (!escaneado) {
         faltantes.push({
@@ -321,15 +331,16 @@ function EscanadorBarras() {
                     <h3><b>Resultado de Comparación</b></h3>
                     <table className="tabla-comparacion">
                     <thead>
-                        <tr>
+                    <tr>
                         <th>Nombre</th>
                         <th>Código</th>
                         <th>SKU</th>
                         <th>Marca</th>
                         <th>RFID</th>
                         <th>Ubicación</th>
+                        <th>Cantidad</th>
                         <th>Estado</th>
-                        </tr>
+                    </tr>
                     </thead>
                     <tbody>
                         {resultadosComparacion.map((item, index) => (
@@ -340,6 +351,7 @@ function EscanadorBarras() {
                             <td>{item.Marca}</td>
                             <td>{item.RFID}</td>
                             <td>{item.Ubicacion}</td>
+                            <td>{item.Cantidad}</td>
                             <td>{item.Estado}</td>
                         </tr>
                         ))}
