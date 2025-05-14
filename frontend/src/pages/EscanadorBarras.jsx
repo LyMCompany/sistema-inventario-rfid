@@ -140,30 +140,30 @@ function EscanadorBarras() {
     const faltantes = [];
     const noRegistrados = [];
   
+    // Agrupar escaneos por Código sumando cantidades
     const codigosAgrupados = new Map();
     codigosBarras.forEach(({ Codigo, Cantidad }) => {
-      codigosAgrupados.set(Codigo, (codigosAgrupados.get(Codigo) || 0) + Cantidad);
+      const actual = codigosAgrupados.get(Codigo) || 0;
+      codigosAgrupados.set(Codigo, actual + Cantidad);
     });
   
-    const inventarioUsado = new Map();
-  
     codigosAgrupados.forEach((cantidadEscaneada, codigo) => {
-      const itemInventario = inventarioMap.get(codigo);
+      const inventarioItem = inventarioMap.get(codigo);
   
-      if (itemInventario) {
-        const cantidadInventario = itemInventario.Cantidad;
+      if (inventarioItem) {
+        const cantidadInventario = inventarioItem.Cantidad;
         const cantidadEncontrada = Math.min(cantidadInventario, cantidadEscaneada);
-        const excedente = cantidadEscaneada - cantidadEncontrada;
+        const sobrante = cantidadEscaneada - cantidadEncontrada;
   
         if (cantidadEncontrada > 0) {
           encontrados.push({
-            ...itemInventario,
+            ...inventarioItem,
             Cantidad: cantidadEncontrada,
             Estado: 'Encontrado'
           });
         }
   
-        if (excedente > 0) {
+        if (sobrante > 0) {
           noRegistrados.push({
             Nombre: '-',
             Codigo: codigo,
@@ -171,14 +171,11 @@ function EscanadorBarras() {
             Marca: '-',
             RFID: '-',
             Ubicacion: '-',
-            Cantidad: excedente,
+            Cantidad: sobrante,
             Estado: 'No Registrado'
           });
         }
-  
-        inventarioUsado.set(codigo, cantidadEncontrada);
       } else {
-        // Totalmente desconocido
         noRegistrados.push({
           Nombre: '-',
           Codigo: codigo,
@@ -192,9 +189,17 @@ function EscanadorBarras() {
       }
     });
   
+    // Verificar faltantes
+    const encontradosPorCodigo = new Map();
+    encontrados.forEach(e => {
+      const actual = encontradosPorCodigo.get(e.Codigo) || 0;
+      encontradosPorCodigo.set(e.Codigo, actual + e.Cantidad);
+    });
+  
     inventarioReducido.forEach(item => {
-      const yaEncontrado = inventarioUsado.get(item.Codigo) || 0;
+      const yaEncontrado = encontradosPorCodigo.get(item.Codigo) || 0;
       const faltan = item.Cantidad - yaEncontrado;
+  
       if (faltan > 0) {
         faltantes.push({
           ...item,
@@ -230,7 +235,6 @@ function EscanadorBarras() {
       icon: 'info'
     });
   };
-  
 
   const subirReporte = async () => {
     const reporte = {
