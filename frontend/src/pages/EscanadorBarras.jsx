@@ -139,17 +139,21 @@ function EscanadorBarras() {
     const encontrados = [];
     const faltantes = [];
     const noRegistrados = [];
-    const inventarioUsado = new Map();
+  
+    // Map para llevar la cantidad ya contada como encontrada
+    const conteoEncontrado = new Map();
   
     codigosBarras.forEach(escaneado => {
       const inventarioItem = inventarioMap.get(escaneado.Codigo);
+      const cantidadEscaneada = escaneado.Cantidad;
   
       if (inventarioItem) {
-        const usados = inventarioUsado.get(escaneado.Codigo) || 0;
-        const disponibles = inventarioItem.Cantidad - usados;
+        const cantidadInventario = inventarioItem.Cantidad;
+        const yaEncontrado = conteoEncontrado.get(escaneado.Codigo) || 0;
   
-        const cantidadEncontrada = Math.min(escaneado.Cantidad, disponibles);
-        const excedente = escaneado.Cantidad - cantidadEncontrada;
+        const disponibles = cantidadInventario - yaEncontrado;
+        const cantidadEncontrada = Math.min(disponibles, cantidadEscaneada);
+        const excedente = cantidadEscaneada - cantidadEncontrada;
   
         if (cantidadEncontrada > 0) {
           encontrados.push({
@@ -157,8 +161,7 @@ function EscanadorBarras() {
             Cantidad: cantidadEncontrada,
             Estado: 'Encontrado'
           });
-  
-          inventarioUsado.set(escaneado.Codigo, usados + cantidadEncontrada);
+          conteoEncontrado.set(escaneado.Codigo, yaEncontrado + cantidadEncontrada);
         }
   
         if (excedente > 0) {
@@ -169,6 +172,7 @@ function EscanadorBarras() {
           });
         }
       } else {
+        // Código que no está en inventario
         noRegistrados.push({
           Nombre: '-',
           Codigo: escaneado.Codigo,
@@ -182,21 +186,19 @@ function EscanadorBarras() {
       }
     });
   
+    // Verifica faltantes por cada código no cubierto por los escaneos
     inventarioReducido.forEach(item => {
-        const usados = inventarioUsado.get(item.Codigo) || 0;
-        const faltan = item.Cantidad - usados;
-      
-        // Solo faltan si NO se escanearon suficientes (y no se contaron como encontrados antes)
-        if (faltan > 0) {
-          faltantes.push({
-            ...item,
-            Cantidad: faltan,
-            Estado: 'Faltante'
-          });
-        }
-      });
-      
-      
+      const yaEncontrado = conteoEncontrado.get(item.Codigo) || 0;
+      const faltan = item.Cantidad - yaEncontrado;
+  
+      if (faltan > 0) {
+        faltantes.push({
+          ...item,
+          Cantidad: faltan,
+          Estado: 'Faltante'
+        });
+      }
+    });
   
     const resultados = [...encontrados, ...faltantes, ...noRegistrados];
     setResultadosComparacion(resultados);
