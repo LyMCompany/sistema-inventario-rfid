@@ -139,48 +139,49 @@ function EscanadorBarras() {
     const encontrados = [];
     const faltantes = [];
     const noRegistrados = [];
-  
+    const inventarioUsado = new Map(); // Para llevar control de cuántas veces se usó un código
+
     codigosBarras.forEach(escaneado => {
-        const inventarioItem = inventarioMap.get(escaneado.Codigo);
-      
-        if (inventarioItem) {
-          const cantidadEncontrada = Math.min(escaneado.Cantidad, inventarioItem.Cantidad);
-          const excedente = escaneado.Cantidad - cantidadEncontrada;
-      
-          // Parte encontrada
-          if (cantidadEncontrada > 0) {
-            encontrados.push({
-              ...inventarioItem,
-              Cantidad: cantidadEncontrada,
-              Estado: 'Encontrado'
-            });
-          }
-      
-          // Parte sobrante → No Registrado
-          if (excedente > 0) {
-            noRegistrados.push({
-              ...inventarioItem,
-              Cantidad: excedente,
-              Estado: 'No Registrado'
-            });
-          }
-      
-        } else {
-          // Código completamente no registrado
+      const inventarioItem = inventarioMap.get(escaneado.Codigo);
+    
+      if (inventarioItem) {
+        const usados = inventarioUsado.get(escaneado.Codigo) || 0;
+        const disponibles = inventarioItem.Cantidad - usados;
+    
+        const cantidadEncontrada = Math.min(escaneado.Cantidad, disponibles);
+        const excedente = escaneado.Cantidad - cantidadEncontrada;
+    
+        if (cantidadEncontrada > 0) {
+          encontrados.push({
+            ...inventarioItem,
+            Cantidad: cantidadEncontrada,
+            Estado: 'Encontrado'
+          });
+          inventarioUsado.set(escaneado.Codigo, usados + cantidadEncontrada);
+        }
+    
+        if (excedente > 0) {
           noRegistrados.push({
-            Nombre: '-',
-            Codigo: escaneado.Codigo,
-            SKU: '-',
-            Marca: '-',
-            RFID: '-',
-            Ubicacion: '-',
-            Cantidad: escaneado.Cantidad,
+            ...inventarioItem,
+            Cantidad: excedente,
             Estado: 'No Registrado'
           });
         }
-      });
-  
-    // Agregar artículos no escaneados en absoluto
+    
+      } else {
+        noRegistrados.push({
+          Nombre: '-',
+          Codigo: escaneado.Codigo,
+          SKU: '-',
+          Marca: '-',
+          RFID: '-',
+          Ubicacion: '-',
+          Cantidad: escaneado.Cantidad,
+          Estado: 'No Registrado'
+        });
+      }
+    });
+      // Agregar artículos no escaneados en absoluto
     inventarioReducido.forEach(item => {
       const escaneado = codigosBarras.find(e => e.Codigo === item.Codigo);
       if (!escaneado) {
