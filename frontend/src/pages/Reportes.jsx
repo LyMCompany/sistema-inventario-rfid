@@ -256,6 +256,7 @@ function Reportes() {
         <td>{item.Marca || item.Marca || '-'}</td>
         <td>{item.RFID || item.RFID || item.Codigo || '-'}</td>
         <td>{item.Ubicacion || item.ubicacion || item['Ubicación'] || '-'}</td>
+        <td>{item.Cantidad || '-'}</td>
         <td>{item.Estado || item.Estado || tipo}</td>
       </tr>
     ))
