@@ -121,7 +121,8 @@ function EscanadorBarras() {
       const invItem = inventario.find((item) => item.Codigo === Codigo);
   
       if (invItem) {
-        const cantidadInventario = parseInt(invItem.Cantidad);
+        const cantidadInventario = parseInt(invItem.Cantidad || '0');
+
         const diferencia = cantidadInventario - cantidadEscaneada;
         const absDiff = Math.abs(diferencia);
   
