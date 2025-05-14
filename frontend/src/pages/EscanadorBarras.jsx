@@ -170,14 +170,19 @@ function EscanadorBarras() {
               
                   if (excedente > 0) {
                     noRegistrados.push({
-                      ...inventarioItem,
+                      Nombre: '-',
+                      Codigo: codigo,
+                      SKU: '-',
+                      Marca: '-',
+                      RFID: '-',
+                      Ubicacion: '-',
                       Cantidad: excedente,
                       Estado: 'No Registrado'
                     });
-                  }                
+                  }
               
                 } else {
-                  // No existe en inventario
+                  // Código completamente desconocido
                   noRegistrados.push({
                     Nombre: '-',
                     Codigo: codigo,
@@ -190,9 +195,8 @@ function EscanadorBarras() {
                   });
                 }
               });
-              
-                            
-  
+       
+    
    // Verifica faltantes por cada código no cubierto por los escaneos
 const encontradosPorCodigo = new Map();
 encontrados.forEach(e => {
@@ -231,6 +235,8 @@ inventarioReducido.forEach(item => {
     localStorage.setItem('reportesComparacion', JSON.stringify(reportesPrevios));
   
     Swal.fire({
+
+        
       title: 'Resultado de la Comparación',
       html: `
         <p><strong>Encontrados:</strong> ${encontrados.length}</p>
