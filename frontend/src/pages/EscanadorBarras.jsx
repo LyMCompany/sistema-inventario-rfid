@@ -108,52 +108,55 @@ function EscanadorBarras() {
   };
 
   const compararConInventario = () => {
-    const agrupados = codigosBarras.map((item) => ({
-      Codigo: item.Codigo,
-      Cantidad: item.Cantidad,
-    }));
+    const agrupados = new Map();
+  
+    // Agrupar por código sumando cantidades escaneadas
+    codigosBarras.forEach(({ Codigo, Cantidad }) => {
+      agrupados.set(Codigo, (agrupados.get(Codigo) || 0) + Cantidad);
+    });
   
     const inventario = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
-    let resultados = [];
+    const inventarioMap = new Map();
+    inventario.forEach(item => {
+      inventarioMap.set(item.Codigo, item);
+    });
   
-    agrupados.forEach((scan) => {
-      const { Codigo, Cantidad: cantidadEscaneada } = scan;
-      const invItem = inventario.find((item) => item.Codigo === Codigo);
+    const resultados = [];
   
-      if (invItem) {
-        const cantidadInventario = parseInt(invItem.Cantidad || '0');
-
-        const diferencia = cantidadInventario - cantidadEscaneada;
-        const absDiff = Math.abs(diferencia);
+    // Comparar escaneados con inventario
+    agrupados.forEach((cantidadEscaneada, codigo) => {
+      const item = inventarioMap.get(codigo);
+      if (item) {
+        const cantidadInventario = parseInt(item.Cantidad);
+        const cantidadEncontrada = Math.min(cantidadEscaneada, cantidadInventario);
+        const diferencia = cantidadEscaneada - cantidadInventario;
   
-        if (diferencia < 0) {
-          // Escaneados más que inventario → No Registrado
+        if (cantidadEncontrada > 0) {
           resultados.push({
-            ...invItem,
-            Cantidad: absDiff,
-            Estado: 'No Registrado',
-          });
-        } else if (diferencia > 0) {
-          // Escaneados menos que inventario → Faltante
-          resultados.push({
-            ...invItem,
-            Cantidad: absDiff,
-            Estado: 'Faltante',
+            ...item,
+            Cantidad: cantidadEncontrada,
+            Estado: 'Encontrado',
           });
         }
   
-        // En todos los casos válidos, se encontraron los que coinciden
-        resultados.push({
-          ...invItem,
-          Cantidad: Math.min(cantidadEscaneada, cantidadInventario),
-          Estado: 'Encontrado',
-        });
+        if (diferencia > 0) {
+          resultados.push({
+            Nombre: '-',
+            Codigo: codigo,
+            SKU: '-',
+            Marca: '-',
+            RFID: '-',
+            Ubicacion: '-',
+            Cantidad: diferencia,
+            Estado: 'No Registrado',
+          });
+        }
   
       } else {
-        // Código completamente desconocido
+        // No existe en inventario → completamente no registrado
         resultados.push({
           Nombre: '-',
-          Codigo: Codigo,
+          Codigo: codigo,
           SKU: '-',
           Marca: '-',
           RFID: '-',
@@ -164,11 +167,25 @@ function EscanadorBarras() {
       }
     });
   
+    // Verificar faltantes
+    inventarioMap.forEach(item => {
+      const cantidadEscaneada = agrupados.get(item.Codigo) || 0;
+      const faltan = parseInt(item.Cantidad) - cantidadEscaneada;
+  
+      if (faltan > 0) {
+        resultados.push({
+          ...item,
+          Cantidad: faltan,
+          Estado: 'Faltante',
+        });
+      }
+    });
+  
     setResultadosComparacion(resultados);
   
-    const encontrados = resultados.filter((r) => r.Estado === 'Encontrado').length;
-    const faltantes = resultados.filter((r) => r.Estado === 'Faltante').length;
-    const noRegistrados = resultados.filter((r) => r.Estado === 'No Registrado').length;
+    const encontrados = resultados.filter(r => r.Estado === 'Encontrado').length;
+    const faltantes = resultados.filter(r => r.Estado === 'Faltante').length;
+    const noRegistrados = resultados.filter(r => r.Estado === 'No Registrado').length;
   
     Swal.fire({
       title: 'Resultado de la Comparación',
@@ -180,9 +197,9 @@ function EscanadorBarras() {
       icon: 'info',
     });
   
-      // Cambiar la vista para mostrar los resultados
     setVistaActiva('comparar');
   };
+  
 
   const subirReporte = async () => {
     const reporte = {
