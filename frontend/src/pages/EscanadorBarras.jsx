@@ -190,15 +190,22 @@ function EscanadorBarras() {
     setResultadosComparacion(resultados);
 
     // Mostrar resultados en un modal
+    const encontrados = resultados.filter((r) => r.Estado === 'Encontrado').length;
+    const faltantes = resultados.filter((r) => r.Estado === 'Faltante').length;
+    const noRegistrados = resultados.filter((r) => r.Estado === 'No Registrado').length;
+
     Swal.fire({
       title: 'Resultado de la Comparación',
       html: `
-        <p><strong>Encontrados:</strong> ${resultados.filter((r) => r.Estado === 'Encontrado').length}</p>
-        <p><strong>Faltantes:</strong> ${resultados.filter((r) => r.Estado === 'Faltante').length}</p>
-        <p><strong>No Registrados:</strong> ${resultados.filter((r) => r.Estado === 'No Registrado').length}</p>
+        <p><strong>Encontrados:</strong> ${encontrados}</p>
+        <p><strong>Faltantes:</strong> ${faltantes}</p>
+        <p><strong>No Registrados:</strong> ${noRegistrados}</p>
       `,
       icon: 'info',
     });
+
+    // Cambiar la vista para mostrar los resultados
+    setVistaActiva('comparar');
   };
 
   const subirReporte = async () => {
