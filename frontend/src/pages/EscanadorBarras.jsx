@@ -170,22 +170,14 @@ function EscanadorBarras() {
               
                   if (excedente > 0) {
                     noRegistrados.push({
-                      Nombre: '-', // <- lo marcamos como desconocido
-                      Codigo: codigo,
-                      SKU: '-',
-                      Marca: '-',
-                      RFID: '-',
-                      Ubicacion: '-',
+                      ...inventarioItem,
                       Cantidad: excedente,
                       Estado: 'No Registrado'
                     });
-                  }
-              
-                  // marcar para cálculo posterior
-                  inventarioItem.__usado = cantidadEncontrada;
+                  }                
               
                 } else {
-                  // Todo escaneado no está en inventario
+                  // No existe en inventario
                   noRegistrados.push({
                     Nombre: '-',
                     Codigo: codigo,
@@ -199,6 +191,7 @@ function EscanadorBarras() {
                 }
               });
               
+                            
   
    // Verifica faltantes por cada código no cubierto por los escaneos
 const encontradosPorCodigo = new Map();
