@@ -179,7 +179,6 @@ function EscanadorBarras() {
           });
         }
       });
-      };
   
     // Agregar artículos no escaneados en absoluto
     inventarioReducido.forEach(item => {
@@ -363,5 +362,5 @@ function EscanadorBarras() {
 
     </div>
   );
-
+}
 export default EscanadorBarras;
