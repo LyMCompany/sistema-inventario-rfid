@@ -112,92 +112,103 @@ function EscanadorBarras() {
   const compararConInventario = () => {
     setVistaActiva('comparar');
     const inventarioRaw = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
-
-    const inventario = inventarioRaw.map(item => {
-        return {
-            Nombre: item.Nombre || '-',
-            Codigo: item.Codigo || '-',
-            SKU: (item.SKU && isNaN(Date.parse(item.SKU))) ? item.SKU : '-', // evita fechas
-            Marca: item.Marca || '-',
-            RFID: String(item.RFID || '-'),
-            Ubicacion: item.Ubicacion || '-',
-          };
-          
-      });
-      
-
-    let encontrados = 0;
-    let noRegistrados = 0;
-
-    const faltantes = inventario.filter(prod => {
-      return !codigosBarras.find(item => item.Codigo === prod.Codigo);
+  
+    const inventario = inventarioRaw.map(item => ({
+      Nombre: item.Nombre || '-',
+      Codigo: item.Codigo || '-',
+      SKU: (item.SKU && isNaN(Date.parse(item.SKU))) ? item.SKU : '-',
+      Marca: item.Marca || '-',
+      RFID: String(item.RFID || '-'),
+      Ubicacion: item.Ubicacion || '-',
+      Cantidad: parseInt(item.Cantidad || 1)
+    }));
+  
+    const inventarioMap = new Map();
+    inventario.forEach(item => {
+      inventarioMap.set(item.Codigo, item);
     });
-
-    const nuevosResultados = codigosBarras.map(item => {
-      const encontrado = inventario.find(prod => prod.Codigo === item.Codigo);
-      if (encontrado) {
-        encontrados++;
-        return {
-          Nombre: encontrado.Nombre || '-',
-          Codigo: encontrado.Codigo || '-',
-          SKU: encontrado.SKU || '-',
-          Marca: encontrado.Marca || '-',
-          RFID: encontrado.RFID || '-',
-          Ubicacion: encontrado.Ubicacion || '-',
-          Estado: 'Encontrado'
-        };
+  
+    const encontrados = [];
+    const faltantes = [];
+    const noRegistrados = [];
+  
+    codigosBarras.forEach(escaneado => {
+      const inventarioItem = inventarioMap.get(escaneado.Codigo);
+  
+      if (inventarioItem) {
+        const diferencia = escaneado.Cantidad - inventarioItem.Cantidad;
+        if (diferencia <= 0) {
+          // Escaneado cantidad igual o menor
+          encontrados.push({
+            ...inventarioItem,
+            Cantidad: escaneado.Cantidad,
+            Estado: 'Encontrado'
+          });
+        } else {
+          // Parte encontrada, parte faltante
+          encontrados.push({
+            ...inventarioItem,
+            Cantidad: inventarioItem.Cantidad,
+            Estado: 'Encontrado'
+          });
+          faltantes.push({
+            ...inventarioItem,
+            Cantidad: diferencia,
+            Estado: 'Faltante'
+          });
+        }
       } else {
-        noRegistrados++;
-        return {
+        noRegistrados.push({
           Nombre: '-',
-          Codigo: item.Codigo,
+          Codigo: escaneado.Codigo,
           SKU: '-',
           Marca: '-',
           RFID: '-',
           Ubicacion: '-',
+          Cantidad: escaneado.Cantidad,
           Estado: 'No Registrado'
-        };
+        });
       }
     });
-
-    const faltantesConvertidos = faltantes.map(prod => ({
-        Nombre: prod.Nombre || '-',
-        Codigo: prod.Codigo || '-',
-        SKU: prod.SKU || '-',
-        Marca: prod.Marca || '-',
-        RFID: prod.RFID || '-',
-        Ubicacion: prod.Ubicacion || '-',
-        Estado: 'Faltante'
-      }));
-      
-      nuevosResultados.push(...faltantesConvertidos);
-      
-
-    setResultadosComparacion(nuevosResultados);
-
+  
+    // Agregar artículos no escaneados en absoluto
+    inventario.forEach(item => {
+      const escaneado = codigosBarras.find(e => e.Codigo === item.Codigo);
+      if (!escaneado) {
+        faltantes.push({
+          ...item,
+          Estado: 'Faltante'
+        });
+      }
+    });
+  
+    const resultados = [...encontrados, ...faltantes, ...noRegistrados];
+    setResultadosComparacion(resultados);
+  
     const nuevoReporte = {
       usuario: user?.correo,
       empresa: empresa,
       fecha: new Date().toLocaleString(),
-      encontrados: nuevosResultados.filter(e => e.Estado === 'Encontrado'),
-      faltantes: [],
-      no_registrados: nuevosResultados.filter(e => e.Estado === 'No Registrado')
+      encontrados,
+      faltantes,
+      no_registrados: noRegistrados
     };
-
+  
     const reportesPrevios = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
     reportesPrevios.push(nuevoReporte);
     localStorage.setItem('reportesComparacion', JSON.stringify(reportesPrevios));
-
+  
     Swal.fire({
       title: 'Resultado de la Comparación',
       html: `
-        <p><strong>Encontrados:</strong> ${encontrados}</p>
+        <p><strong>Encontrados:</strong> ${encontrados.length}</p>
         <p><strong>Faltantes:</strong> ${faltantes.length}</p>
-        <p><strong>No Registrados:</strong> ${noRegistrados}</p>
+        <p><strong>No Registrados:</strong> ${noRegistrados.length}</p>
       `,
       icon: 'info'
     });
   };
+  
 
   const subirReporte = async () => {
     const reporte = {
