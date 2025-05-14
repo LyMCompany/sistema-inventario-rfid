@@ -114,24 +114,22 @@ function EscanadorBarras() {
     const inventarioRaw = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
   
     const inventarioReducido = [];
-
-inventarioRaw.forEach(item => {
-  const index = inventarioReducido.findIndex(i => i.Codigo === item.Codigo);
-  if (index !== -1) {
-    inventarioReducido[index].Cantidad += parseInt(item.Cantidad || 1);
-  } else {
-    inventarioReducido.push({
-      Nombre: item.Nombre || '-',
-      Codigo: item.Codigo || '-',
-      SKU: (item.SKU && isNaN(Date.parse(item.SKU))) ? item.SKU : '-',
-      Marca: item.Marca || '-',
-      RFID: String(item.RFID || '-'),
-      Ubicacion: item.Ubicacion || '-',
-      Cantidad: parseInt(item.Cantidad || 1)
+    inventarioRaw.forEach(item => {
+      const index = inventarioReducido.findIndex(i => i.Codigo === item.Codigo);
+      if (index !== -1) {
+        inventarioReducido[index].Cantidad += parseInt(item.Cantidad || 1);
+      } else {
+        inventarioReducido.push({
+          Nombre: item.Nombre || '-',
+          Codigo: item.Codigo || '-',
+          SKU: (item.SKU && isNaN(Date.parse(item.SKU))) ? item.SKU : '-',
+          Marca: item.Marca || '-',
+          RFID: String(item.RFID || '-'),
+          Ubicacion: item.Ubicacion || '-',
+          Cantidad: parseInt(item.Cantidad || 1)
+        });
+      }
     });
-  }
-});
-
   
     const inventarioMap = new Map();
     inventarioReducido.forEach(item => {
@@ -146,25 +144,31 @@ inventarioRaw.forEach(item => {
       const inventarioItem = inventarioMap.get(escaneado.Codigo);
   
       if (inventarioItem) {
-        const diferencia = escaneado.Cantidad - inventarioItem.Cantidad;
-        if (diferencia <= 0) {
-          // Escaneado cantidad igual o menor
+        if (escaneado.Cantidad <= inventarioItem.Cantidad) {
           encontrados.push({
             ...inventarioItem,
             Cantidad: escaneado.Cantidad,
             Estado: 'Encontrado'
           });
         } else {
-          // Parte encontrada, parte faltante
+          const cantidadEncontrada = inventarioItem.Cantidad;
+          const excedente = escaneado.Cantidad - inventarioItem.Cantidad;
+  
           encontrados.push({
             ...inventarioItem,
-            Cantidad: inventarioItem.Cantidad,
+            Cantidad: cantidadEncontrada,
             Estado: 'Encontrado'
           });
-          faltantes.push({
-            ...inventarioItem,
-            Cantidad: diferencia,
-            Estado: 'Faltante'
+  
+          noRegistrados.push({
+            Nombre: '-',
+            Codigo: escaneado.Codigo,
+            SKU: '-',
+            Marca: '-',
+            RFID: '-',
+            Ubicacion: '-',
+            Cantidad: excedente,
+            Estado: 'No Registrado'
           });
         }
       } else {
@@ -218,6 +222,7 @@ inventarioRaw.forEach(item => {
       icon: 'info'
     });
   };
+  
   
 
   const subirReporte = async () => {
