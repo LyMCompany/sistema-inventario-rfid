@@ -165,17 +165,18 @@ function EscanadorBarras() {
         }
   
         if (sobrante > 0) {
-          noRegistrados.push({
-            Nombre: '-',
-            Codigo: codigo,
-            SKU: '-',
-            Marca: '-',
-            RFID: '-',
-            Ubicacion: '-',
-            Cantidad: sobrante,
-            Estado: 'No Registrado'
-          });
-        }
+            noRegistrados.push({
+              Nombre: invItem.Nombre,
+              Codigo: invItem.Codigo,
+              SKU: invItem.SKU,
+              Marca: invItem.Marca,
+              RFID: invItem.RFID,
+              Ubicacion: invItem.Ubicacion,
+              Cantidad: sobrante,
+              Estado: 'No Registrado'
+            });
+          }
+          
       } else {
         // Código no existe en inventario
         noRegistrados.push({
