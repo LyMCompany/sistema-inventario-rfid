@@ -242,6 +242,7 @@ function Reportes() {
                 <th>Marca</th>
                 <th>RFID</th>
                 <th>Ubicación</th>
+                <th>Cantidad</th>
                 <th>Estado</th>
               </tr>
             </thead>
