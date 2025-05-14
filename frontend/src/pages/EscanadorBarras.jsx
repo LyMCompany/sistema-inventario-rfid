@@ -183,13 +183,10 @@ function EscanadorBarras() {
     });
   
     inventarioReducido.forEach(item => {
-        const totalEscaneado = codigosBarras
-          .filter(e => e.Codigo === item.Codigo)
-          .reduce((sum, curr) => sum + curr.Cantidad, 0);
-      
         const usados = inventarioUsado.get(item.Codigo) || 0;
         const faltan = item.Cantidad - usados;
       
+        // Solo faltan si NO se escanearon suficientes (y no se contaron como encontrados antes)
         if (faltan > 0) {
           faltantes.push({
             ...item,
@@ -198,6 +195,7 @@ function EscanadorBarras() {
           });
         }
       });
+      
       
   
     const resultados = [...encontrados, ...faltantes, ...noRegistrados];
