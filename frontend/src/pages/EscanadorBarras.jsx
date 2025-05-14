@@ -108,101 +108,127 @@ function EscanadorBarras() {
   };
 
   const compararConInventario = () => {
-    const agrupados = codigosBarras.map((item) => ({
-      Codigo: item.Codigo,
-      Cantidad: item.Cantidad,
-    }));
-
-    const inventario = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
-    let resultados = [];
-
-    // Procesar cada código escaneado agrupado
-    agrupados.forEach((scan) => {
-      const { Codigo, Cantidad: qtyScan } = scan;
-      const invItem = inventario.find((item) => item.Codigo === Codigo);
-
-      if (invItem) {
-        const qtyInv = invItem.Cantidad;
-
-        // Caso: Encontrados
-        if (qtyScan > 0 && qtyInv > 0) {
-          const encontrados = Math.min(qtyScan, qtyInv);
-          resultados.push({
-            Nombre: invItem.Nombre,
-            Codigo: invItem.Codigo,
-            SKU: invItem.SKU,
-            Marca: invItem.Marca,
-            RFID: invItem.RFID,
-            Ubicacion: invItem.Ubicacion,
-            Cantidad: encontrados,
-            Estado: 'Encontrado',
+    setVistaActiva('comparar');
+    const inventarioRaw = JSON.parse(localStorage.getItem(`inventarioBase_${empresa}`)) || [];
+  
+    const inventarioReducido = [];
+    inventarioRaw.forEach(item => {
+      const index = inventarioReducido.findIndex(i => i.Codigo === item.Codigo);
+      if (index !== -1) {
+        inventarioReducido[index].Cantidad += parseInt(item.Cantidad || 1);
+      } else {
+        inventarioReducido.push({
+          Nombre: item.Nombre || '-',
+          Codigo: item.Codigo || '-',
+          SKU: (item.SKU && isNaN(Date.parse(item.SKU))) ? item.SKU : '-',
+          Marca: item.Marca || '-',
+          RFID: String(item.RFID || '-'),
+          Ubicacion: item.Ubicacion || '-',
+          Cantidad: parseInt(item.Cantidad || 1)
+        });
+      }
+    });
+  
+    const inventarioMap = new Map();
+    inventarioReducido.forEach(item => {
+      inventarioMap.set(item.Codigo, item);
+    });
+  
+    const encontrados = [];
+    const faltantes = [];
+    const noRegistrados = [];
+  
+    // Agrupar escaneos por código
+    const codigosAgrupados = new Map();
+    codigosBarras.forEach(({ Codigo, Cantidad }) => {
+      const actual = codigosAgrupados.get(Codigo) || 0;
+      codigosAgrupados.set(Codigo, actual + Cantidad);
+    });
+  
+    const encontradosPorCodigo = new Map();
+  
+    codigosAgrupados.forEach((cantidadEscaneada, codigo) => {
+      const inventarioItem = inventarioMap.get(codigo);
+  
+      if (inventarioItem) {
+        const cantidadInventario = inventarioItem.Cantidad;
+        const cantidadEncontrada = Math.min(cantidadInventario, cantidadEscaneada);
+        const sobrante = cantidadEscaneada - cantidadInventario;
+  
+        if (cantidadEncontrada > 0) {
+          encontrados.push({
+            ...inventarioItem,
+            Cantidad: cantidadEncontrada,
+            Estado: 'Encontrado'
           });
+          encontradosPorCodigo.set(codigo, cantidadEncontrada);
         }
-
-        
-        // Caso: Sobrantes (No Registrados conocidos)
-        if (qtyScan > qtyInv) {
-          resultados.push({
-            Nombre: invItem.Nombre,
-            Codigo: invItem.Codigo,
-            SKU: invItem.SKU,
-            Marca: invItem.Marca,
-            RFID: invItem.RFID,
-            Ubicacion: invItem.Ubicacion,
-            Cantidad: qtyScan - qtyInv,
-            Estado: 'No Registrado',
+  
+        if (sobrante > 0) {
+          noRegistrados.push({
+            Nombre: '-',
+            Codigo: codigo,
+            SKU: '-',
+            Marca: '-',
+            RFID: '-',
+            Ubicacion: '-',
+            Cantidad: sobrante,
+            Estado: 'No Registrado'
           });
         }
       } else {
-        // Caso: Código completamente nuevo (No existe en inventario)
-        resultados.push({
+        // Código no existe en inventario
+        noRegistrados.push({
           Nombre: '-',
-          Codigo: Codigo,
+          Codigo: codigo,
           SKU: '-',
           Marca: '-',
           RFID: '-',
           Ubicacion: '-',
-          Cantidad: qtyScan,
-          Estado: 'No Registrado',
+          Cantidad: cantidadEscaneada,
+          Estado: 'No Registrado'
         });
       }
     });
-
-    // Procesar faltantes en inventario (no escaneados o con cantidad escaneada menor)
-    inventario.forEach((item) => {
-      const scan = agrupados.find((s) => s.Codigo === item.Codigo);
-      const qtyScan = scan ? scan.Cantidad : 0;
-
-      if (item.Cantidad > qtyScan) {
-        resultados.push({
-          Nombre: item.Nombre,
-          Codigo: item.Codigo,
-          SKU: item.SKU,
-          Marca: item.Marca,
-          RFID: item.RFID,
-          Ubicacion: item.Ubicacion,
-          Cantidad: item.Cantidad - qtyScan,
-          Estado: 'Faltante',
+  
+    // Revisar faltantes
+    inventarioReducido.forEach(item => {
+      const encontradosCantidad = encontradosPorCodigo.get(item.Codigo) || 0;
+      const faltan = item.Cantidad - encontradosCantidad;
+  
+      if (faltan > 0) {
+        faltantes.push({
+          ...item,
+          Cantidad: faltan,
+          Estado: 'Faltante'
         });
       }
     });
-
-    // Actualizar estado con los resultados
+  
+    const resultados = [...encontrados, ...faltantes, ...noRegistrados];
     setResultadosComparacion(resultados);
-
-    // Mostrar resultados en un modal
-    const encontrados = resultados.filter((r) => r.Estado === 'Encontrado').length;
-    const faltantes = resultados.filter((r) => r.Estado === 'Faltante').length;
-    const noRegistrados = resultados.filter((r) => r.Estado === 'No Registrado').length;
-
+  
+    const nuevoReporte = {
+      usuario: user?.correo,
+      empresa: empresa,
+      fecha: new Date().toLocaleString(),
+      encontrados,
+      faltantes,
+      no_registrados: noRegistrados
+    };
+  
+    const reportesPrevios = JSON.parse(localStorage.getItem('reportesComparacion')) || [];
+    reportesPrevios.push(nuevoReporte);
+    localStorage.setItem('reportesComparacion', JSON.stringify(reportesPrevios));
+  
     Swal.fire({
       title: 'Resultado de la Comparación',
       html: `
-        <p><strong>Encontrados:</strong> ${encontrados}</p>
-        <p><strong>Faltantes:</strong> ${faltantes}</p>
-        <p><strong>No Registrados:</strong> ${noRegistrados}</p>
+        <p><strong>Encontrados:</strong> ${encontrados.length}</p>
+        <p><strong>Faltantes:</strong> ${faltantes.length}</p>
+        <p><strong>No Registrados:</strong> ${noRegistrados.length}</p>
       `,
-      icon: 'info',
+      icon: 'info'
     });
 
     // Cambiar la vista para mostrar los resultados
