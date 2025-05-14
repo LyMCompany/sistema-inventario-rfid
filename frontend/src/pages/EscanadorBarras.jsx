@@ -139,6 +139,7 @@ function EscanadorBarras() {
           });
         }
 
+        
         // Caso: Sobrantes (No Registrados conocidos)
         if (qtyScan > qtyInv) {
           resultados.push({
