@@ -161,20 +161,31 @@ function EscanadorBarras() {
                 const excedente = cantidadEscaneada - cantidadEncontrada;
 
                 if (cantidadEncontrada > 0) {
-                encontrados.push({
-                    ...inventarioItem,
-                    Cantidad: cantidadEncontrada,
-                    Estado: 'Encontrado'
-                });
-                }
-
-                if (excedente > 0) {
-                noRegistrados.push({
-                    ...inventarioItem,
-                    Cantidad: excedente,
-                    Estado: 'No Registrado'
-                });
-                }
+                    encontrados.push({
+                      Nombre: inventarioItem.Nombre,
+                      Codigo: inventarioItem.Codigo,
+                      SKU: inventarioItem.SKU,
+                      Marca: inventarioItem.Marca,
+                      RFID: inventarioItem.RFID,
+                      Ubicacion: inventarioItem.Ubicacion,
+                      Cantidad: cantidadEncontrada,
+                      Estado: 'Encontrado'
+                    });
+                  }
+                  
+                  if (excedente > 0) {
+                    noRegistrados.push({
+                      Nombre: inventarioItem.Nombre,
+                      Codigo: inventarioItem.Codigo,
+                      SKU: inventarioItem.SKU,
+                      Marca: inventarioItem.Marca,
+                      RFID: inventarioItem.RFID,
+                      Ubicacion: inventarioItem.Ubicacion,
+                      Cantidad: excedente,
+                      Estado: 'No Registrado'
+                    });
+                  }
+                  
             } else {
                 // No existe en inventario
                 noRegistrados.push({
