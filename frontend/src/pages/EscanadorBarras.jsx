@@ -190,20 +190,26 @@ function EscanadorBarras() {
             }
             });
   
-    // Verifica faltantes por cada código no cubierto por los escaneos
-    inventarioReducido.forEach(item => {
-        const escaneado = codigosAgrupados.get(item.Codigo) || 0;
-        const faltan = item.Cantidad - escaneado;
-      
-        if (faltan > 0) {
-          faltantes.push({
-            ...item,
-            Cantidad: faltan,
-            Estado: 'Faltante'
-          });
-        }
-      });
-      
+   // Verifica faltantes por cada código no cubierto por los escaneos
+const encontradosPorCodigo = new Map();
+encontrados.forEach(e => {
+  const actual = encontradosPorCodigo.get(e.Codigo) || 0;
+  encontradosPorCodigo.set(e.Codigo, actual + e.Cantidad);
+});
+
+inventarioReducido.forEach(item => {
+  const yaEncontrado = encontradosPorCodigo.get(item.Codigo) || 0;
+  const faltan = item.Cantidad - yaEncontrado;
+
+  if (faltan > 0) {
+    faltantes.push({
+      ...item,
+      Cantidad: faltan,
+      Estado: 'Faltante'
+    });
+  }
+});
+     
   
     const resultados = [...encontrados, ...faltantes, ...noRegistrados];
     setResultadosComparacion(resultados);
