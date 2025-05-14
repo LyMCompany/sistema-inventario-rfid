@@ -183,16 +183,22 @@ function EscanadorBarras() {
     });
   
     inventarioReducido.forEach(item => {
-      const totalUsado = inventarioUsado.get(item.Codigo) || 0;
-      if (totalUsado < item.Cantidad) {
-        const cantidadFaltante = item.Cantidad - totalUsado;
-        faltantes.push({
-          ...item,
-          Cantidad: cantidadFaltante,
-          Estado: 'Faltante'
-        });
-      }
-    });
+        const totalEscaneado = codigosBarras
+          .filter(e => e.Codigo === item.Codigo)
+          .reduce((sum, curr) => sum + curr.Cantidad, 0);
+      
+        const usados = inventarioUsado.get(item.Codigo) || 0;
+        const faltan = item.Cantidad - usados;
+      
+        if (faltan > 0) {
+          faltantes.push({
+            ...item,
+            Cantidad: faltan,
+            Estado: 'Faltante'
+          });
+        }
+      });
+      
   
     const resultados = [...encontrados, ...faltantes, ...noRegistrados];
     setResultadosComparacion(resultados);
