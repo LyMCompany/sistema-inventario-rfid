@@ -126,44 +126,34 @@ function EscanadorBarras() {
     }
 
     const resultados = [];
-    const inventarioMap = new Map();
-    inventario.forEach(item => {
-        const codigo = item.Codigo;
-        if (!inventarioMap.has(codigo)) {
-            inventarioMap.set(codigo, []);
-        }
-        inventarioMap.get(codigo).push({ ...item, CantidadDisponible: parseInt(item.Cantidad || 1) });
-    });
-
-    const escaneadosMap = new Map();
+    const inventarioMarcado = inventario.map(item => ({ ...item, encontrado: 0 }));
+    const conteoEscaneados = {};
     escaneados.forEach(item => {
-        const codigo = item.Codigo;
-        escaneadosMap.set(codigo, (escaneadosMap.get(codigo) || 0) + parseInt(item.Cantidad || 1));
+        conteoEscaneados[item.Codigo] = (conteoEscaneados[item.Codigo] || 0) + parseInt(item.Cantidad || 1);
     });
 
-    for (const [codigo, cantidadEscaneada] of escaneadosMap.entries()) {
-        const inventarioItems = inventarioMap.get(codigo) || [];
-        let cantidadEscaneadaRestante = cantidadEscaneada;
+    for (const codigoEscaneado in conteoEscaneados) {
+        let cantidadEscaneadaRestante = conteoEscaneados[codigoEscaneado];
 
-        // Primero, intentar encontrar coincidencias en el inventario
-        for (const item of inventarioItems) {
-            if (item.CantidadDisponible > 0 && cantidadEscaneadaRestante > 0) {
-                const encontrados = Math.min(cantidadEscaneadaRestante, item.CantidadDisponible);
+        // Intentar encontrar coincidencias en el inventario
+        inventarioMarcado.forEach((itemInventario) => {
+            if (itemInventario.Codigo === codigoEscaneado && itemInventario.encontrado < parseInt(itemInventario.Cantidad || 1) && cantidadEscaneadaRestante > 0) {
+                const cantidadEncontrada = Math.min(cantidadEscaneadaRestante, (parseInt(itemInventario.Cantidad || 1) - itemInventario.encontrado));
                 resultados.push({
-                    ...item,
-                    Cantidad: encontrados,
+                    ...itemInventario,
+                    Cantidad: cantidadEncontrada,
                     Estado: 'Encontrado'
                 });
-                item.CantidadDisponible -= encontrados;
-                cantidadEscaneadaRestante -= encontrados;
+                itemInventario.encontrado += cantidadEncontrada;
+                cantidadEscaneadaRestante -= cantidadEncontrada;
             }
-        }
+        });
 
-        // Si quedan escaneados sin coincidir, son "No Registrados"
+        // Si quedaron escaneados sin coincidir, son "No Registrados"
         if (cantidadEscaneadaRestante > 0) {
             resultados.push({
                 Nombre: '-',
-                Codigo: codigo,
+                Codigo: codigoEscaneado,
                 SKU: '-',
                 Marca: '-',
                 RFID: '-',
@@ -175,17 +165,16 @@ function EscanadorBarras() {
     }
 
     // Identificar los faltantes
-    for (const [codigo, items] of inventarioMap.entries()) {
-        items.forEach(item => {
-            if (item.CantidadDisponible > 0) {
-                resultados.push({
-                    ...item,
-                    Cantidad: item.CantidadDisponible,
-                    Estado: 'Faltante'
-                });
-            }
-        });
-    }
+    inventarioMarcado.forEach(itemInventario => {
+        const cantidadFaltante = (parseInt(itemInventario.Cantidad || 1) - itemInventario.encontrado);
+        if (cantidadFaltante > 0) {
+            resultados.push({
+                ...itemInventario,
+                Cantidad: cantidadFaltante,
+                Estado: 'Faltante'
+            });
+        }
+    });
 
     const resultadosFiltrados = resultados.filter(r => parseInt(r.Cantidad) > 0);
     setResultadosComparacion(resultadosFiltrados);
@@ -206,7 +195,6 @@ function EscanadorBarras() {
 
     setVistaActiva('comparar');
 };
-   
 
   const subirReporte = async () => {
     const reporte = {
