@@ -149,53 +149,59 @@ function EscanadorBarras() {
   
     // Comparar escaneados con inventario
     for (const [codigo, cantidadEscaneada] of escaneadosMap.entries()) {
-      const inventarioItem = inventarioMap.get(codigo);
-  
-      if (inventarioItem) {
-        const cantidadInventario = inventarioItem.Cantidad;
-        const diferencia = cantidadInventario - cantidadEscaneada;
-        const absDiff = Math.abs(diferencia);
-  
-        if (diferencia < 0 && absDiff > 0) {
+        const inventarioItem = inventarioMap.get(codigo);
+      
+        if (inventarioItem) {
+          const cantidadInventario = inventarioItem.Cantidad;
+      
+          const encontrados = Math.min(cantidadEscaneada, cantidadInventario);
+          const sobrante = cantidadEscaneada - cantidadInventario;
+          const faltante = cantidadInventario - cantidadEscaneada;
+      
+          if (encontrados > 0) {
+            resultados.push({
+              ...inventarioItem,
+              Cantidad: encontrados,
+              Estado: 'Encontrado'
+            });
+          }
+      
+          if (sobrante > 0) {
+            resultados.push({
+              Nombre: '-',
+              Codigo: codigo,
+              SKU: '-',
+              Marca: '-',
+              RFID: '-',
+              Ubicacion: '-',
+              Cantidad: sobrante,
+              Estado: 'No Registrado'
+            });
+          }
+      
+          if (faltante > 0) {
+            resultados.push({
+              ...inventarioItem,
+              Cantidad: faltante,
+              Estado: 'Faltante'
+            });
+          }
+      
+          inventarioMap.delete(codigo);
+        } else {
           resultados.push({
-            ...inventarioItem,
-            Cantidad: absDiff,
+            Nombre: '-',
+            Codigo: codigo,
+            SKU: '-',
+            Marca: '-',
+            RFID: '-',
+            Ubicacion: '-',
+            Cantidad: cantidadEscaneada,
             Estado: 'No Registrado'
           });
-        } else if (diferencia > 0 && absDiff > 0) {
-          resultados.push({
-            ...inventarioItem,
-            Cantidad: absDiff,
-            Estado: 'Faltante'
-          });
         }
-  
-        const cantidadEncontrada = Math.min(cantidadEscaneada, cantidadInventario);
-        if (cantidadEncontrada > 0) {
-          resultados.push({
-            ...inventarioItem,
-            Cantidad: cantidadEncontrada,
-            Estado: 'Encontrado'
-          });
-        }
-  
-        // Marcar como procesado
-        inventarioMap.delete(codigo);
-  
-      } else {
-        // Código completamente desconocido
-        resultados.push({
-          Nombre: '-',
-          Codigo: codigo,
-          SKU: '-',
-          Marca: '-',
-          RFID: '-',
-          Ubicacion: '-',
-          Cantidad: cantidadEscaneada,
-          Estado: 'No Registrado'
-        });
       }
-    }
+      
   
     // Lo que queda en inventarioMap no fue escaneado → Faltantes
     for (const [codigo, item] of inventarioMap.entries()) {
