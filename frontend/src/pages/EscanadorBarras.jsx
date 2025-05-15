@@ -107,7 +107,7 @@ function EscanadorBarras() {
     });
   };
 
-  const compararConInventario = () => {
+    const compararConInventario = () => {
     const claveEmpresa = user?.empresa?.trim() ?? 'EmpresaNoDefinida';
     const claveInventario = `inventarioBase_${claveEmpresa}`;
     const claveEscaneados = `escaneados_barras_${claveEmpresa}`;
@@ -116,57 +116,77 @@ function EscanadorBarras() {
     const escaneados = JSON.parse(localStorage.getItem(claveEscaneados)) || [];
   
     if (!inventario.length) {
-      Swal.fire('Inventario vacío', 'No se encontró inventario para esta empresa.', 'warning');
-      return;
-    }
-  
-    if (!escaneados.length) {
-      Swal.fire('Sin escaneos', 'No se han escaneado códigos aún.', 'warning');
-      return;
-    }
-  
-    const resultados = [];
-    const inventarioMap = new Map();
-  
-    // Agrupar inventario por código y sumar cantidades
-    inventario.forEach(item => {
-      const codigo = item.Codigo;
-      const cantidad = parseInt(item.Cantidad || 1);
-      if (inventarioMap.has(codigo)) {
-        inventarioMap.get(codigo).Cantidad += cantidad;
-      } else {
-        inventarioMap.set(codigo, { ...item, Cantidad: cantidad });
+        Swal.fire('Inventario vacío', 'No se encontró inventario para esta empresa.', 'warning');
+        return;
       }
+    
+      if (!escaneados.length) {
+        Swal.fire('Sin escaneos', 'No se han escaneado códigos aún.', 'warning');
+        return;
+      }
+    
+      const resultados = [];
+      const inventarioMap = new Map();
+  
+      // Agrupar inventario por código y sumar cantidades
+    inventario.forEach(item => {
+    const codigo = item.Codigo;
+    const cantidad = parseInt(item.Cantidad || 1);
+    if (inventarioMap.has(codigo)) {
+      inventarioMap.get(codigo).Cantidad += cantidad;
+    } else {
+      inventarioMap.set(codigo, { ...item, Cantidad: cantidad });
+    }
+  });
+  
+        // Agrupar escaneados por código y sumar cantidades
+        const escaneadosMap = new Map();
+        escaneados.forEach(item => {
+        const codigo = item.Codigo;
+        const cantidad = parseInt(item.Cantidad || 1);
+        escaneadosMap.set(codigo, (escaneadosMap.get(codigo) || 0) + cantidad);
     });
   
-    // Agrupar escaneados por código y sumar cantidades
-    const escaneadosMap = new Map();
-    escaneados.forEach(item => {
-      const codigo = item.Codigo;
-      const cantidad = parseInt(item.Cantidad || 1);
-      escaneadosMap.set(codigo, (escaneadosMap.get(codigo) || 0) + cantidad);
-    });
-  
-    // Comparar escaneados con inventario
-// Comparar escaneados con inventario
-for (const [codigo, cantidadEscaneada] of escaneadosMap.entries()) {
+      // Comparar escaneados con inventario
+    for (const [codigo, cantidadEscaneada] of escaneadosMap.entries()) {
     const inventarioItem = inventarioMap.get(codigo);
   
     if (inventarioItem) {
-      const cantidadInventario = inventarioItem.Cantidad;
+        const cantidadInventario = inventarioItem.Cantidad;
   
-      const encontrados = Math.min(cantidadEscaneada, cantidadInventario);
-      const sobrantes = cantidadEscaneada - cantidadInventario;
+        // Encontrados: La cantidad mínima entre lo escaneado y lo que hay en inventario
+        const encontrados = Math.min(cantidadEscaneada, cantidadInventario);
   
-      if (encontrados > 0) {
-        resultados.push({
-          ...inventarioItem,
-          Cantidad: encontrados,
-          Estado: 'Encontrado'
+        if (encontrados > 0) {
+            resultados.push({
+              ...inventarioItem,
+              Cantidad: encontrados,
+              Estado: 'Encontrado'
+            });
+          }
+  
+        // No Registrados: La cantidad sobrante después de los encontrados
+        const sobrantes = cantidadEscaneada - encontrados;
+        if (sobrantes > 0) {
+          resultados.push({
+            Nombre: '-',
+            Codigo: codigo,
+            SKU: '-',
+            Marca: '-',
+            RFID: '-',
+            Ubicacion: '-',
+            Cantidad: sobrantes,
+            Estado: 'No Registrado'
+          });
+        }
+
+    // Actualizar el inventario restante
+        inventarioMap.set(codigo, {
+            ...inventarioItem,
+            Cantidad: cantidadInventario - encontrados
         });
-      }
-  
-      if (sobrantes > 0) {
+    } else {
+        // Código no existe en inventario (todo es "No Registrado")
         resultados.push({
           Nombre: '-',
           Codigo: codigo,
@@ -174,59 +194,31 @@ for (const [codigo, cantidadEscaneada] of escaneadosMap.entries()) {
           Marca: '-',
           RFID: '-',
           Ubicacion: '-',
-          Cantidad: sobrantes,
+          Cantidad: cantidadEscaneada,
           Estado: 'No Registrado'
         });
       }
-      for (const [codigo, item] of inventarioMap.entries()) {
-        if (item.Cantidad > 0) {
-          resultados.push({
-            ...item,
-            Cantidad: item.Cantidad,
-            Estado: 'Faltante'
-          });
-        }
-       }
-      inventarioMap.set(codigo, {
-        ...inventarioItem,
-        Cantidad: cantidadInventario - encontrados
-      });
-  
-    } else {
+    }
+   // Lo que queda en inventarioMap no fue escaneado → Faltantes
+   for (const [codigo, item] of inventarioMap.entries()) {
+    if (item.Cantidad > 0) {
       resultados.push({
-        Nombre: '-',
-        Codigo: codigo,
-        SKU: '-',
-        Marca: '-',
-        RFID: '-',
-        Ubicacion: '-',
-        Cantidad: cantidadEscaneada,
-        Estado: 'No Registrado'
+        ...item,
+        Cantidad: item.Cantidad,
+        Estado: 'Faltante'
       });
     }
   }
   
-      
+
+   // Filtrar resultados con cantidad > 0
+   const resultadosFiltrados = resultados.filter(r => parseInt(r.Cantidad) > 0);
+   setResultadosComparacion(resultadosFiltrados);
   
-    // Lo que queda en inventarioMap no fue escaneado → Faltantes
-    for (const [codigo, item] of inventarioMap.entries()) {
-      if (item.Cantidad > 0) {
-        resultados.push({
-          ...item,
-          Cantidad: item.Cantidad,
-          Estado: 'Faltante'
-        });
-      }
-    }
-  
-    // Filtrar resultados con cantidad > 0
-    const resultadosFiltrados = resultados.filter(r => parseInt(r.Cantidad) > 0);
-    setResultadosComparacion(resultadosFiltrados);
-  
-    const encontrados = resultadosFiltrados.filter(r => r.Estado === 'Encontrado').length;
-    const faltantes = resultadosFiltrados.filter(r => r.Estado === 'Faltante').length;
-    const noRegistrados = resultadosFiltrados.filter(r => r.Estado === 'No Registrado').length;
-  
+     const encontrados = resultadosFiltrados.filter(r => r.Estado === 'Encontrado').length;
+     const faltantes = resultadosFiltrados.filter(r => r.Estado === 'Faltante').length;
+     const noRegistrados = resultadosFiltrados.filter(r => r.Estado === 'No Registrado').length;
+
     Swal.fire({
       title: 'Resultado de la Comparación',
       html: `
