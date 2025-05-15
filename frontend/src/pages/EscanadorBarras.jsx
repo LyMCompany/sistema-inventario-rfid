@@ -126,31 +126,41 @@ function EscanadorBarras() {
     }
 
     const resultados = [];
-    const inventarioMarcado = inventario.map(item => ({ ...item, encontrado: 0 }));
+    const inventarioMap = new Map();
+    inventario.forEach(item => {
+        inventarioMap.set(item.Codigo, { ...item, CantidadDisponible: parseInt(item.Cantidad || 1) });
+    });
+
     const conteoEscaneados = {};
     escaneados.forEach(item => {
         conteoEscaneados[item.Codigo] = (conteoEscaneados[item.Codigo] || 0) + parseInt(item.Cantidad || 1);
     });
 
     for (const codigoEscaneado in conteoEscaneados) {
-        let cantidadEscaneadaRestante = conteoEscaneados[codigoEscaneado];
+        const cantidadEscaneada = conteoEscaneados[codigoEscaneado];
+        const itemInventario = inventarioMap.get(codigoEscaneado);
+        let cantidadEncontradaTotal = 0;
 
-        // Intentar encontrar coincidencias en el inventario
-        inventarioMarcado.forEach((itemInventario) => {
-            if (itemInventario.Codigo === codigoEscaneado && itemInventario.encontrado < parseInt(itemInventario.Cantidad || 1) && cantidadEscaneadaRestante > 0) {
-                const cantidadEncontrada = Math.min(cantidadEscaneadaRestante, (parseInt(itemInventario.Cantidad || 1) - itemInventario.encontrado));
+        if (itemInventario) {
+            const cantidadEncontrada = Math.min(cantidadEscaneada, itemInventario.CantidadDisponible);
+            if (cantidadEncontrada > 0) {
                 resultados.push({
                     ...itemInventario,
                     Cantidad: cantidadEncontrada,
                     Estado: 'Encontrado'
                 });
-                itemInventario.encontrado += cantidadEncontrada;
-                cantidadEscaneadaRestante -= cantidadEncontrada;
+                inventarioMap.set(codigoEscaneado, { ...itemInventario, CantidadDisponible: itemInventario.CantidadDisponible - cantidadEncontrada });
+                cantidadEncontradaTotal = cantidadEncontrada;
             }
-        });
-
-        // Si quedaron escaneados sin coincidir, son "No Registrados"
-        if (cantidadEscaneadaRestante > 0) {
+            const cantidadNoRegistrada = cantidadEscaneada - cantidadEncontrada;
+            if (cantidadNoRegistrada > 0) {
+                resultados.push({
+                    ...itemInventario, // Usamos los datos del inventario aquí
+                    Cantidad: cantidadNoRegistrada,
+                    Estado: 'No Registrado'
+                });
+            }
+        } else {
             resultados.push({
                 Nombre: '-',
                 Codigo: codigoEscaneado,
@@ -158,25 +168,39 @@ function EscanadorBarras() {
                 Marca: '-',
                 RFID: '-',
                 Ubicacion: '-',
-                Cantidad: cantidadEscaneadaRestante,
+                Cantidad: cantidadEscaneada,
                 Estado: 'No Registrado'
             });
         }
     }
 
     // Identificar los faltantes
-    inventarioMarcado.forEach(itemInventario => {
-        const cantidadFaltante = (parseInt(itemInventario.Cantidad || 1) - itemInventario.encontrado);
-        if (cantidadFaltante > 0) {
+    for (const [codigo, itemInventario] of inventarioMap.entries()) {
+        if (itemInventario.CantidadDisponible > 0) {
             resultados.push({
                 ...itemInventario,
-                Cantidad: cantidadFaltante,
+                Cantidad: itemInventario.CantidadDisponible,
                 Estado: 'Faltante'
             });
         }
+    }
+
+    // Agrupar resultados por código y estado para sumar cantidades
+    const resultadosAgrupados = [];
+    const agrupacionMap = new Map();
+
+    resultados.forEach(item => {
+        const clave = `${item.Codigo}-${item.Estado}`;
+        if (agrupacionMap.has(clave)) {
+            agrupacionMap.get(clave).Cantidad += item.Cantidad;
+        } else {
+            agrupacionMap.set(clave, { ...item });
+        }
     });
 
-    const resultadosFiltrados = resultados.filter(r => parseInt(r.Cantidad) > 0);
+    resultadosAgrupados.push(...agrupacionMap.values());
+
+    const resultadosFiltrados = resultadosAgrupados.filter(r => parseInt(r.Cantidad) > 0);
     setResultadosComparacion(resultadosFiltrados);
 
     const encontrados = resultadosFiltrados.filter(r => r.Estado === 'Encontrado').reduce((sum, item) => sum + parseInt(item.Cantidad), 0);
