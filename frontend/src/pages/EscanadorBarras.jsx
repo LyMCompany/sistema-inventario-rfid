@@ -231,7 +231,6 @@ function EscanadorBarras() {
   
     setVistaActiva('comparar');
   };
-  
 
   const subirReporte = async () => {
     const reporte = {
