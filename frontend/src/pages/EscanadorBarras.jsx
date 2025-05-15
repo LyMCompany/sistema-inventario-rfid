@@ -148,59 +148,64 @@ function EscanadorBarras() {
     });
   
     // Comparar escaneados con inventario
-    for (const [codigo, cantidadEscaneada] of escaneadosMap.entries()) {
-        const inventarioItem = inventarioMap.get(codigo);
-      
-        if (inventarioItem) {
-          const cantidadInventario = inventarioItem.Cantidad;
-      
-          const encontrados = Math.min(cantidadEscaneada, cantidadInventario);
-          const sobrante = cantidadEscaneada - cantidadInventario;
-          const faltante = cantidadInventario - cantidadEscaneada;
-      
-          if (encontrados > 0) {
-            resultados.push({
-              ...inventarioItem,
-              Cantidad: encontrados,
-              Estado: 'Encontrado'
-            });
-          }
-      
-          if (sobrante > 0) {
-            resultados.push({
-              Nombre: '-',
-              Codigo: codigo,
-              SKU: '-',
-              Marca: '-',
-              RFID: '-',
-              Ubicacion: '-',
-              Cantidad: sobrante,
-              Estado: 'No Registrado'
-            });
-          }
-      
-          if (faltante > 0) {
-            resultados.push({
-              ...inventarioItem,
-              Cantidad: faltante,
-              Estado: 'Faltante'
-            });
-          }
-      
-          inventarioMap.delete(codigo);
-        } else {
+// Comparar escaneados con inventario
+for (const [codigo, cantidadEscaneada] of escaneadosMap.entries()) {
+    const inventarioItem = inventarioMap.get(codigo);
+  
+    if (inventarioItem) {
+      const cantidadInventario = inventarioItem.Cantidad;
+  
+      const encontrados = Math.min(cantidadEscaneada, cantidadInventario);
+      const sobrantes = cantidadEscaneada - cantidadInventario;
+  
+      if (encontrados > 0) {
+        resultados.push({
+          ...inventarioItem,
+          Cantidad: encontrados,
+          Estado: 'Encontrado'
+        });
+      }
+  
+      if (sobrantes > 0) {
+        resultados.push({
+          Nombre: '-',
+          Codigo: codigo,
+          SKU: '-',
+          Marca: '-',
+          RFID: '-',
+          Ubicacion: '-',
+          Cantidad: sobrantes,
+          Estado: 'No Registrado'
+        });
+      }
+      for (const [codigo, item] of inventarioMap.entries()) {
+        if (item.Cantidad > 0) {
           resultados.push({
-            Nombre: '-',
-            Codigo: codigo,
-            SKU: '-',
-            Marca: '-',
-            RFID: '-',
-            Ubicacion: '-',
-            Cantidad: cantidadEscaneada,
-            Estado: 'No Registrado'
+            ...item,
+            Cantidad: item.Cantidad,
+            Estado: 'Faltante'
           });
         }
-      }
+       }
+      inventarioMap.set(codigo, {
+        ...inventarioItem,
+        Cantidad: cantidadInventario - encontrados
+      });
+  
+    } else {
+      resultados.push({
+        Nombre: '-',
+        Codigo: codigo,
+        SKU: '-',
+        Marca: '-',
+        RFID: '-',
+        Ubicacion: '-',
+        Cantidad: cantidadEscaneada,
+        Estado: 'No Registrado'
+      });
+    }
+  }
+  
       
   
     // Lo que queda en inventarioMap no fue escaneado → Faltantes
