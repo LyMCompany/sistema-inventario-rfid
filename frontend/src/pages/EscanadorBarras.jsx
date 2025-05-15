@@ -111,119 +111,102 @@ function EscanadorBarras() {
     const claveEmpresa = user?.empresa?.trim() ?? 'EmpresaNoDefinida';
     const claveInventario = `inventarioBase_${claveEmpresa}`;
     const claveEscaneados = `escaneados_barras_${claveEmpresa}`;
-  
+
     const inventario = JSON.parse(localStorage.getItem(claveInventario)) || [];
     const escaneados = JSON.parse(localStorage.getItem(claveEscaneados)) || [];
-  
+
     if (!inventario.length) {
-     Swal.fire('Inventario vacío', 'No se encontró inventario para esta empresa.', 'warning');
-     return;
+        Swal.fire('Inventario vacío', 'No se encontró inventario para esta empresa.', 'warning');
+        return;
     }
-  
+
     if (!escaneados.length) {
-     Swal.fire('Sin escaneos', 'No se han escaneado códigos aún.', 'warning');
-     return;
+        Swal.fire('Sin escaneos', 'No se han escaneado códigos aún.', 'warning');
+        return;
     }
-  
+
     const resultados = [];
     const inventarioMap = new Map();
-  
-    // Agrupar inventario por código y sumar cantidades
     inventario.forEach(item => {
-     const codigo = item.Codigo;
-     const cantidad = parseInt(item.Cantidad || 1);
-     if (inventarioMap.has(codigo)) {
-      inventarioMap.get(codigo).Cantidad += cantidad;
-     } else {
-      inventarioMap.set(codigo, { ...item, Cantidad: cantidad });
-     }
+        const codigo = item.Codigo;
+        if (!inventarioMap.has(codigo)) {
+            inventarioMap.set(codigo, []);
+        }
+        inventarioMap.get(codigo).push({ ...item, CantidadDisponible: parseInt(item.Cantidad || 1) });
     });
-  
-    // Agrupar escaneados por código y obtener la lista de escaneos
+
     const escaneadosMap = new Map();
     escaneados.forEach(item => {
-     const codigo = item.Codigo;
-     escaneadosMap.set(codigo, (escaneadosMap.get(codigo) || 0) + parseInt(item.Cantidad || 1));
+        const codigo = item.Codigo;
+        escaneadosMap.set(codigo, (escaneadosMap.get(codigo) || 0) + parseInt(item.Cantidad || 1));
     });
-  
-    // Comparar escaneados con inventario
+
     for (const [codigo, cantidadEscaneada] of escaneadosMap.entries()) {
-     const inventarioItem = inventarioMap.get(codigo);
-  
-     if (inventarioItem) {
-      const cantidadInventario = inventarioItem.Cantidad;
-      const encontrados = Math.min(cantidadEscaneada, cantidadInventario);
-  
-      if (encontrados > 0) {
-       resultados.push({
-        ...inventarioItem,
-        Cantidad: encontrados,
-        Estado: 'Encontrado'
-       });
-      }
-  
-      const noRegistrados = cantidadEscaneada - encontrados;
-      if (noRegistrados > 0) {
-       resultados.push({
-        Nombre: '-',
-        Codigo: codigo,
-        SKU: '-',
-        Marca: '-',
-        RFID: '-',
-        Ubicacion: '-',
-        Cantidad: noRegistrados,
-        Estado: 'No Registrado'
-       });
-      }
-  
-      // Actualizar la cantidad restante en el inventario (importante para los faltantes)
-      inventarioMap.set(codigo, { ...inventarioItem, Cantidad: cantidadInventario - encontrados });
-  
-     } else {
-      // Código no existe en inventario
-      resultados.push({
-       Nombre: '-',
-       Codigo: codigo,
-       SKU: '-',
-       Marca: '-',
-       RFID: '-',
-       Ubicacion: '-',
-       Cantidad: cantidadEscaneada,
-       Estado: 'No Registrado'
-      });
-     }
+        const inventarioItems = inventarioMap.get(codigo) || [];
+        let cantidadEscaneadaRestante = cantidadEscaneada;
+
+        // Primero, intentar encontrar coincidencias en el inventario
+        for (const item of inventarioItems) {
+            if (item.CantidadDisponible > 0 && cantidadEscaneadaRestante > 0) {
+                const encontrados = Math.min(cantidadEscaneadaRestante, item.CantidadDisponible);
+                resultados.push({
+                    ...item,
+                    Cantidad: encontrados,
+                    Estado: 'Encontrado'
+                });
+                item.CantidadDisponible -= encontrados;
+                cantidadEscaneadaRestante -= encontrados;
+            }
+        }
+
+        // Si quedan escaneados sin coincidir, son "No Registrados"
+        if (cantidadEscaneadaRestante > 0) {
+            resultados.push({
+                Nombre: '-',
+                Codigo: codigo,
+                SKU: '-',
+                Marca: '-',
+                RFID: '-',
+                Ubicacion: '-',
+                Cantidad: cantidadEscaneadaRestante,
+                Estado: 'No Registrado'
+            });
+        }
     }
-  
-    // Lo que queda en inventarioMap no fue escaneado → Faltantes
-    for (const [codigo, item] of inventarioMap.entries()) {
-     if (item.Cantidad > 0) {
-      resultados.push({
-       ...item,
-       Cantidad: item.Cantidad,
-       Estado: 'Faltante'
-      });
-     }
+
+    // Identificar los faltantes
+    for (const [codigo, items] of inventarioMap.entries()) {
+        items.forEach(item => {
+            if (item.CantidadDisponible > 0) {
+                resultados.push({
+                    ...item,
+                    Cantidad: item.CantidadDisponible,
+                    Estado: 'Faltante'
+                });
+            }
+        });
     }
-  
+
     const resultadosFiltrados = resultados.filter(r => parseInt(r.Cantidad) > 0);
     setResultadosComparacion(resultadosFiltrados);
-  
+
     const encontrados = resultadosFiltrados.filter(r => r.Estado === 'Encontrado').reduce((sum, item) => sum + parseInt(item.Cantidad), 0);
     const faltantes = resultadosFiltrados.filter(r => r.Estado === 'Faltante').reduce((sum, item) => sum + parseInt(item.Cantidad), 0);
     const noRegistrados = resultadosFiltrados.filter(r => r.Estado === 'No Registrado').reduce((sum, item) => sum + parseInt(item.Cantidad), 0);
-  
+
     Swal.fire({
-     title: 'Resultado de la Comparación',
-     html: `
-      <p><strong>Encontrados:</strong> ${encontrados}</p>
-      <p><strong>Faltantes:</strong> ${faltantes}</p>
-      <p><strong>No Registrados:</strong> ${noRegistrados}</p>
-     `,
-     icon: 'info',
+        title: 'Resultado de la Comparación',
+        html: `
+            <p><strong>Encontrados:</strong> ${encontrados}</p>
+            <p><strong>Faltantes:</strong> ${faltantes}</p>
+            <p><strong>No Registrados:</strong> ${noRegistrados}</p>
+        `,
+        icon: 'info',
     });
-  
+
     setVistaActiva('comparar');
-   };
+};
+   
 
   const subirReporte = async () => {
     const reporte = {
